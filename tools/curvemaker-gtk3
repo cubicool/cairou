@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+
+from gi.repository import Gtk, Gdk
+
+import math
+
+class Curve(object):
+	def __init__(self, origin, radius):
+		object.__init__(self)
+
+		self._radius = radius
+
+		x, y = origin
+		s    = radius * 10.0
+
+		self.coords = [[x, y], [x + s, y], [x + s, y + s], [x, y + s]]
+
+	def control_point_intersects_with(self, x, y):
+		for i, c in enumerate(self.coords):
+			if all([
+				x > c[0] - self._radius,
+				x < c[0] + self._radius,
+				y > c[1] - self._radius,
+				y < c[1] + self._radius
+			]):
+				return True, i
+
+		return False, -1
+
+class CairoDrawingArea(Gtk.DrawingArea):
+	def __init__(self):
+		Gtk.DrawingArea.__init__(self)
+
+		self._curves = []
+		self._radius = 5.0
+		self._active = None
+
+		self.set_events(
+			Gdk.EventMask.BUTTON_PRESS_MASK | 
+			Gdk.EventMask.BUTTON_RELEASE_MASK |
+			Gdk.EventMask.POINTER_MOTION_MASK |
+			Gdk.EventMask.ENTER_NOTIFY_MASK |
+			Gdk.EventMask.LEAVE_NOTIFY_MASK
+		)
+
+		self.connect("motion-notify-event", self._move)
+		self.connect("button-press-event", self._click)
+		self.connect("button-release-event", self._click)
+		self.connect("draw", self._render)
+
+	def _move(self, widget, event):
+		if not self._active:
+			return
+
+		c = self._active[0]
+		i = self._active[1]
+
+		c.coords[i] = [event.x, event.y]
+
+		self.queue_draw()
+	
+	def _click(self, widget, event):
+		b, bn = event.get_button()
+
+		if not b:
+			return
+		
+		x, y = event.x, event.y
+
+		if bn == 1:
+			if event.type == Gdk.EventType.BUTTON_PRESS:
+				for curve in self._curves:
+					intersects, index = curve.control_point_intersects_with(x, y)
+
+					if intersects:
+						self._active = [curve, index]
+
+						break
+
+			else:
+				self._active = None
+
+		if bn == 2 and event.type == Gdk.EventType.BUTTON_PRESS:
+			w = widget.get_allocated_width()
+			h = widget.get_allocated_height()
+
+			minx, miny = w, h
+			maxx, maxy = 0, 0
+
+			for curve in self._curves:
+				for coord in curve.coords:
+					if coord[0] < minx:
+						minx = coord[0]
+
+					if coord[1] < miny:
+						miny = coord[1]
+
+					if coord[0] > maxx:
+						maxx = coord[0]
+
+					if coord[1] > maxy:
+						maxy = coord[1]
+
+			w, h = maxx - minx, maxy - miny
+
+			def conv(c):
+				return "%.02f, %.02f" % ((c[0] - minx) / w, (c[1] - miny) / h)
+
+			print("")
+
+			for curve in self._curves:
+				print("cairo_move_to(cr, %s);" % conv(curve.coords[0]))
+				print("cairo_curve_to(cr, %s, %s, %s);" % (
+					conv(curve.coords[1]),
+					conv(curve.coords[2]),
+					conv(curve.coords[3])
+				))
+
+		if bn == 3 and event.type == Gdk.EventType.BUTTON_PRESS:
+			self._curves.append(Curve((x, y), self._radius))
+
+			self.queue_draw()
+
+	def _render(self, widget, cr):
+		# w = widget.get_allocated_width()
+		# h = widget.get_allocated_height()
+
+		cr.set_line_width(self._radius / 3.0)
+
+		for curve in self._curves:
+			cr.set_source_rgba(0.8, 0.4, 0.0, 1.0)
+			
+			for coord in curve.coords:
+				cr.arc(coord[0], coord[1], self._radius, 0.0, 2.0 * math.pi)
+				cr.fill()
+
+			cr.set_source_rgba(0.4, 0.6, 0.8, 1.0)
+
+			cp00 = curve.coords[1][0]
+			cp01 = curve.coords[1][1]
+			cp10 = curve.coords[2][0]
+			cp11 = curve.coords[2][1]
+			end0 = curve.coords[3][0]
+			end1 = curve.coords[3][1]
+
+			cr.new_path()
+			cr.move_to(*curve.coords[0])
+			cr.curve_to(cp00, cp01, cp10, cp11, end0, end1)
+			cr.stroke()
+
+class CairoWindow(Gtk.Window):
+	def __init__(self, w, h):
+		Gtk.Window.__init__(self)
+
+		vbox = Gtk.VBox()
+
+		vbox.pack_start(CairoDrawingArea(), True, True, 0)
+		vbox.pack_start(Gtk.HSeparator(), False, True, 0)
+		vbox.pack_start(Gtk.Label("Right click to spawn; left click to move."), False, False, 5)
+
+		self.add(vbox)
+
+		self.set_size_request(w, h)
+
+if __name__ == "__main__":
+	w  = 512
+	h  = 512
+	cw = CairoWindow(w, h)
+
+	cw.connect("destroy", Gtk.main_quit)
+	cw.show_all()
+
+	Gtk.main()
+
