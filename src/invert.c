@@ -13,7 +13,7 @@ cairo_bool_t cairocks_a8_invert(cairo_surface_t* surface) {
 
 		return FALSE;
 	}
-	
+
 	for(i = 0; i < width * height; i++) src[i] = 255 - src[i];
 
 	return TRUE;

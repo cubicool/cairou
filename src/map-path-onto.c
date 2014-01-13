@@ -186,7 +186,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	double dx;
 	double dy;
 	int    i;
-	
+
 	cairo_path_t*      path = param->path;
 	parametrization_t* parametrization = param->parametrization;
 	cairo_path_data_t* data;
@@ -201,7 +201,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		i + path->data[i].header.length < path->num_data &&
 		(the_x > parametrization[i] || path->data[i].header.type == CAIRO_PATH_MOVE_TO);
 		i += path->data[i].header.length
-	) {	
+	) {
 		the_x -= parametrization[i];
 		data   = &path->data[i];
 
@@ -266,7 +266,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		double ratio_2_0;
 		double ratio_0_2;
 		double ratio_3_0;
-		double ratio_2_1; 
+		double ratio_2_1;
 		double ratio_1_2;
 		double ratio_0_3;
 		double _1__4ratio_1_0_3ratio_2_0;
@@ -314,7 +314,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		ratio  = the_y / sqrt(dx * dx + dy * dy);
 		*x    += -dy * ratio;
 		*y    += dx * ratio;
-		
+
 		break;
 	}
 	}
@@ -339,13 +339,13 @@ cairo_bool_t cairocks_map_path_onto(cairo_t* cr, cairo_path_t* path) {
 		(transform_point_func_t)(point_on_path),
 		&param
 	);
-	
+
 	cairo_append_path(cr, cur_path);
 
 	free(param.parametrization);
 
 	cairo_path_destroy(cur_path);
-	
+
 	return TRUE;
 }
 

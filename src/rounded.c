@@ -102,7 +102,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 
 	cairo_save(cr);
 	cairo_set_operator(cr, CAIRO_OPERATOR_DEST_IN);
-	
+
 	cairocks_rounded_rectangle(
 		cr,
 		x,
@@ -112,7 +112,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 		radius,
 		corners
 	);
-	
+
 	cairo_fill(cr);
 	cairo_restore(cr);
 

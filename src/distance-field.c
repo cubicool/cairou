@@ -52,7 +52,7 @@ static double find_signed_distance(
 
 		for(y = start_y; y < end_y; y++) {
 			unsigned char c;
-			
+
 			if(y < 0 || y >= width) continue;
 
 			c = data[(x * width) + y];
@@ -71,7 +71,7 @@ static double find_signed_distance(
 			else {
 				if(c > 0) {
 					double dist = separation(px, py, x, y);
-					
+
 					if(dist < closest) {
 						closest       = dist;
 						closest_valid = 1;
@@ -122,7 +122,7 @@ cairo_surface_t* cairocks_distance_field_create(
 	/* Furthermore, the image must be evenly divisible by the block_size. */
 	if(surface_width % block_size) return 0;
 
-	distances = malloc(width * height * sizeof(double));
+	distances = (double*)(malloc(width * height * sizeof(double)));
 
 	for(x = 0; x < width; x++) {
 		for(y = 0; y < height; y++) {
@@ -175,7 +175,7 @@ cairo_surface_t* cairocks_distance_field_create(
 	/* Here is where things get tricky. Since we use A8 surface, the stride may actually
 	be bigger than what we expect, so we'll need to make sure we set the data appropriately. */
 	stride = cairo_format_stride_for_width(CAIRO_FORMAT_A8, width);
-	output = malloc(stride * height);
+	output = (unsigned char*)(malloc(stride * height));
 
 	memset(output, 0, stride * height);
 

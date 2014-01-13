@@ -111,13 +111,13 @@ static void cairocks_gif_private_decode_row(
 
 		else {
 			cmentry = colormap ? &colormap->Colors[col] : NULL;
-			
+
 			if(cmentry) {
 				*ptr++ = cmentry->Blue;
 				*ptr++ = cmentry->Green;
 				*ptr++ = cmentry->Red;
 			}
-			
+
 			else {
 				*ptr++ = col;
 				*ptr++ = col;
@@ -194,14 +194,14 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 			col    = gif_data->gif_file->Image.Left;
 			width  = gif_data->gif_file->Image.Width;
 			height = gif_data->gif_file->Image.Height;
-			
+
 			if(gif_data->gif_file->Image.Interlace) {
 				int j;
 
 				for(i = 0; i < 4; i++) {
 					for(j = row + interlacedoffset[i]; j < row + height; j += interlacedjumps[i]) {
 						if(DGifGetLine(gif_data->gif_file, rowdata, width) == GIF_ERROR) break;
-						
+
 						if(load_data) cairocks_gif_private_decode_row(
 							gif_data->gif_file,
 							buffer,
@@ -239,12 +239,12 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 		else if(record == EXTENSION_RECORD_TYPE) {
 			int          extcode;
 			GifByteType* extension;
-			
+
 			if(DGifGetExtension(gif_data->gif_file, &extcode, &extension) == GIF_ERROR) break;
 
 			else if(extcode == GRAPHICS_EXT_FUNC_CODE) {
 				if(extension[0] >= 4 && extension[1] & 0x1) transparent = extension[4];
-				
+
 				else transparent = -1;
 
 				/* minimum unit 1/100s, so 8 here means 8/100s */
@@ -291,7 +291,7 @@ static unsigned int cairocks_gif_private_get_num_frames(cairocks_gif_private_t* 
 	unsigned int count = 0;
 
 	while(_cairocks_gif_private_next(NULL, gif_data, FALSE, FALSE, NULL) != RESET) count++;
-	
+
 	return count;
 }
 
@@ -308,7 +308,7 @@ static cairo_surface_t* cairocks_gif_private_surface_create(cairocks_gif_private
 	width   = gif_data->gif_file->SWidth;
 	height  = gif_data->gif_file->SHeight;
 	surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, width, height);
-	
+
 	/* This is where the ACTUAL compositing of GIF frame to frame is done; next() simply copies
 	this data into the surface accessible to Cairo. The reason we do this is to allow further
 	compositing inside Cairo. */
@@ -384,7 +384,7 @@ int cairocks_gif_surface_next(cairo_surface_t* surface) {
 	}
 
 	if(r == FAILURE) return -3;
-	
+
 	return delay;
 }
 

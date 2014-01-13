@@ -44,9 +44,9 @@ cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path) {
 	auto data = cairocks_named_path_private_get(cr);
 
 	if(!data) return FALSE;
-	
+
 	const auto key_value = data->find(named_path);
-	
+
 	if(key_value == data->end()) return FALSE;
 
 	cairo_new_path(cr);

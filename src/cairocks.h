@@ -84,7 +84,7 @@ void cairocks_append_named_path(cairo_t* cr, const char* named_path);
  *
  * This function clears the current path and makes the named path
  * specified by @named_path the current path on the passed-in context.
- * The named path is not deleted, and be reused until either the 
+ * The named path is not deleted, and be reused until either the
  * context to which it is bound is destroyed or the user explicitly calls
  * @cairocks_named_path_destroy.
  **/
@@ -105,7 +105,7 @@ void cairocks_named_path_destroy(cairo_t* cr, const char* named_path);
  * @corners: a cairo path onto which the CURRENT cr path will be mapped
  *
  * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map
- * the current path on @cr to the path provided by @path. In the common case you can 
+ * the current path on @cr to the path provided by @path. In the common case you can
  * create an arc or curve, quickly issue a copy_path/copy_path_flat, create a NEW path on @cr
  * and then pass the previously saved path into @path.
  **/
@@ -201,7 +201,7 @@ cairo_bool_t cairocks_gaussian_blur(
  **/
 cairo_bool_t cairocks_a8_invert(cairo_surface_t* surface);
 
-/** 
+/**
  * cairocks_distance_field_create:
  * @surface: a CAIRO_FORMAT_A8 surface
  * @scan_size: size of the "effect" region
@@ -220,7 +220,7 @@ cairo_surface_t* cairocks_distance_field_create(
 	int              block_size
 );
 
-/** 
+/**
  * cairocks_surface_from_jpeg:
  * @file: path to a JPEG file on disk
  *
@@ -229,7 +229,7 @@ cairo_surface_t* cairocks_distance_field_create(
  **/
 cairo_surface_t* cairocks_surface_from_jpeg(const char* file);
 
-/** 
+/**
  * cairocks_surface_from_jpeg_data:
  * @data: buffer of JPEG data in memory
  * @size: size of JPEG buffer data in bytes
@@ -244,7 +244,7 @@ cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* data, unsigned i
  * @file: path to a GIF file on disk
  *
  * This function creates a new image surface with special "user data" attached that
- * represents the internal state of the GIF library. Each new frame is loaded "on 
+ * represents the internal state of the GIF library. Each new frame is loaded "on
  * demand" with @cairo_gif_surface_next.
  **/
 cairo_surface_t* cairocks_gif_surface_create(const char* file);

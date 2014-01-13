@@ -15,9 +15,9 @@
 
 unsigned char minc(double d) {
 	if(d < 0.0f) return 0;
-	
+
 	else if(d > 1.0) return UCHAR_MAX;
-	
+
 	else return (unsigned char)(d * (double)(UCHAR_MAX));
 }
 
@@ -42,7 +42,7 @@ static cairo_surface_t* _cairocks_create_embossed_surface(
 	unsigned char* dst = cairo_image_surface_get_data(dst_surface);
 
 	double scale = height / (4.0f * 255.0f);
-	
+
 	double Lx = cos(azimuth) * cos(elevation);
 	double Ly = sin(azimuth) * cos(elevation);
 	double Lz = sin(elevation);
@@ -88,7 +88,7 @@ static cairo_surface_t* _cairocks_create_embossed_surface(
 
 			NdotL = (Nx * Lx) + (Ny * Ly) + (Nz * Lz);
 			NdotL = (NdotL > 0.0) ? NdotL : 0.0;
-			
+
 			dst[(y * stride) + x] = minc(ambient + (diffuse * NdotL));
 		}
 	}

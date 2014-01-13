@@ -16,7 +16,7 @@ static cairo_surface_t* cairocks_surface_from_jpeg_private(struct jpeg_decompres
 	surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, cinfo->image_width, cinfo->image_height);
 	data    = cairo_image_surface_get_data(surface);
 	rgb     = (unsigned char*)(malloc(cinfo->output_width * cinfo->output_components));
-	
+
 	while(cinfo->output_scanline < cinfo->output_height) {
 		unsigned int i;
 		int          scanline = cinfo->output_scanline * cairo_image_surface_get_stride(surface);
