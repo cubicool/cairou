@@ -1,6 +1,10 @@
 # There is no shebang here because you need to manually invoke
 # this file with the python interpreter of your choice. :)
 
+import os
+
+os.environ["LD_LIBRARY_PATH"] = "..;../..;../../build"
+
 import sys
 
 sys.path.extend((".", "..", "../build", "../src"))
@@ -87,7 +91,7 @@ def test_rounded_rectangle_apply():
 	cr.set_source_surface(s, 400, 200)
 	cr.paint()
 
-@test_function
+# @test_function
 def test_named_path():
 	for i in range(5):
 		cr.arc(100.0 * i, 100.0 * i, 75.0, 0.0, 2.0 * math.pi)
@@ -191,19 +195,22 @@ def test_gaussian_blur():
 
 @test_function
 def test_jpeg_load():
-	cairocks.surface_from_jpeg("test.jpg")
+	cairocks.surface_from_jpeg("../data/test.jpg")
 
 	print("Successfully read test.jpg into a Surface.")
 
 @test_function
 def test_gif_load():
-	surface = cairocks.GIFSurface("test.gif")
+	surface = cairocks.GIFSurface("../data/test.gif")
 
 	print("Successfully read test.gif into a Surface.")
 
 	frames = surface.num_frames
 
 	print("GIF has %d frames." % frames)
+
+	if not os.path.isdir("gif_frames"):
+		os.mkdir("gif_frames")
 
 	for i in range(frames):
 		file_name = "gif_frames/%03d.png" % i
@@ -217,8 +224,5 @@ if __name__ == "__main__":
 
 	print("Writing python-module.png to display all of the results.")
 
-	surface.write_to_png("python-module.png")
-
-	if os.path.exists("/usr/bin/eog"):
-		os.system("/usr/bin/eog python-module.png")
+	surface.write_to_png("basic-tests.png")
 

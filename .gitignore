@@ -1,1 +1,4 @@
-src/__pycache__
+tests/python-cffi/basic-tests.png
+tests/python-cffi/gif_frames
+tests/python-cffi/cairocks.pyc
+tests/python-cffi/__pycache__

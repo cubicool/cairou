@@ -1,3 +1,9 @@
+"""
+This is an example CFFI-based (specifically using cairocffi) implementation of
+Cairocks for use with Python3. It may be helpful as a starting point for your
+own bindings, though I personally tend to prefer Cython.
+"""
+
 import cairocffi
 
 cairocffi.ffi.cdef(r"""

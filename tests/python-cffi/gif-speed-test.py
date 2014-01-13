@@ -7,10 +7,13 @@ def time_test(surface, mult):
 	for i in range(surface.num_frames * mult):
 		surface.next()
 
-	print("Took:", time.time() - t, "seconds for", mult, "full animation cycles.")
+	print("Took %.04f seconds for %d full animation cyles." % (
+		time.time() - t,
+		mult,
+	))
 
 if __name__ == "__main__":
-	surface = cairocks.GIFSurface("test.gif")
+	surface = cairocks.GIFSurface("../data/test.gif")
 
 	time_test(surface, 1)
 
