@@ -14,7 +14,8 @@ although it strictly maintains a C-linkable API for maximum accessibility.
 
 While Cairocks does include an example build system using CMake, you are
 welcome to include the source wholesale into your own projects. Additionally,
-I have included a robust Python extension module demonstrating cairocks' usage.
+I have provided an example Python extension module demonstrating cairocks' usage
+when paired with the fantastic cairocffi project.
 
 Enjoy! AND PLEASE, contribute your own little tidbits of useful stuff!
 

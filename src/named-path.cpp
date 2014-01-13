@@ -62,6 +62,8 @@ void cairocks_named_path_destroy(cairo_t* cr, const char* named_path) {
 
 	if(key_value == data->end()) return;
 
+	for(auto path : key_value->second) cairo_path_destroy(path);
+
 	(*data).erase(key_value);
 }
 
