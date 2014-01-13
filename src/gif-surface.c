@@ -4,7 +4,6 @@
 #include "cairocks.h"
 
 #include <stdio.h>
-
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,9 +12,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define NO_SUPPORT printf("GIF support not built into cairocks!\n")
-
-#ifdef CAIROCKS_GIF_SUPPORT
 #include <gif_lib.h>
 
 #if GIFLIB_MAJOR < 5
@@ -157,11 +153,11 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 
 	cairocks_gif_private_next_result result = FAILURE;
 
-	if(load_data) buffer = cairo_image_surface_get_data(gif_data->surface);
-
 	/* The way an interlaced image should be read - offsets and jumps */
 	static int interlacedoffset[] = { 0, 4, 2, 1 };
 	static int interlacedjumps[]  = { 8, 8, 4, 2 };
+
+	if(load_data) buffer = cairo_image_surface_get_data(gif_data->surface);
 
 	rowdata = (unsigned char*)(malloc(gif_data->gif_file->SWidth));
 
@@ -247,8 +243,6 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 			if(DGifGetExtension(gif_data->gif_file, &extcode, &extension) == GIF_ERROR) break;
 
 			else if(extcode == GRAPHICS_EXT_FUNC_CODE) {
-				int delaytime;
-
 				if(extension[0] >= 4 && extension[1] & 0x1) transparent = extension[4];
 				
 				else transparent = -1;
@@ -303,8 +297,6 @@ static unsigned int cairocks_gif_private_get_num_frames(cairocks_gif_private_t* 
 
 static cairo_surface_t* cairocks_gif_private_surface_create(cairocks_gif_private_t* gif_data) {
 	cairo_surface_t* surface;
-	struct stat      s;
-	int              fd;
 	int              width;
 	int              height;
 	int              err;
@@ -336,10 +328,8 @@ static cairo_surface_t* cairocks_gif_private_surface_create(cairocks_gif_private
 
 	return surface;
 }
-#endif
 
 cairo_surface_t* cairocks_gif_surface_create(const char* file) {
-#ifdef CAIROCKS_GIF_SUPPORT
 	cairocks_gif_private_t* gif_data;
 	FILE*                   fp;
 	size_t                  size;
@@ -361,15 +351,9 @@ cairo_surface_t* cairocks_gif_surface_create(const char* file) {
 	fread(gif_data->data, 1, size, fp);
 
 	return cairocks_gif_private_surface_create(gif_data);
-#else
-	NO_SUPPORT;
-
-	return NULL;
-#endif
 }
 
 cairo_surface_t* cairocks_gif_surface_create_for_data(unsigned char* data, unsigned int size) {
-#ifdef CAIROCKS_GIF_SUPPORT
 	cairocks_gif_private_t* gif_data = cairocks_gif_private_create();
 
 	gif_data->data  = (unsigned char*)(malloc(size));
@@ -378,18 +362,11 @@ cairo_surface_t* cairocks_gif_surface_create_for_data(unsigned char* data, unsig
 	memcpy(gif_data->data, data, size);
 
 	return cairocks_gif_private_surface_create(gif_data);
-#else
-	NO_SUPPORT;
-
-	return NULL;
-#endif
 }
 
 int cairocks_gif_surface_next(cairo_surface_t* surface) {
-#ifdef CAIROCKS_GIF_SUPPORT
 	cairocks_gif_private_t*          gif_data;
 	cairocks_gif_private_next_result r;
-	cairo_t*                         cr;
 	unsigned int                     delay = 0;
 
 	gif_data = cairocks_gif_private_get(surface);
@@ -409,24 +386,13 @@ int cairocks_gif_surface_next(cairo_surface_t* surface) {
 	if(r == FAILURE) return -3;
 	
 	return delay;
-#else
-	NO_SUPPORT;
-
-	return -1;
-#endif
 }
 
 unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface) {
-#ifdef CAIROCKS_GIF_SUPPORT
 	cairocks_gif_private_t* gif_data = cairocks_gif_private_get(surface);
 
 	if(!gif_data) return 0;
 
 	return gif_data->num_frames;
-#else
-	NO_SUPPORT;
-
-	return 0;
-#endif
 }
 

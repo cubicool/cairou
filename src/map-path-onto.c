@@ -185,6 +185,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	double the_x = *x;
 	double dx;
 	double dy;
+	int    i;
 	
 	cairo_path_t*      path = param->path;
 	parametrization_t* parametrization = param->parametrization;
@@ -194,8 +195,6 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 
 	current_point.point.x = 0.0;
 	current_point.point.y = 0.0;
-
-	int i;
 
 	for(
 		i = 0;

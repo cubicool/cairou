@@ -114,7 +114,6 @@ cairo_surface_t* cairocks_distance_field_create(
 
 	double mind  = 0.0f;
 	double maxd  = 0.0f;
-	double range = 0.0f;
 	double scale = 0.0f;
 
 	/* Image MUST be square (for now). */
@@ -153,7 +152,6 @@ cairo_surface_t* cairocks_distance_field_create(
 		}
 	}
 
-	range = maxd - mind;
 	scale = max(fabs(mind), fabs(maxd));
 
 	for(x = 0; x < width; x++) {

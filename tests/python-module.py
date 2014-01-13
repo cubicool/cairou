@@ -2,6 +2,9 @@
 # this file with the python interpreter of your choice. :)
 
 import sys
+
+sys.path.extend((".", "..", "../build", "../src"))
+
 import os
 import cairocffi as cairo
 import cairocks
@@ -12,6 +15,7 @@ cr      = cairo.Context(surface)
 
 cr.set_source_rgb(1.0, 1.0, 1.0)
 cr.paint()
+cr.set_source_rgb(1.0, 0.5, 0.0)
 
 TESTS = []
 
@@ -82,6 +86,18 @@ def test_rounded_rectangle_apply():
 
 	cr.set_source_surface(s, 400, 200)
 	cr.paint()
+
+@test_function
+def test_named_path():
+	for i in range(5):
+		cr.arc(100.0 * i, 100.0 * i, 75.0, 0.0, 2.0 * math.pi)
+
+		cairocks.append_named_path(cr, "circles")
+
+	cairocks.set_named_path(cr, "circles")
+
+	cr.set_line_width(10.0)
+	cr.stroke()
 
 @test_function
 def test_map_path_onto():
@@ -175,34 +191,26 @@ def test_gaussian_blur():
 
 @test_function
 def test_jpeg_load():
-	try:
-		surface = cairocks.surface_from_jpeg("test.jpg")
+	cairocks.surface_from_jpeg("test.jpg")
 
-		print("Successfully read test.jpg into a Surface.")
-
-	except NotImplementedError:
-		print("No JPEG support built in")
+	print("Successfully read test.jpg into a Surface.")
 
 @test_function
 def test_gif_load():
-	try:
-		surface = cairocks.GIFSurface("test.gif")
+	surface = cairocks.GIFSurface("test.gif")
 
-		print("Successfully read test.gif into a Surface.")
+	print("Successfully read test.gif into a Surface.")
 
-		frames = surface.num_frames
+	frames = surface.num_frames
 
-		print("GIF has %d frames." % frames)
+	print("GIF has %d frames." % frames)
 
-		for i in range(frames):
-			file_name = "gif_frames/%03d.png" % i
-			
-			surface.write_to_png(file_name)
-			
-			print("Wrote:", file_name, surface.next())
+	for i in range(frames):
+		file_name = "gif_frames/%03d.png" % i
 
-	except NotImplementedError:
-		print("No GIF support built in.")
+		surface.write_to_png(file_name)
+
+		print("Wrote:", file_name, surface.next())
 
 if __name__ == "__main__":
 	[t() for t in TESTS]

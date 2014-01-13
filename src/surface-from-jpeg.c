@@ -3,16 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef CAIROCKS_JPEG_SUPPORT
 #include <jpeglib.h>
-#endif
 
-#ifdef CAIROCKS_JPEG_SUPPORT
 static cairo_surface_t* cairocks_surface_from_jpeg_private(struct jpeg_decompress_struct* cinfo) {
 	cairo_surface_t* surface = 0;
 	unsigned char*   data    = 0;
 	unsigned char*   rgb     = 0;
-	FILE*            infile  = 0;
 
 	jpeg_read_header(cinfo, TRUE);
 	jpeg_start_decompress(cinfo);
@@ -46,10 +42,8 @@ static cairo_surface_t* cairocks_surface_from_jpeg_private(struct jpeg_decompres
 
 	return surface;
 }
-#endif
 
 cairo_surface_t* cairocks_surface_from_jpeg(const char* file) {
-#ifdef CAIROCKS_JPEG_SUPPORT
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr         jerr;
 	cairo_surface_t*              surface;
@@ -67,16 +61,9 @@ cairo_surface_t* cairocks_surface_from_jpeg(const char* file) {
 	fclose(infile);
 
 	return surface;
-
-#else
-	printf("JPEG support not built into cairocks!\n");
-
-	return NULL;
-#endif
 }
 
 cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* inbuffer, unsigned int insize) {
-#ifdef CAIROCKS_JPEG_SUPPORT
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr         jerr;
 	cairo_surface_t*              surface;
@@ -89,11 +76,5 @@ cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* inbuffer, unsign
 	surface = cairocks_surface_from_jpeg_private(&cinfo);
 
 	return surface;
-
-#else
-	printf("JPEG support not built into cairocks!\n");
-
-	return NULL;
-#endif
 }
 

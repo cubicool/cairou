@@ -24,7 +24,7 @@ extern "C" {
  * @width: the width value
  * @height: the height value
  * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL.
+ * @corners: a 4-value cairo_bool_t array, or NULL
  *
  * This function creates a common rounded-rectangle shape, with the caveat that each
  * round corner can be optionally turned off by using an array of 4 cairo_bool_t values.
@@ -49,7 +49,7 @@ cairo_bool_t cairocks_rounded_rectangle(
  * @width: the width value
  * @height: the height value
  * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL.
+ * @corners: a 4-value cairo_bool_t array, or NULL
  *
  * This function, whose signature is identical to cairocks_rounded_rectangle,
  * applies the resultant rounded rectangle and "punches out" the edges of the
@@ -66,13 +66,43 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 	const cairo_bool_t* corners
 );
 
+/**
+ * cairocks_append_named_path:
+ * @cr: a cairo context
+ * @named_path: a string representing the name (or key) for the path
+ *
+ * This function appends the current path (in its entirety) to the
+ * specified named path. After calling this routine, the current path
+ * on the context is cleared.
+ **/
 void cairocks_append_named_path(cairo_t* cr, const char* named_path);
-cairo_bool_t cairocks_set_named_path(ciaro_t* cr, const char* named_path);
+
+/**
+ * cairocks_set_named_path:
+ * @cr: a cairo context
+ * @named_path: a string representing the name (or key) for the path
+ *
+ * This function clears the current path and makes the named path
+ * specified by @named_path the current path on the passed-in context.
+ * The named path is not deleted, and be reused until either the 
+ * context to which it is bound is destroyed or the user explicitly calls
+ * @cairocks_named_path_destroy.
+ **/
+cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
+
+/**
+ * cairocks_set_named_path:
+ * @cr: a cairo context
+ * @named_path: a string representing the name (or key) for the path
+ *
+ * Deletes the named path bound the specified context.
+ **/
+void cairocks_named_path_destroy(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_map_path_onto:
  * @cr: a cairo context
- * @corners: a cairo path onto which the CURRENT cr path will be mapped.
+ * @corners: a cairo path onto which the CURRENT cr path will be mapped
  *
  * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map
  * the current path on @cr to the path provided by @path. In the common case you can 
@@ -256,3 +286,4 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
 #ifdef __cplusplus
 }
 #endif
+

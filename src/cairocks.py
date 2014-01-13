@@ -21,6 +21,10 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 	const cairo_bool_t* corners
 );
 
+void cairocks_append_named_path(cairo_t* cr, const char* named_path);
+cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
+void cairocks_named_path_destroy(cairo_t* cr, const char* named_path);
+
 cairo_bool_t cairocks_map_path_onto(
 	cairo_t*      cr,
 	cairo_path_t* path
@@ -99,6 +103,12 @@ def rounded_rectangle(cr, x, y, width, height, radius, corners=(True, True, True
 def rounded_rectangle_apply(cr, x, y, width, height, radius, corners=(True, True, True, True)):
 	return _rounded_rectangle(_lib.cairocks_rounded_rectangle_apply, cr, x, y, width, height, radius, corners)
 
+def append_named_path(cr, named_path):
+	_lib.cairocks_append_named_path(cr._pointer, named_path.encode("utf8"))
+
+def set_named_path(cr, named_path):
+	return _lib.cairocks_set_named_path(cr._pointer, named_path.encode("utf8"))
+
 def map_path_onto(cr, path):
 	path_ptr, path_data = cairocffi.context._encode_path(path)
 
@@ -141,7 +151,7 @@ def surface_from_jpeg(path):
 	surface = _lib.cairocks_surface_from_jpeg(path.encode("utf8"))
 
 	if not surface:
-		raise NotImplementedError()
+		raise IOError("Couldn't find file: %s" % path)
 
 	return cairocffi.Surface._from_pointer(surface, True)
 
@@ -154,7 +164,7 @@ def surface_from_jpeg_data(data):
 	)
 
 	if not surface:
-		raise NotImplementedError()
+		raise ValueError("Couldn't load JPEG from data.")
 
 	return cairocffi.Surface._from_pointer(surface, True)
 
@@ -165,6 +175,9 @@ class GIFSurface(cairocffi.Surface):
 		if not data:
 			surface = _lib.cairocks_gif_surface_create(path.encode("utf8"))
 
+			if not surface:
+				raise IOError("Couldn't find file: %s" % path)
+
 		else:
 			address, size = cairocffi.surfaces.from_buffer(data)
 
@@ -173,8 +186,8 @@ class GIFSurface(cairocffi.Surface):
 				size
 			)
 
-		if not surface:
-			raise NotImplementedError()
+			if not surface:
+				raise ValueError("Couldn't load GIF from data.")
 
 		cairocffi.Surface.__init__(self, surface)
 
