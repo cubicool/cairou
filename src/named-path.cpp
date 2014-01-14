@@ -4,7 +4,8 @@
 #include <list>
 #include <string>
 
-typedef std::map<std::string, std::list<cairo_path_t*>> cairocks_named_path_t;
+typedef std::list<cairo_path_t*>                          cairocks_named_path_list_t;
+typedef std::map<std::string, cairocks_named_path_list_t> cairocks_named_path_t;
 
 static cairo_user_data_key_t PATH_DATA;
 
@@ -13,11 +14,11 @@ static cairocks_named_path_t* cairocks_named_path_private_get(cairo_t* cr) {
 }
 
 static void cairocks_named_path_private_destroy(void* data) {
-	auto named_path = static_cast<cairocks_named_path_t*>(data);
+	cairocks_named_path_t* named_path = static_cast<cairocks_named_path_t*>(data);
 
-	for(const auto& keys_values : *named_path) {
-		for(auto path : keys_values.second) {
-			cairo_path_destroy(path);
+	for(cairocks_named_path_t::iterator i = named_path->begin(); i != named_path->end(); i++) {
+		for(cairocks_named_path_list_t::iterator j = i->second.begin(); j != i->second.end(); j++) {
+			cairo_path_destroy(*j);
 		}
 	}
 
@@ -27,7 +28,7 @@ static void cairocks_named_path_private_destroy(void* data) {
 extern "C" {
 
 void cairocks_append_named_path(cairo_t* cr, const char* named_path) {
-	auto data = cairocks_named_path_private_get(cr);
+	cairocks_named_path_t* data = cairocks_named_path_private_get(cr);
 
 	if(!data) {
 		data = new cairocks_named_path_t();
@@ -41,28 +42,37 @@ void cairocks_append_named_path(cairo_t* cr, const char* named_path) {
 }
 
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path) {
-	auto data = cairocks_named_path_private_get(cr);
+	cairocks_named_path_t* data = cairocks_named_path_private_get(cr);
 
 	if(!data) return FALSE;
 
-	const auto key_value = data->find(named_path);
+	cairocks_named_path_t::const_iterator key_value = data->find(named_path);
 
 	if(key_value == data->end()) return FALSE;
 
 	cairo_new_path(cr);
 
-	for(const auto p : key_value->second) cairo_append_path(cr, p);
+	for(
+		cairocks_named_path_list_t::const_iterator i = key_value->second.begin();
+		i != key_value->second.end();
+		i++
+	) cairo_append_path(cr, *i);
 
 	return TRUE;
 }
 
 void cairocks_named_path_destroy(cairo_t* cr, const char* named_path) {
-	auto data      = cairocks_named_path_private_get(cr);
-	auto key_value = data->find(named_path);
+	cairocks_named_path_t*          data      = cairocks_named_path_private_get(cr);
+	cairocks_named_path_t::iterator key_value = data->find(named_path);
 
 	if(key_value == data->end()) return;
 
-	for(auto path : key_value->second) cairo_path_destroy(path);
+	// for(auto path : key_value->second) cairo_path_destroy(path);
+	for(
+		cairocks_named_path_list_t::const_iterator i = key_value->second.begin();
+		i != key_value->second.end();
+		i++
+	) cairo_path_destroy(*i);
 
 	(*data).erase(key_value);
 }

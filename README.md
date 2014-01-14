@@ -9,7 +9,7 @@ Overview
 Cairocks (Cairo Rocks!) was born from a common codebase I continually ended up
 copying from project to project. Instead of trying to keep all these different
 versions in sync, I've decided to divorce it out into its own project and
-maintain it thusly. It is written using a mix of C90-compatible C and C++11,
+maintain it thusly. It is written using a mix of C90-compatible C and C++,
 although it strictly maintains a C-linkable API for maximum accessibility.
 
 While Cairocks does include an example build system using CMake, you are
