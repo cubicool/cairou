@@ -12,6 +12,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#define CAIROCKS_VERSION_MAJOR  0
+#define CAIROCKS_VERSION_MINOR  1
+#define CAIROCKS_VERSION_BUGFIX 0
+
 #ifdef __cplusplus
 extern "C" {
 #endif

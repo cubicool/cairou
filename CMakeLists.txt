@@ -4,7 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
-SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic")
+SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -std=c90 -ansi -pedantic")
 SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror -std=c++11")
 
 FIND_PACKAGE(Cairo REQUIRED)
