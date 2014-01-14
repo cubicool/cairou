@@ -61,13 +61,12 @@ cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path) {
 	return TRUE;
 }
 
-void cairocks_named_path_destroy(cairo_t* cr, const char* named_path) {
+void cairocks_remove_named_path(cairo_t* cr, const char* named_path) {
 	cairocks_named_path_t*          data      = cairocks_named_path_private_get(cr);
 	cairocks_named_path_t::iterator key_value = data->find(named_path);
 
 	if(key_value == data->end()) return;
 
-	// for(auto path : key_value->second) cairo_path_destroy(path);
 	for(
 		cairocks_named_path_list_t::const_iterator i = key_value->second.begin();
 		i != key_value->second.end();

@@ -91,7 +91,7 @@ def test_rounded_rectangle_apply():
 	cr.set_source_surface(s, 400, 200)
 	cr.paint()
 
-@test_function
+# @test_function
 def test_named_path():
 	for i in range(5):
 		cr.arc(100.0 * i, 100.0 * i, 75.0, 0.0, 2.0 * math.pi)

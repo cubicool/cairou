@@ -14,7 +14,7 @@
 
 #define CAIROCKS_VERSION_MAJOR  0
 #define CAIROCKS_VERSION_MINOR  1
-#define CAIROCKS_VERSION_BUGFIX 0
+#define CAIROCKS_VERSION_BUGFIX 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,18 +90,18 @@ void cairocks_append_named_path(cairo_t* cr, const char* named_path);
  * specified by @named_path the current path on the passed-in context.
  * The named path is not deleted, and be reused until either the
  * context to which it is bound is destroyed or the user explicitly calls
- * @cairocks_named_path_destroy.
+ * @cairocks_remove_named_path.
  **/
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
 
 /**
- * cairocks_set_named_path:
+ * cairocks_remove_named_path:
  * @cr: a cairo context
  * @named_path: a string representing the name (or key) for the path
  *
  * Deletes the named path bound the specified context.
  **/
-void cairocks_named_path_destroy(cairo_t* cr, const char* named_path);
+void cairocks_removed_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_map_path_onto:

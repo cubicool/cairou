@@ -29,7 +29,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 
 void cairocks_append_named_path(cairo_t* cr, const char* named_path);
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
-void cairocks_named_path_destroy(cairo_t* cr, const char* named_path);
+void cairocks_remove_named_path(cairo_t* cr, const char* named_path);
 
 cairo_bool_t cairocks_map_path_onto(
 	cairo_t*      cr,
@@ -114,6 +114,9 @@ def append_named_path(cr, named_path):
 
 def set_named_path(cr, named_path):
 	return _lib.cairocks_set_named_path(cr._pointer, named_path.encode("utf8"))
+
+def remove_named_path(cr, named_path):
+	return _lib.cairocks_remove_named_path(cr._pointer, named_path.encode("utf8"))
 
 def map_path_onto(cr, path):
 	path_ptr, path_data = cairocffi.context._encode_path(path)
