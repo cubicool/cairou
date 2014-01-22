@@ -13,8 +13,8 @@
 #endif
 
 #define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  1
-#define CAIROCKS_VERSION_BUGFIX 2
+#define CAIROCKS_VERSION_MINOR  2
+#define CAIROCKS_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -80,6 +80,17 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
  * on the context is cleared.
  **/
 void cairocks_append_named_path(cairo_t* cr, const char* named_path);
+
+/**
+ * cairocks_append_named_path_preserve:
+ * @cr: a cairo context
+ * @named_path: a string representing the name (or key) for the path
+ *
+ * This function appends the current path (in its entirety) to the
+ * specified named path. Unlike @cairocks_append_named_path, the path
+ * is NOT cleared after a call to this function.
+ **/
+void cairocks_append_named_path_preserve(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_set_named_path:

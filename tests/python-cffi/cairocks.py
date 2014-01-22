@@ -28,6 +28,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 );
 
 void cairocks_append_named_path(cairo_t* cr, const char* named_path);
+void cairocks_append_named_path_preserve(cairo_t* cr, const char* named_path);
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
 void cairocks_remove_named_path(cairo_t* cr, const char* named_path);
 
