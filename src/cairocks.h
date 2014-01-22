@@ -14,7 +14,7 @@
 
 #define CAIROCKS_VERSION_MAJOR  0
 #define CAIROCKS_VERSION_MINOR  1
-#define CAIROCKS_VERSION_BUGFIX 1
+#define CAIROCKS_VERSION_BUGFIX 2
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,7 +101,7 @@ cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
  *
  * Deletes the named path bound the specified context.
  **/
-void cairocks_removed_named_path(cairo_t* cr, const char* named_path);
+void cairocks_remove_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_map_path_onto:
