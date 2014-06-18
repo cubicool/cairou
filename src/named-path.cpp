@@ -39,8 +39,6 @@ void cairocks_named_path_private_append(cairo_t* cr, const char* named_path, boo
 	if(new_path) cairo_new_path(cr);
 }
 
-extern "C" {
-
 void cairocks_append_named_path(cairo_t* cr, const char* named_path) {
 	cairocks_named_path_private_append(cr, named_path);
 }
@@ -82,7 +80,5 @@ void cairocks_remove_named_path(cairo_t* cr, const char* named_path) {
 	) cairo_path_destroy(*i);
 
 	(*data).erase(key_value);
-}
-
 }
 
