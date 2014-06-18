@@ -14,7 +14,7 @@
 
 #include <gif_lib.h>
 
-#if GIFLIB_MAJOR < 5
+#if GIFLIB_MAJOR < 5 || GIFLIB_MINOR < 1
 #error "You need giflib 5.0 or higher."
 #endif
 
@@ -43,11 +43,13 @@ static cairocks_gif_private_t* cairocks_gif_private_create() {
 }
 
 static void cairocks_gif_private_destroy(void* data) {
+	int err;
+
 	cairocks_gif_private_t* gif_data = (cairocks_gif_private_t*)(data);
 
 	if(gif_data->alloc && gif_data->data) free(gif_data->data);
 
-	if(gif_data->gif_file) DGifCloseFile(gif_data->gif_file);
+	if(gif_data->gif_file) DGifCloseFile(gif_data->gif_file, &err);
 
 	cairo_surface_destroy(gif_data->surface);
 
@@ -73,7 +75,7 @@ static int cairocks_gif_private_read(GifFileType* gif_file, GifByteType* data, i
 static void cairocks_gif_private_reset(cairocks_gif_private_t* gif_data) {
 	int err;
 
-	if(gif_data->gif_file) DGifCloseFile(gif_data->gif_file);
+	if(gif_data->gif_file) DGifCloseFile(gif_data->gif_file, &err);
 
 	gif_data->bytes_read = 0;
 	gif_data->gif_file   = DGifOpen(gif_data, cairocks_gif_private_read, &err);
