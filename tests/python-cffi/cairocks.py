@@ -78,6 +78,8 @@ cairo_surface_t* cairocks_distance_field_create(
 cairo_surface_t* cairocks_surface_from_jpeg(const char* file);
 cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* data, unsigned int size);
 
+cairo_surface_t* cairocks_surface_from_png_data(unsigned char* data);
+
 cairo_surface_t* cairocks_gif_surface_create(const char* file);
 cairo_surface_t* cairocks_gif_surface_create_for_data(unsigned char* data, unsigned int size);
 
@@ -175,6 +177,18 @@ def surface_from_jpeg_data(data):
 
 	if not surface:
 		raise ValueError("Couldn't load JPEG from data.")
+
+	return cairocffi.Surface._from_pointer(surface, True)
+
+def surface_from_png_data(data):
+	address, size = cairocffi.surfaces.from_buffer(data)
+
+	surface = _lib.cairocks_surface_from_png_data(
+		cairocffi.ffi.cast("unsigned char*", address),
+	)
+
+	if not surface:
+		raise ValueError("Couldn't load PNG from data.")
 
 	return cairocffi.Surface._from_pointer(surface, True)
 

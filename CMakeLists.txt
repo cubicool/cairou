@@ -1,6 +1,6 @@
 PROJECT(cairocks)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
@@ -20,6 +20,7 @@ SET(CAIROCKS_SRC_FILES
 	"src/map-path-onto.c"
 	"src/rounded.c"
 	"src/surface-from-jpeg.c"
+	"src/surface-from-png.c"
 	"src/named-path.cpp"
 )
 

@@ -251,8 +251,20 @@ cairo_surface_t* cairocks_surface_from_jpeg(const char* file);
  *
  * This routine will return a new cairo_surface_t* initialized from JPEG data previously
  * loaded into memory. Only the RGB24 Cairo format is suported.
+ * TODO: Why is the size needed?
  **/
 cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* data, unsigned int size);
+
+/**
+ * cairocks_surface_from_png_data:
+ * @data: buffer of PNG data in memory
+ * @size: size of PNG buffer data in bytes
+ *
+ * This routine will return a new cairo_surface_t* initialized from PNG data previously
+ * loaded into memory. It is nothing more (or less) than a simple wrapper over the standard
+ * cairo_image_surface_create_from_png_stream.
+ **/
+cairo_surface_t* cairocks_surface_from_png_data(unsigned char* data);
 
 /**
  * cairocks_gif_surface_create:
