@@ -33,15 +33,6 @@ def cr_cast(cr):
 		incref=True
 	)
 
-class Curve(object):
-	def __init__(self):
-		object.__init__(self)
-
-		self.start = 0, 0
-		self.cp0   = 0, 0
-		self.cp1   = 0, 0
-		self.end   = 0, 0
-
 class CairoDrawingArea(Gtk.DrawingArea):
 	def __init__(self, width=0, height=0, win=None, buf=DEFAULT_BUFFER):
 		Gtk.DrawingArea.__init__(self)
@@ -51,7 +42,7 @@ class CairoDrawingArea(Gtk.DrawingArea):
 		self._cp     = []
 
 		self.set_events(
-			Gdk.EventMask.BUTTON_PRESS_MASK | 
+			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.BUTTON_RELEASE_MASK |
 			Gdk.EventMask.POINTER_MOTION_MASK |
 			Gdk.EventMask.ENTER_NOTIFY_MASK |
@@ -59,18 +50,7 @@ class CairoDrawingArea(Gtk.DrawingArea):
 		)
 
 		self.set_size_request(width, height)
-		self.connect("motion-notify-event", self._move)
-		self.connect("button-press-event", self._click)
 		self.connect("draw", self._render)
-
-	def _move(self, widget, event):
-		b, bn = event.get_button()
-
-		if b and bn == 3:
-			self._cp.append(Curve)
-
-	def _click(self, widget, event):
-		print(event.get_button())
 
 	def _render(self, widget, cr):
 		w = widget.get_allocated_width()
@@ -93,10 +73,10 @@ class CairoDrawingArea(Gtk.DrawingArea):
 	def _size(self, w, h):
 		if not w:
 			w = self.get_allocated_width()
-		
+
 		if not h:
 			h = self.get_allocated_height()
-	
+
 		return int(w), int(h)
 
 	def parse(self, buf):
@@ -106,7 +86,7 @@ class CairoDrawingArea(Gtk.DrawingArea):
 
 	def write_to_png(self, path, w=None, h=None):
 		w, h = self._size(w, h)
-		
+
 		surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
 		context = cairo.Context(surface)
 
@@ -151,7 +131,7 @@ class TextView(Gtk.TextView):
 
 	def get_text(self):
 		buf = self.get_buffer()
-		
+
 		return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
 
 class CairoWindow(Gtk.Window):
@@ -210,7 +190,7 @@ class CairoWindow(Gtk.Window):
 			button.set_image(image)
 			button.set_tooltip_text(tt)
 			button.connect("clicked", cb)
-			
+
 			tool.pack_start(button, False, False, 0)
 
 		fontSizeLabel = Gtk.Label("Font Size:")
@@ -306,7 +286,7 @@ class CairoWindow(Gtk.Window):
 
 	def _parse(self, *args):
 		self._draw.parse(self._text.get_text())
-	
+
 	def _set_font(self, cb):
 		self._text.set_font_size(int(cb.get_active_text()))
 

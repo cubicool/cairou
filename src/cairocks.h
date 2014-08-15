@@ -13,7 +13,7 @@
 #endif
 
 #define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  2
+#define CAIROCKS_VERSION_MINOR  3
 #define CAIROCKS_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
