@@ -4,7 +4,7 @@ import sys
 
 sys.path.extend(("../src", "../tests"))
 
-from gi.repository import Gtk, Gdk, Pango
+from gi.repository import Gtk, Gdk, Pango, GtkSource
 
 import cairocffi
 import cairocffi as cairo
@@ -14,11 +14,13 @@ DEFAULT_BUFFER = """\
 # This is a Python script to quickly test Cairo stuff!
 # You have access to the following variables:
 # cr = The Cairo drawing context.
-# w  = The DrawingArea's allocated width.
-# h  = The DrwaingArea's allocated height.
+# w = The DrawingArea's allocated width.
+# h = The DrwaingArea's allocated height.
 
 import math
 
+cr.set_source_rgba(0.1, 0.2, 0.3, 1.0)
+cr.paint()
 cr.set_line_width(10)
 cr.arc(w / 2.0, h / 2.0, h / 3.0, 0.0, 2.0 * math.pi)
 cr.set_source_rgb(0.3, 0.3, 0.3)
@@ -27,295 +29,307 @@ cr.set_source_rgb(0.1, 0.1, 0.1)
 cr.stroke()
 """
 
+
 def cr_cast(cr):
-	return cairocffi.Context._from_pointer(
-		cairocffi.ffi.cast("cairo_t **", id(cr) + object.__basicsize__)[0],
-		incref=True
-	)
+    return cairocffi.Context._from_pointer(
+        cairocffi.ffi.cast("cairo_t **", id(cr) + object.__basicsize__)[0],
+        incref=True
+    )
+
 
 class CairoDrawingArea(Gtk.DrawingArea):
-	def __init__(self, width=0, height=0, win=None, buf=DEFAULT_BUFFER):
-		Gtk.DrawingArea.__init__(self)
+    def __init__(self, width=0, height=0, win=None, buf=DEFAULT_BUFFER):
+        Gtk.DrawingArea.__init__(self)
 
-		self._buffer = buf
-		self._win    = win
-		self._cp     = []
+        self._buffer = buf
+        self._win = win
+        self._cp = []
 
-		self.set_events(
-			Gdk.EventMask.BUTTON_PRESS_MASK |
-			Gdk.EventMask.BUTTON_RELEASE_MASK |
-			Gdk.EventMask.POINTER_MOTION_MASK |
-			Gdk.EventMask.ENTER_NOTIFY_MASK |
-			Gdk.EventMask.LEAVE_NOTIFY_MASK
-		)
+        self.set_events(
+            Gdk.EventMask.BUTTON_PRESS_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK |
+            Gdk.EventMask.POINTER_MOTION_MASK |
+            Gdk.EventMask.ENTER_NOTIFY_MASK |
+            Gdk.EventMask.LEAVE_NOTIFY_MASK
+        )
 
-		self.set_size_request(width, height)
-		self.connect("draw", self._render)
+        self.set_size_request(width, height)
+        self.connect("draw", self._render)
 
-	def _render(self, widget, cr):
-		w = widget.get_allocated_width()
-		h = widget.get_allocated_height()
+    def _render(self, widget, cr):
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
 
-		if self._win:
-			self._win.set_status(w, h)
+        if self._win:
+            self._win.set_status(w, h)
 
-		self._eval(self._buffer, cr_cast(cr), w, h)
+        self._eval(self._buffer, cr_cast(cr), w, h)
 
-		return True
+        return True
 
-	def _eval(self, buf, cr, w, h):
-		eval(compile(buf, "<cairoscript>", "exec"), {
-			"cr": cr,
-			"w":  w,
-			"h":  h
-		})
+    def _eval(self, buf, cr, w, h):
+        eval(compile(buf, "<cairoscript>", "exec"), {
+            "cr": cr,
+            "w":  w,
+            "h":  h
+        })
 
-	def _size(self, w, h):
-		if not w:
-			w = self.get_allocated_width()
+    def _size(self, w, h):
+        if not w:
+            w = self.get_allocated_width()
 
-		if not h:
-			h = self.get_allocated_height()
+        if not h:
+            h = self.get_allocated_height()
 
-		return int(w), int(h)
+        return int(w), int(h)
 
-	def parse(self, buf):
-		self._buffer = buf
+    def parse(self, buf):
+        self._buffer = buf
 
-		self.queue_draw()
+        self.queue_draw()
 
-	def write_to_png(self, path, w=None, h=None):
-		w, h = self._size(w, h)
+    def write_to_png(self, path, w=None, h=None):
+        w, h = self._size(w, h)
 
-		surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
-		context = cairo.Context(surface)
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
+        context = cairo.Context(surface)
 
-		self._eval(self._buffer, context, w, h)
+        self._eval(self._buffer, context, w, h)
 
-		surface.write_to_png(path)
+        surface.write_to_png(path)
 
-	def write_to_svg(self, path, w=None, h=None):
-		w, h = self._size(w, h)
+    def write_to_svg(self, path, w=None, h=None):
+        w, h = self._size(w, h)
 
-		surface = cairo.SVGSurface(path, w, h)
-		context = cairo.Context(surface)
+        surface = cairo.SVGSurface(path, w, h)
+        context = cairo.Context(surface)
 
-		self._eval(self._buffer, context, w, h)
+        self._eval(self._buffer, context, w, h)
 
-		surface.flush()
-		surface.finish()
+        surface.flush()
+        surface.finish()
 
-class TextView(Gtk.TextView):
-	def __init__(self, text=""):
-		Gtk.TextView.__init__(self)
 
-		buf = Gtk.TextBuffer()
+class TextView(GtkSource.View):
+    def __init__(self, text="", on_change=lambda *a: None):
+        GtkSource.View.__init__(self)
 
-		buf.set_text(text)
+        buf = GtkSource.Buffer()
 
-		self.set_buffer(buf)
-		self.connect("realize", self._realize)
+        style_manager = GtkSource.StyleSchemeManager.get_default()
+        lang_manager = GtkSource.LanguageManager.get_default()
 
-	def _realize(self, *args):
-		self.set_font_size(10)
+        buf.set_text(text)
+        buf.set_style_scheme(style_manager.get_scheme("cubicool"))
+        buf.set_highlight_syntax(True)
+        buf.set_language(lang_manager.get_language("python3"))
+        buf.connect("changed", on_change)
 
-	def set_text(self, text):
-		self.get_buffer().set_text(text)
+        self.set_buffer(buf)
+        self.connect("realize", self._realize)
+        self.set_tab_width(4)
+        self.connect("realize", self._realize)
 
-	def set_font_size(self, size):
-		font = Pango.FontDescription("Droid Sans Mono")
+    def _realize(self, *args):
+        self.set_font_size(12)
 
-		font.set_size(Pango.SCALE * size)
+    def set_text(self, text):
+        self.get_buffer().set_text(text)
 
-		self.modify_font(font)
+    def set_font_size(self, size):
+        font = Pango.FontDescription("Droid Sans Mono")
 
-	def get_text(self):
-		buf = self.get_buffer()
+        font.set_size(Pango.SCALE * size)
 
-		return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+        self.modify_font(font)
+
+    def get_text(self):
+        buf = self.get_buffer()
+
+        return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+
 
 class CairoWindow(Gtk.Window):
-	def __init__(self, w, h, script=None, autosave=None):
-		Gtk.Window.__init__(self)
+    def __init__(self, w, h, script=None, autosave=None):
+        Gtk.Window.__init__(self)
 
-		b = script and open(script).read() or DEFAULT_BUFFER
+        b = script and open(script).read() or DEFAULT_BUFFER
 
-		self._draw   = CairoDrawingArea(w, h, self, b)
-		self._text   = TextView(b)
-		self._status = Gtk.Statusbar()
+        self._draw = CairoDrawingArea(w, h, self, b)
+        self._text = TextView(b, self._parse)
+        self._status = Gtk.Statusbar()
 
-		tool   = Gtk.HBox()
-		vbox   = Gtk.VBox()
-		scroll = Gtk.ScrolledWindow()
-		paned  = Gtk.VPaned()
-		frame  = Gtk.Frame()
+        tool = Gtk.HBox()
+        vbox = Gtk.VBox()
+        scroll = Gtk.ScrolledWindow()
+        paned = Gtk.VPaned()
+        frame = Gtk.Frame()
 
-		scroll.add(self._text)
+        scroll.add(self._text)
 
-		frame.add(scroll)
+        frame.add(scroll)
+        frame.set_border_width(5)
 
-		paned.pack1(self._draw, False, False)
-		paned.pack2(frame, True, True)
+        paned.pack1(self._draw, False, False)
+        paned.pack2(frame, True, True)
 
-		vbox.pack_start(paned, True, True, 0)
-		vbox.pack_start(tool, False, False, 2)
-		vbox.pack_start(self._status, False, False, 0)
+        vbox.pack_start(paned, True, True, 0)
+        vbox.pack_start(tool, False, False, 2)
+        vbox.pack_start(self._status, False, False, 0)
 
-		for st, tt, cb in zip((
-			Gtk.STOCK_OPEN,
-			Gtk.STOCK_SAVE,
-			Gtk.STOCK_YES,
-			Gtk.STOCK_REFRESH,
-			Gtk.STOCK_QUIT
-		), (
-			"Open an existing script",
-			"Save this script",
-			"Write script to PNG/SVG images",
-			"Refresh the DrawingArea",
-			"Quit the application"
-		), (
-			self._open_script,
-			self._save_script,
-			self._save_image,
-			self._parse,
-			lambda *a, **k: Gtk.main_quit()
-		)):
-			button = Gtk.Button()
-			image  = Gtk.Image()
+        for st, tt, cb in zip((
+            Gtk.STOCK_OPEN,
+            Gtk.STOCK_SAVE,
+            Gtk.STOCK_YES,
+            Gtk.STOCK_QUIT
+        ), (
+            "Open an existing script",
+            "Save this script",
+            "Write script to PNG/SVG images",
+            "Quit the application"
+        ), (
+            self._open_script,
+            self._save_script,
+            self._save_image,
+            lambda *a, **k: Gtk.main_quit()
+        )):
+            button = Gtk.Button()
+            image = Gtk.Image()
 
-			image.set_from_stock(st, Gtk.IconSize.MENU)
+            image.set_from_stock(st, Gtk.IconSize.MENU)
 
-			button.set_relief(Gtk.ReliefStyle.NONE)
-			button.set_focus_on_click(False)
-			button.set_image(image)
-			button.set_tooltip_text(tt)
-			button.connect("clicked", cb)
+            button.set_relief(Gtk.ReliefStyle.NONE)
+            button.set_focus_on_click(False)
+            button.set_image(image)
+            button.set_tooltip_text(tt)
+            button.connect("clicked", cb)
 
-			tool.pack_start(button, False, False, 0)
+            tool.pack_start(button, False, False, 0)
 
-		fontSizeLabel = Gtk.Label("Font Size:")
-		fontSize      = Gtk.ComboBoxText()
+        fontSizeLabel = Gtk.Label("Font Size:")
+        fontSize = Gtk.ComboBoxText()
 
-		fontSizeLabel.set_alignment(1.0, 0.5)
+        fontSizeLabel.set_alignment(1.0, 0.5)
 
-		[fontSize.append_text("%i" % i) for i in range(8, 13)]
+        [fontSize.append_text("%i" % i) for i in range(10, 20)]
 
-		fontSize.connect("changed", self._set_font)
-		fontSize.set_active(2)
+        fontSize.connect("changed", self._set_font)
+        fontSize.set_active(2)
 
-		tool.pack_start(fontSizeLabel, True, True, 5)
-		tool.pack_start(fontSize, False, False, 0)
+        tool.pack_start(fontSizeLabel, True, True, 5)
+        tool.pack_start(fontSize, False, False, 0)
 
-		self.set_title("cairodraw")
-		self.add(vbox)
-		self.set_focus(self._text)
+        self.set_title("cairodraw")
+        self.add(vbox)
+        self.set_focus(self._text)
 
-		if autosave:
-			self._draw.queue_draw()
-			self._save_image(None, w, h)
+        if autosave:
+            self._draw.queue_draw()
+            self._save_image(None, w, h)
 
-	def _open_script(self, *args):
-		fc = Gtk.FileChooserDialog(
-			"Selet a script file...",
-			self,
-			Gtk.FileChooserAction.OPEN,
-			(
-				Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-				Gtk.STOCK_OPEN, Gtk.ResponseType.OK
-			)
-		)
+    def _open_script(self, *args):
+        fc = Gtk.FileChooserDialog(
+            "Selet a script file...",
+            self,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN, Gtk.ResponseType.OK
+            )
+        )
 
-		fl1 = Gtk.FileFilter()
+        fl1 = Gtk.FileFilter()
 
-		fl1.set_name("Pycairo Scripts")
-		fl1.add_pattern("*.py")
+        fl1.set_name("Pycairo Scripts")
+        fl1.add_pattern("*.py")
 
-		fl2 = Gtk.FileFilter()
+        fl2 = Gtk.FileFilter()
 
-		fl2.set_name("All Files")
-		fl2.add_pattern("*")
+        fl2.set_name("All Files")
+        fl2.add_pattern("*")
 
-		fc.add_filter(fl1)
-		fc.add_filter(fl2)
+        fc.add_filter(fl1)
+        fc.add_filter(fl2)
 
-		if fc.run() == Gtk.ResponseType.OK:
-			self._text.set_text(open(fc.get_filename()).read())
+        if fc.run() == Gtk.ResponseType.OK:
+            self._text.set_text(open(fc.get_filename()).read())
 
-			self._parse()
+            self._parse()
 
-		fc.destroy()
+        fc.destroy()
 
-	def _save_script(self, *args):
-		fc = Gtk.FileChooserDialog(
-			"Save Python Script as...",
-			self,
-			Gtk.FileChooserAction.SAVE,
-			(
-				Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-				Gtk.STOCK_SAVE, Gtk.ResponseType.OK
-			)
-		)
+    def _save_script(self, *args):
+        fc = Gtk.FileChooserDialog(
+            "Save Python Script as...",
+            self,
+            Gtk.FileChooserAction.SAVE,
+            (
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE, Gtk.ResponseType.OK
+            )
+        )
 
-		if fc.run() == Gtk.ResponseType.OK:
-			fn = fc.get_filename()
+        if fc.run() == Gtk.ResponseType.OK:
+            fn = fc.get_filename()
 
-			if not fn.endswidth(".py"):
-				fn += ".py"
+            if not fn.endswidth(".py"):
+                fn += ".py"
 
-			with open(fn, "w") as f:
-				f.write(self._text.get_text())
+            with open(fn, "w") as f:
+                f.write(self._text.get_text())
 
-		fc.destroy()
+        fc.destroy()
 
-	def _save_image(self, widget, w=None, h=None):
-		fc = Gtk.FileChooserDialog(
-			"Save PNG & SVG Images as...",
-			self,
-			Gtk.FileChooserAction.SAVE,
-			(
-				Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-				Gtk.STOCK_SAVE, Gtk.ResponseType.OK
-			)
-		)
+    def _save_image(self, widget, w=None, h=None):
+        fc = Gtk.FileChooserDialog(
+            "Save PNG & SVG Images as...",
+            self,
+            Gtk.FileChooserAction.SAVE,
+            (
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE, Gtk.ResponseType.OK
+            )
+        )
 
-		if fc.run() == Gtk.ResponseType.OK:
-			self._draw.write_to_png(fc.get_filename() + ".png", w, h)
-			self._draw.write_to_svg(fc.get_filename() + ".svg", w, h)
+        if fc.run() == Gtk.ResponseType.OK:
+            self._draw.write_to_png(fc.get_filename() + ".png", w, h)
+            self._draw.write_to_svg(fc.get_filename() + ".svg", w, h)
 
-		fc.destroy()
+        fc.destroy()
 
-	def _parse(self, *args):
-		self._draw.parse(self._text.get_text())
+    def _parse(self, *args):
+        self._draw.parse(self._text.get_text())
 
-	def _set_font(self, cb):
-		self._text.set_font_size(int(cb.get_active_text()))
+    def _set_font(self, cb):
+        self._text.set_font_size(int(cb.get_active_text()))
 
-	def set_status(self, w, h):
-		self._status.push(0, "Dimensions: %i x %i" % (w, h))
+    def set_status(self, w, h):
+        self._status.push(0, "Dimensions: %i x %i" % (w, h))
+
 
 if __name__ == "__main__":
-	f = None
-	w = 512
-	h = 256
-	s = False
+    f = None
+    w = 512
+    h = 256
+    s = False
 
-	if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
-		f = sys.argv[1]
+    if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
+        f = sys.argv[1]
 
-	if len(sys.argv) >= 4:
-		try:
-			w = int(sys.argv[2])
-			h = int(sys.argv[3])
-			s = True
+    if len(sys.argv) >= 4:
+        try:
+            w = int(sys.argv[2])
+            h = int(sys.argv[3])
+            s = True
 
-		except:
-			pass
+        except:
+            pass
 
-	cw = CairoWindow(w, h, f, s)
+    cw = CairoWindow(w, h, f, s)
 
-	if not s:
-		cw.connect("destroy", Gtk.main_quit)
-		cw.show_all()
-		cw.set_size_request(-1, 550)
+    if not s:
+        cw.connect("destroy", Gtk.main_quit)
+        cw.show_all()
+        cw.set_size_request(-1, 550)
 
-		Gtk.main()
+        Gtk.main()
