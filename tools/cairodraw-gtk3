@@ -131,7 +131,7 @@ class TextView(GtkSource.View):
         self.connect("realize", self._realize)
 
     def _realize(self, *args):
-        self.set_font_size(12)
+        self.set_font_size(10)
 
     def set_text(self, text):
         self.get_buffer().set_text(text)
@@ -214,7 +214,7 @@ class CairoWindow(Gtk.Window):
         [fontSize.append_text("%i" % i) for i in range(10, 20)]
 
         fontSize.connect("changed", self._set_font)
-        fontSize.set_active(2)
+        fontSize.set_active(0)
 
         tool.pack_start(fontSizeLabel, True, True, 5)
         tool.pack_start(fontSize, False, False, 0)
