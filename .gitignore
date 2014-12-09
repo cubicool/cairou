@@ -1,4 +1,2 @@
-tests/python-cffi/basic-tests.png
-tests/python-cffi/gif_frames
-tests/python-cffi/cairocks.pyc
-tests/python-cffi/__pycache__
+src/python/__pycache__
+src/python/cairockscffi.pyc
