@@ -13,7 +13,7 @@
 #endif
 
 #define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  3
+#define CAIROCKS_VERSION_MINOR  5
 #define CAIROCKS_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
@@ -79,7 +79,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
  * specified named path. After calling this routine, the current path
  * on the context is cleared.
  **/
-void cairocks_append_named_path(cairo_t* cr, const char* named_path);
+cairo_bool_t cairocks_append_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_append_named_path_preserve:
@@ -90,7 +90,7 @@ void cairocks_append_named_path(cairo_t* cr, const char* named_path);
  * specified named path. Unlike @cairocks_append_named_path, the path
  * is NOT cleared after a call to this function.
  **/
-void cairocks_append_named_path_preserve(cairo_t* cr, const char* named_path);
+cairo_bool_t cairocks_append_named_path_preserve(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_set_named_path:
@@ -112,7 +112,7 @@ cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
  *
  * Deletes the named path bound the specified context.
  **/
-void cairocks_remove_named_path(cairo_t* cr, const char* named_path);
+cairo_bool_t cairocks_remove_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_map_path_onto:
@@ -140,7 +140,7 @@ cairo_bool_t cairocks_map_path_onto(
  *
  * This function (taken mostly from "Graphics Gems IV") will return a newly-created
  * Cairo image surface created by applying the emboss algorightm on @surface. This
- * new surface can be used to create a pattern with, or directly with set_source_surface.
+ * new surface can be used to create a new pattern, or used directly with set_source_surface.
  * This function was further adapted by Andrea Canciani to use a Sobel operator to perform
  * the matrix convolution.
  **/
@@ -309,6 +309,105 @@ int cairocks_gif_surface_next(cairo_surface_t* surface);
  * how many frames (or records) are in the file.
  **/
 unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
+
+/**
+ * cairocks_text_flags_t:
+ * @CAIROCKS_BOLD: enables the bold Cairo font weight.
+ * @CAIROCKS_ITACLI: enables the italic Cairo font slant.
+ * @CAIROCKS_X_LEFT: aligns the entire text body to the right of the X position.
+ * @CAIROCKS_X_CENTER: aligns the entire text body in the middle of the X position.
+ * @CAIROCKS_X_RIGHT: aligns the entire text body to the left of the X position.
+ * @CAIROCKS_X_BASELINE: the default X text alignment.
+ * @CAIROCKS_Y_TOP: aligns the entire text body below the Y position.
+ * @CAIROCKS_Y_CENTER: aligns the entire text body in the middle of the Y position.
+ * @CAIROCKS_Y_BOTTOM: aligns the entire text body above the Y position.
+ * @CAIROCKS_Y_BASELINE: the default Y text alignment.
+ * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the left.
+ * @CAIROCKS_ALIGN_RIGHT: aligns each line of text in the text body to the right.
+ * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the center.
+ *
+ * #cairo_text_flags_t is used a bitfield to combine one or more text flags into
+ * a single parameter. Note that the ALIGN flags differ from the X/Y flags in that
+ * they do not specify the absolute position of the text, but rather how each line
+ * of text in the text body aligns to eachother.
+ *
+ * Other flags will be added in the future as this function evolves; particularly
+ * the ability use Harfbuzz for layout and the ability to install callbacks to
+ * override the rendering of each glyph.
+ **/
+typedef enum _cairocks_text_flags {
+	CAIROCKS_BOLD = 1 << 0,
+	CAIROCKS_ITALIC = 1 << 1,
+	CAIROCKS_X_LEFT = 1 << 2,
+	CAIROCKS_X_CENTER = 1 << 3,
+	CAIROCKS_X_RIGHT = 1 << 4,
+	CAIROCKS_X_BASELINE = 1 << 5,
+	CAIROCKS_Y_TOP = 1 << 6,
+	CAIROCKS_Y_CENTER = 1 << 7,
+	CAIROCKS_Y_BOTTOM = 1 << 8,
+	CAIROCKS_Y_BASELINE = 1 << 9,
+	CAIROCKS_ALIGN_LEFT = 1 << 10,
+	CAIROCKS_ALIGN_RIGHT = 1 << 11,
+	CAIROCKS_ALIGN_JUSTIFY = 1 << 12
+} cairocks_text_flags_t;
+
+/**
+ * cairocks_show_text:
+ * @cr: a cairo context
+ * @utf8: a UTF8-encoded string of text
+ * @font: the font name (to be passed to cairo_select_font)
+ * @size: the font size, in user coordinates
+ * @x: the X position of the text
+ * @y: the Y position of the text
+ * @flags: a bitfield of cairocks_text_flags_t options
+ *
+ * This function brings together huge portions of the Cairo "toy" text API
+ * and attempts to make it even easier to use by providing a number of common
+ * flags and text positioning options. While serious text handling is certainly
+ * outside the scope of what Cairo can (and should) do, Cairo's "toy" API is
+ * often overlooked, and its usage is sometimes overly-discouraged, even though
+ * it can perform quite nicely.
+ *
+ * The bulk of the magic facilitated by this routine is described in the various
+ * flags documentation.
+ **/
+cairo_bool_t cairocks_show_text(
+	cairo_t*    cr,
+	const char* utf8,
+	const char* font,
+	double      size,
+	double      x,
+	double      y,
+	int         flags
+);
+
+/**
+ * cairocks_text_extents:
+ * @cr: a cairo context
+ * @utf8: a UTF8-encoded string of text
+ * @font: the font name (to be passed to cairo_select_font)
+ * @size: the font size, in user coordinates
+ * @x: the X position of the text
+ * @y: the Y position of the text
+ * @flags: a bitfield of cairocks_text_flags_t options
+ * @rect_extents: an array of doubles representing the final drawn extents rectangle
+ *
+ * Similar to the the standard cairo_text_extents function, this routine will return
+ * the extents applicable with the various flags also set. Optionally, if @rect_extents
+ * is non-NULL, it will return 4 doubles specifying a rectangle (in Cairo parlance) that
+ * defines the final, inked rectangle extents of the text body.
+ **/
+cairo_bool_t cairocks_text_extents(
+	cairo_t*              cr,
+	const char*           utf8,
+	const char*           font,
+	double                size,
+	double                x,
+	double                y,
+	int                   flags,
+	cairo_text_extents_t* extents,
+	double*               rect_extents
+);
 
 #ifdef __cplusplus
 }

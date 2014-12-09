@@ -12,6 +12,7 @@ FIND_PACKAGE(JPEG REQUIRED)
 FIND_PACKAGE(GIF REQUIRED)
 
 SET(CAIROCKS_SRC_FILES
+	# Standard C files.
 	"src/distance-field.c"
 	"src/emboss.c"
 	"src/gaussian-blur.c"
@@ -21,6 +22,9 @@ SET(CAIROCKS_SRC_FILES
 	"src/rounded.c"
 	"src/surface-from-jpeg.c"
 	"src/surface-from-png.c"
+	"src/text.c"
+
+	# C++ files, use external C linkage.
 	"src/named-path.cpp"
 )
 
