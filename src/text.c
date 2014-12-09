@@ -59,14 +59,15 @@ static void cairocks_text_private_get_translate(
 	else if(flags & CAIROCKS_Y_TOP) *ty = -extents->y_bearing;
 }
 
-cairo_bool_t cairocks_show_text(
+static cairo_bool_t cairocks_text_private_draw(
 	cairo_t*    cr,
 	const char* utf8,
 	const char* font,
 	double      size,
 	double      x,
 	double      y,
-	int         flags
+	int         flags,
+	void        (*function)(cairo_t*, const char*)
 ) {
 	double tx = 0.0;
 	double ty = 0.0;
@@ -78,10 +79,36 @@ cairo_bool_t cairocks_show_text(
 
 	cairo_save(cr);
 	cairo_translate(cr, x + tx, y + ty);
-	cairo_show_text(cr, utf8);
+
+	function(cr, utf8);
+
 	cairo_restore(cr);
 
 	return TRUE;
+}
+
+cairo_bool_t cairocks_show_text(
+	cairo_t*    cr,
+	const char* utf8,
+	const char* font,
+	double      size,
+	double      x,
+	double      y,
+	int         flags
+) {
+	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_show_text);
+}
+
+cairo_bool_t cairocks_text_path(
+	cairo_t*    cr,
+	const char* utf8,
+	const char* font,
+	double      size,
+	double      x,
+	double      y,
+	int         flags
+) {
+	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_text_path);
 }
 
 cairo_bool_t cairocks_text_extents(

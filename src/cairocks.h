@@ -13,8 +13,8 @@
 #endif
 
 #define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  5
-#define CAIROCKS_VERSION_BUGFIX 0
+#define CAIROCKS_VERSION_MINOR  4
+#define CAIROCKS_VERSION_BUGFIX 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -372,6 +372,29 @@ typedef enum _cairocks_text_flags {
  * flags documentation.
  **/
 cairo_bool_t cairocks_show_text(
+	cairo_t*    cr,
+	const char* utf8,
+	const char* font,
+	double      size,
+	double      x,
+	double      y,
+	int         flags
+);
+
+/**
+ * cairocks_text_path:
+ * @cr: a cairo context
+ * @utf8: a UTF8-encoded string of text
+ * @font: the font name (to be passed to cairo_select_font)
+ * @size: the font size, in user coordinates
+ * @x: the X position of the text
+ * @y: the Y position of the text
+ * @flags: a bitfield of cairocks_text_flags_t options
+ *
+ * This function behaves just like show_text, but calls text_path
+ * as the underlying Cairo function.
+ **/
+cairo_bool_t cairocks_text_path(
 	cairo_t*    cr,
 	const char* utf8,
 	const char* font,
