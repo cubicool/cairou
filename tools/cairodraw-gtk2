@@ -4,7 +4,10 @@ import sys
 
 sys.path.extend(("../src", "../tests"))
 
-import pygtk; pygtk.require("2.0")
+import pygtk
+
+pygtk.require("2.0")
+
 import gtk
 import cairo
 import pango

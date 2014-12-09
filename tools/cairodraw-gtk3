@@ -110,7 +110,7 @@ class CairoDrawingArea(Gtk.DrawingArea):
         surface.finish()
 
 
-class TextView(GtkSource.View):
+class SourceView(GtkSource.View):
     def __init__(self, text="", on_change=lambda *a: None):
         GtkSource.View.__init__(self)
 
@@ -120,7 +120,7 @@ class TextView(GtkSource.View):
         lang_manager = GtkSource.LanguageManager.get_default()
 
         buf.set_text(text)
-        buf.set_style_scheme(style_manager.get_scheme("cubicool"))
+        buf.set_style_scheme(style_manager.get_scheme("kate"))
         buf.set_highlight_syntax(True)
         buf.set_language(lang_manager.get_language("python3"))
         buf.connect("changed", on_change)
@@ -156,7 +156,7 @@ class CairoWindow(Gtk.Window):
         b = script and open(script).read() or DEFAULT_BUFFER
 
         self._draw = CairoDrawingArea(w, h, self, b)
-        self._text = TextView(b, self._parse)
+        self._text = SourceView(b, self._parse)
         self._status = Gtk.Statusbar()
 
         tool = Gtk.HBox()
