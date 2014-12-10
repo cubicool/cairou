@@ -27,22 +27,22 @@ static double separation(double x1, double y1, double x2, double y2) {
 }
 
 static double find_signed_distance(
-	int              px,
-	int              py,
+	int px,
+	int py,
 	cairo_surface_t* surface,
-	int              scan_width,
-	int              scan_height
+	int scan_width,
+	int scan_height
 ) {
-	int            width         = cairo_image_surface_get_width(surface);
-	unsigned char* data          = cairo_image_surface_get_data(surface);
-	unsigned char  base          = data[(px * width) + py];
-	int            base_solid    = base > 0;
-	double         closest       = MAX_VALUE;
-	int            closest_valid = 0;
-	int            start_x       = px - (scan_width / 2);
-	int            end_x         = start_x + scan_width;
-	int            start_y       = py - (scan_height / 2);
-	int            end_y         = start_y + scan_height;
+	int width = cairo_image_surface_get_width(surface);
+	unsigned char* data = cairo_image_surface_get_data(surface);
+	unsigned char base = data[(px * width) + py];
+	int base_solid = base > 0;
+	double closest = MAX_VALUE;
+	int closest_valid = 0;
+	int start_x = px - (scan_width / 2);
+	int end_x = start_x + scan_width;
+	int start_y = py - (scan_height / 2);
+	int end_y = start_y + scan_height;
 
 	int x;
 	int y;
@@ -61,8 +61,8 @@ static double find_signed_distance(
 				if(c == 0) {
 					double dist = separation(px, py, x, y);
 
-					if (dist < closest) {
-						closest       = dist;
+					if(dist < closest) {
+						closest = dist;
 						closest_valid = 1;
 					}
 				}
@@ -73,7 +73,7 @@ static double find_signed_distance(
 					double dist = separation(px, py, x, y);
 
 					if(dist < closest) {
-						closest       = dist;
+						closest = dist;
 						closest_valid = 1;
 					}
 				}
@@ -96,13 +96,13 @@ static double find_signed_distance(
 
 cairo_surface_t* cairocks_distance_field_create(
 	cairo_surface_t* surface,
-	int              scan_size,
-	int              block_size
+	int scan_size,
+	int block_size
 ) {
-	int surface_width  = cairo_image_surface_get_width(surface);
+	int surface_width = cairo_image_surface_get_width(surface);
 	int surface_height = cairo_image_surface_get_height(surface);
-	int width          = surface_width / block_size;
-	int height         = surface_height / block_size;
+	int width = surface_width / block_size;
+	int height = surface_height / block_size;
 
 	double* distances = 0;
 
@@ -112,8 +112,8 @@ cairo_surface_t* cairocks_distance_field_create(
 	int y;
 	int stride;
 
-	double mind  = 0.0f;
-	double maxd  = 0.0f;
+	double mind = 0.0f;
+	double maxd = 0.0f;
 	double scale = 0.0f;
 
 	/* Image MUST be square (for now). */
@@ -181,8 +181,8 @@ cairo_surface_t* cairocks_distance_field_create(
 
 	for(x = 0; x < width; x++) {
 		for(y = 0; y < height; y++) {
-			unsigned int    offset = (x * width) + y;
-			volatile double d      = distances[offset];
+			unsigned int offset = (x * width) + y;
+			volatile double d = distances[offset];
 
 			if(d != d) d = 0.0f;
 

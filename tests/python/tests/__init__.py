@@ -4,5 +4,6 @@ from . import (
     # image,
     # path,
     # rectangle,
+    spline,
     text
 )

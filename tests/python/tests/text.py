@@ -2,6 +2,8 @@ from . import common
 
 import cairockscffi as cairocks
 
+cairocks.merge_with_cairocffi()
+
 
 font = "Futura"
 size = 200
@@ -45,11 +47,8 @@ def draw_character(cr, c, x, y, flag):
 
     ex, r_ex = cairocks.text_extents(*text_args, rect_extents=True)
 
-    cr.save()
-
-    cairocks.show_text(*text_args)
-
-    cr.restore()
+    with cr.saved():
+        cairocks.show_text(*text_args)
 
     cr.rectangle(*r_ex)
     cr.set_source_rgba(1.0, 1.0, 0.0, 1.0)

@@ -3,10 +3,10 @@
 #include <stdio.h>
 
 cairo_bool_t cairocks_a8_invert(cairo_surface_t* surface) {
-	unsigned char* src    = cairo_image_surface_get_data(surface);
-	unsigned int   width  = cairo_image_surface_get_width(surface);
-	unsigned int   height = cairo_image_surface_get_height(surface);
-	unsigned int   i;
+	unsigned char* src = cairo_image_surface_get_data(surface);
+	unsigned int width = cairo_image_surface_get_width(surface);
+	unsigned int height = cairo_image_surface_get_height(surface);
+	unsigned int i;
 
 	if(cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
 		printf("This routine only supports inverting A8 surfaces.\n");

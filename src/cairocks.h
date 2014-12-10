@@ -8,6 +8,10 @@
 #define TRUE 1
 #endif
 
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -22,7 +26,7 @@ extern "C" {
 
 /**
  * cairocks_rounded_rectangle:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @x: the x coordinate
  * @y: the y coordinate
  * @width: the width value
@@ -47,7 +51,7 @@ cairo_bool_t cairocks_rounded_rectangle(
 
 /**
  * cairocks_rounded_rectangle_apply:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @x: the x coordinate
  * @y: the y coordinate
  * @width: the width value
@@ -72,7 +76,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 
 /**
  * cairocks_append_named_path:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @named_path: a string representing the name (or key) for the path
  *
  * This function appends the current path (in its entirety) to the
@@ -83,7 +87,7 @@ cairo_bool_t cairocks_append_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_append_named_path_preserve:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @named_path: a string representing the name (or key) for the path
  *
  * This function appends the current path (in its entirety) to the
@@ -94,7 +98,7 @@ cairo_bool_t cairocks_append_named_path_preserve(cairo_t* cr, const char* named_
 
 /**
  * cairocks_set_named_path:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @named_path: a string representing the name (or key) for the path
  *
  * This function clears the current path and makes the named path
@@ -107,7 +111,7 @@ cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_remove_named_path:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @named_path: a string representing the name (or key) for the path
  *
  * Deletes the named path bound the specified context.
@@ -116,7 +120,7 @@ cairo_bool_t cairocks_remove_named_path(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_map_path_onto:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @corners: a cairo path onto which the CURRENT cr path will be mapped
  *
  * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map
@@ -353,7 +357,7 @@ typedef enum _cairocks_text_flags {
 
 /**
  * cairocks_show_text:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @utf8: a UTF8-encoded string of text
  * @font: the font name (to be passed to cairo_select_font)
  * @size: the font size, in user coordinates
@@ -383,7 +387,7 @@ cairo_bool_t cairocks_show_text(
 
 /**
  * cairocks_text_path:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @utf8: a UTF8-encoded string of text
  * @font: the font name (to be passed to cairo_select_font)
  * @size: the font size, in user coordinates
@@ -406,7 +410,7 @@ cairo_bool_t cairocks_text_path(
 
 /**
  * cairocks_text_extents:
- * @cr: a cairo context
+ * @cr: a Cairo context
  * @utf8: a UTF8-encoded string of text
  * @font: the font name (to be passed to cairo_select_font)
  * @size: the font size, in user coordinates
@@ -430,6 +434,28 @@ cairo_bool_t cairocks_text_extents(
 	int                   flags,
 	cairo_text_extents_t* extents,
 	double*               rect_extents
+);
+
+/**
+ * cairocks_point_t:
+ */
+typedef struct _cairocks_point_t {
+	double x;
+	double y;
+} cairocks_point_t;
+
+/**
+ * cairocks_append_spline:
+ * @cr: a Cairo context
+ * @points: an array of cairocks_point_t structures
+ * @num_points: number of points in @points
+ * @closed: whether or not to close the spline path
+ */
+cairo_bool_t cairocks_append_spline(
+	cairo_t* cr,
+	cairocks_point_t* points,
+	int n_points,
+	cairo_bool_t closed
 );
 
 #ifdef __cplusplus

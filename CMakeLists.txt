@@ -20,6 +20,7 @@ SET(CAIROCKS_SRC_FILES
 	"src/invert.c"
 	"src/map-path-onto.c"
 	"src/rounded.c"
+	"src/spline.c"
 	"src/surface-from-jpeg.c"
 	"src/surface-from-png.c"
 	"src/text.c"

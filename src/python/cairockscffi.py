@@ -5,25 +5,26 @@ own bindings, though I personally tend to prefer Cython.
 """
 
 import cairocffi
+import contextlib
 
 cairocffi.ffi.cdef(r"""
 cairo_bool_t cairocks_rounded_rectangle(
-    cairo_t*            cr,
-    double              x,
-    double              y,
-    double              width,
-    double              height,
-    double              radius,
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
     const cairo_bool_t* corners
 );
 
 cairo_bool_t cairocks_rounded_rectangle_apply(
-    cairo_t*            cr,
-    double              x,
-    double              y,
-    double              width,
-    double              height,
-    double              radius,
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
     const cairo_bool_t* corners
 );
 
@@ -48,52 +49,52 @@ cairo_bool_t cairocks_remove_named_path(
 );
 
 cairo_bool_t cairocks_map_path_onto(
-    cairo_t*      cr,
+    cairo_t* cr,
     cairo_path_t* path
 );
 
 cairo_surface_t* cairocks_emboss_create(
     cairo_surface_t* surface,
-    double           azimuth,
-    double           elevation,
-    double           height,
-    double           ambient,
-    double           diffuse
+    double azimuth,
+    double elevation,
+    double height,
+    double ambient,
+    double diffuse
 );
 
 cairo_bool_t cairocks_emboss(
     cairo_surface_t* surface,
-    double           azimuth,
-    double           elevation,
-    double           height,
-    double           ambient,
-    double           diffuse
+    double azimuth,
+    double elevation,
+    double height,
+    double ambient,
+    double diffuse
 );
 
 cairo_surface_t* cairocks_gaussian_blur_create(
     cairo_surface_t* surface,
-    double           radius,
-    double           deviation
+    double radius,
+    double deviation
 );
 
 cairo_bool_t cairocks_gaussian_blur(
     cairo_surface_t* surface,
-    double           radius,
-    double           deviation
+    double radius,
+    double deviation
 );
 
 cairo_bool_t cairocks_a8_invert(cairo_surface_t* surface);
 
 cairo_surface_t* cairocks_distance_field_create(
     cairo_surface_t* surface,
-    int              scan_size,
-    int              block_size
+    int scan_size,
+    int block_size
 );
 
 cairo_surface_t* cairocks_surface_from_jpeg(const char* file);
 cairo_surface_t* cairocks_surface_from_jpeg_data(
     unsigned char* data,
-    unsigned int   size
+    unsigned int size
 );
 
 cairo_surface_t* cairocks_surface_from_png_data(unsigned char* data);
@@ -109,26 +110,39 @@ int cairocks_gif_surface_next(cairo_surface_t* surface);
 unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
 
 cairo_bool_t cairocks_show_text(
-    cairo_t*    cr,
+    cairo_t* cr,
     const char* utf8,
     const char* font,
-    double      size,
-    double      x,
-    double      y,
-    int         flags
+    double size,
+    double x,
+    double y,
+    int flags
 );
 
 cairo_bool_t cairocks_text_extents(
-    cairo_t*              cr,
-    const char*           utf8,
-    const char*           font,
-    double                size,
-    double                x,
-    double                y,
-    int                   flags,
+    cairo_t* cr,
+    const char* utf8,
+    const char* font,
+    double size,
+    double x,
+    double y,
+    int flags,
     cairo_text_extents_t* extents,
-    double*               rect_extents
+    double* rect_extents
 );
+
+typedef struct _cairocks_point_t {
+    double x;
+    double y;
+} cairocks_point_t;
+
+cairo_bool_t cairocks_append_spline(
+    cairo_t* cr,
+    cairocks_point_t* points,
+    int num_points,
+    cairo_bool_t closed
+);
+
 """)
 
 _lib = cairocffi.ffi.dlopen("libcairocks.so")
@@ -440,6 +454,28 @@ def text_extents(
         return ex
 
 
+def append_spline(cr, spline, closed=False):
+    points = cairocffi.ffi.new("cairocks_point_t[%d]" % len(spline))
+
+    for i, p in enumerate(spline):
+        points[i].x = p[0]
+        points[i].y = p[1]
+
+    _lib.cairocks_append_spline(cr._pointer, points, len(spline), closed)
+
+
+# From: http://preshing.com/20110920/the-python-with-statement-by-example
+@contextlib.contextmanager
+def saved(cr):
+    cr.save()
+
+    try:
+        yield cr
+
+    finally:
+        cr.restore()
+
+
 def merge_with_cairocffi():
     def method_wrap(func):
         def method_wrapped_func(self, *args, **kwargs):
@@ -456,7 +492,9 @@ def merge_with_cairocffi():
         remove_named_path,
         map_path_onto,
         show_text,
-        text_extents
+        text_extents,
+        append_spline,
+        saved
     ):
         setattr(cairocffi.Context, method.__name__, method_wrap(method))
 
