@@ -438,6 +438,7 @@ cairo_bool_t cairocks_text_extents(
 
 /**
  * cairocks_point_t:
+ * This structure serves as the primitive unit for each point in a spline.
  */
 typedef struct _cairocks_point_t {
 	double x;
@@ -450,6 +451,9 @@ typedef struct _cairocks_point_t {
  * @points: an array of cairocks_point_t structures
  * @num_points: number of points in @points
  * @closed: whether or not to close the spline path
+ *
+ * This routine appends an array of #cairocks_point_t instances to the current path.
+ * The points define a spline, which is optionally @closed or otherwise.
  */
 cairo_bool_t cairocks_append_spline(
 	cairo_t* cr,
