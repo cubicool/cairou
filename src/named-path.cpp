@@ -7,10 +7,10 @@
 typedef std::list<cairo_path_t*> cairocks_named_path_list_t;
 typedef std::map<std::string, cairocks_named_path_list_t> cairocks_named_path_t;
 
-static cairo_user_data_key_t PATH_DATA;
+static cairo_user_data_key_t NAMED_PATH_DATA;
 
 static cairocks_named_path_t* cairocks_named_path_private_get(cairo_t* cr) {
-	return static_cast<cairocks_named_path_t*>(cairo_get_user_data(cr, &PATH_DATA));
+	return static_cast<cairocks_named_path_t*>(cairo_get_user_data(cr, &NAMED_PATH_DATA));
 }
 
 static void cairocks_named_path_private_destroy(void* data) {
@@ -37,7 +37,7 @@ cairo_bool_t cairocks_named_path_private_append(
 	if(!data) {
 		data = new cairocks_named_path_t();
 
-		cairo_set_user_data(cr, &PATH_DATA, data, cairocks_named_path_private_destroy);
+		cairo_set_user_data(cr, &NAMED_PATH_DATA, data, cairocks_named_path_private_destroy);
 	}
 
 	(*data)[named_path].push_back(cairo_copy_path(cr));
