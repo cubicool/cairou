@@ -6,11 +6,16 @@ A small library of useful, common Cairo routines.
 Overview
 ========
 
+.. _named-path: https://github.com/cubicool/cairocks/blob/master/src/named-path.cpp
+.. _text: https://github.com/cubicool/cairocks/blob/master/src/text.cpp
+
 Cairocks (Cairo Rocks!) was born from a common codebase I continually ended up
 copying from project to project. Instead of trying to keep all these different
 versions in sync, I've decided to divorce it out into its own project and
-maintain it thusly. It is written using a mix of C90-compatible C and C++,
-although it strictly maintains a C-linkable API for maximum accessibility.
+maintain it thusly. It is written using a mix of C90-compatible C and C++03,
+although it strictly maintains a C-linkable API for maximum accessibility. C++
+is usually only used (see `text`_ and `named-path`_) to take advantage of the
+STL.
 
 While Cairocks does include an example build system using CMake, you are
 welcome to include the source wholesale into your own projects. Additionally,
