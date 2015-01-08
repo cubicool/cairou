@@ -3,8 +3,6 @@ import tests.common
 import cairocffi as cairo
 
 
-WIDTH = 1024
-HEIGHT = 512
 OUTPUT_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "test_output"
@@ -13,9 +11,19 @@ OUTPUT_DIR = os.path.join(
 
 if __name__ == "__main__":
     for test in tests.common.TESTS:
-        print("Running test: %s" % test.name)
+        output = "Running test: %s" % test.name
 
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, WIDTH, HEIGHT)
+        if test.description:
+            output += " (%s)" % test.description
+
+        print(output)
+
+        surface = cairo.ImageSurface(
+            test.surface_format,
+            test.width,
+            test.height
+        )
+
         cr = cairo.Context(surface)
 
         cr.set_source_rgba(0.0, 0.0, 0.0, 1.0)
@@ -23,7 +31,7 @@ if __name__ == "__main__":
         cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
 
         try:
-            test(cr, WIDTH, HEIGHT)
+            test(cr, test.width, test.height)
 
         except Exception as e:
             print("Error in test %s: %s" % (test.name, e))

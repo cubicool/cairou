@@ -1,6 +1,7 @@
 import os
 import sys
 
+import cairocffi as cairo
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -24,7 +25,13 @@ sys.path.extend((
 TESTS = []
 
 
-def test_function(func_name=None):
+def test_function(
+    name,
+    width,
+    height,
+    surface_format=cairo.FORMAT_ARGB32,
+    description=""
+):
     def test_function_decorated0(func):
         global TESTS
 
@@ -37,7 +44,15 @@ def test_function(func_name=None):
 
         f = test_function_decorated1
 
-        f.name = func_name
+        # TODO: Can this be replaced with an introspection library?
+        # for var in test_function.__code__.co_varnames:
+        #    setattr(f, "var", eval(var))
+
+        f.name = name
+        f.width = width
+        f.height = height
+        f.surface_format = surface_format
+        f.description = description
 
         TESTS.append(f)
 

@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic")
 SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror")
 
@@ -23,10 +24,10 @@ SET(CAIROCKS_SRC_FILES
 	"src/spline.c"
 	"src/surface-from-jpeg.c"
 	"src/surface-from-png.c"
-	"src/text.c"
 
 	# C++ files, use external C linkage.
 	"src/named-path.cpp"
+	"src/text.cpp"
 )
 
 SET(CAIROCKS_HEADER_FILE "src/cairocks.h")
@@ -38,9 +39,7 @@ INCLUDE_DIRECTORIES(
 	${GIF_INCLUDE_DIR}
 )
 
-LINK_DIRECTORIES(
-	${CAIRO_LIBRARY_DIRS}
-)
+LINK_DIRECTORIES(${CAIRO_LIBRARY_DIRS})
 
 SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILE})
 SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
@@ -48,6 +47,10 @@ SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
 ADD_LIBRARY(cairocks SHARED ${CAIROCKS_HEADER_FILE} ${CAIROCKS_SRC_FILES})
 
 TARGET_LINK_LIBRARIES(cairocks cairo ${JPEG_LIBRARIES} ${GIF_LIBRARIES})
+
+# Add the C/C++ compiled examples (though Python is generally the preferred
+# testing approach.
+ADD_SUBDIRECTORY("tests/c")
 
 INSTALL(TARGETS cairocks
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

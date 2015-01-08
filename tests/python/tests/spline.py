@@ -6,7 +6,7 @@ import cairockscffi as cairocks
 cairocks.merge_with_cairocffi()
 
 
-@common.test_function("spline")
+@common.test_function("spline", 512, 512)
 def test_spline(cr, w, h):
     spline = (
         (-10, -10),
