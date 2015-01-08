@@ -321,11 +321,11 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
  * @CAIROCKS_X_LEFT: aligns the entire text body to the right of the X position.
  * @CAIROCKS_X_CENTER: aligns the entire text body in the middle of the X position.
  * @CAIROCKS_X_RIGHT: aligns the entire text body to the left of the X position.
- * @CAIROCKS_X_BASELINE: the default X text alignment.
+ * @CAIROCKS_X_BASELINE: the default, natural X text alignment.
  * @CAIROCKS_Y_TOP: aligns the entire text body below the Y position.
  * @CAIROCKS_Y_CENTER: aligns the entire text body in the middle of the Y position.
  * @CAIROCKS_Y_BOTTOM: aligns the entire text body above the Y position.
- * @CAIROCKS_Y_BASELINE: the default Y text alignment.
+ * @CAIROCKS_Y_BASELINE: the default, natural Y text alignment.
  * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the left.
  * @CAIROCKS_ALIGN_RIGHT: aligns each line of text in the text body to the right.
  * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the center.
@@ -333,7 +333,10 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
  * #cairo_text_flags_t is used a bitfield to combine one or more text flags into
  * a single parameter. Note that the ALIGN flags differ from the X/Y flags in that
  * they do not specify the absolute position of the text, but rather how each line
- * of text in the text body aligns to eachother.
+ * of text in the text body aligns to eachother. Note that when positioning a body
+ * of text, the default alignment is BASELINE on both the X and Y axes. This is the
+ * "natural" alignment of text, wherein you can conceivably have parts of the glyph
+ * to-the-left-of and below the specified origin.
  *
  * Other flags will be added in the future as this function evolves; particularly
  * the ability use Harfbuzz for layout and the ability to install callbacks to
@@ -456,10 +459,10 @@ typedef struct _cairocks_point_t {
  * The points define a spline, which is optionally @closed or otherwise.
  */
 cairo_bool_t cairocks_append_spline(
-	cairo_t* cr,
+	cairo_t*          cr,
 	cairocks_point_t* points,
-	int n_points,
-	cairo_bool_t closed
+	int               n_points,
+	cairo_bool_t      closed
 );
 
 #ifdef __cplusplus
