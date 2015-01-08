@@ -22,7 +22,7 @@ static void cairocks_named_path_private_destroy(void* data) {
 		}
 	}
 
-	delete static_cast<cairocks_named_path_t*>(data);
+	delete named_path;
 }
 
 extern "C" {
