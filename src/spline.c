@@ -58,7 +58,7 @@ static void cairocks_spline_private_get_neighbors(
 	 * and 'next' points by extrapolating a cairocks_spline_private_quadratic spline. */
 	if(!i) {
 		if(prev) {
-			if(closed) *prev = GET_POINT (n_points - 1);
+			if(closed) *prev = GET_POINT(n_points - 1);
 
 			else {
 				double t = -1.0 / 4.0;
@@ -120,7 +120,6 @@ cairo_bool_t cairocks_append_spline(
 
 	if(n_points < 3) return FALSE;
 
-	/* printf("move to %f %f\n", points[0].x, points[0].y); */
 	cairo_move_to(cr, points[0].x, points[0].y);
 
 	for(i = 1; i < n_points + closed ? 1 : 0; i++) {
