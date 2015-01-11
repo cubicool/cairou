@@ -43,6 +43,11 @@ cairo_bool_t cairocks_set_named_path(
     const char* named_path
 );
 
+cairo_bool_t cairocks_set_named_path_preserve(
+    cairo_t* cr,
+    const char* named_path
+);
+
 cairo_bool_t cairocks_remove_named_path(
     cairo_t* cr,
     const char* named_path
@@ -110,6 +115,16 @@ int cairocks_gif_surface_next(cairo_surface_t* surface);
 unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
 
 cairo_bool_t cairocks_show_text(
+    cairo_t* cr,
+    const char* utf8,
+    const char* font,
+    double size,
+    double x,
+    double y,
+    int flags
+);
+
+cairo_bool_t cairocks_text_path(
     cairo_t* cr,
     const char* utf8,
     const char* font,
@@ -232,6 +247,13 @@ def append_named_path_preserve(cr, named_path):
 
 def set_named_path(cr, named_path):
     return _lib.cairocks_set_named_path(
+        cr._pointer,
+        named_path.encode("utf8")
+    )
+
+
+def set_named_path_preserve(cr, named_path):
+    return _lib.cairocks_set_named_path_preserve(
         cr._pointer,
         named_path.encode("utf8")
     )
@@ -408,6 +430,26 @@ def show_text(
     )
 
 
+def text_path(
+    cr,
+    utf8,
+    font="sans-serif",
+    size=10.0,
+    x=0.0,
+    y=0.0,
+    flags=0
+):
+    return _lib.cairocks_text_path(
+        cr._pointer,
+        utf8.encode("utf8"),
+        font.encode("utf8"),
+        size,
+        x,
+        y,
+        flags
+    )
+
+
 def text_extents(
     cr,
     utf8,
@@ -492,6 +534,7 @@ def merge_with_cairocffi():
         remove_named_path,
         map_path_onto,
         show_text,
+        text_path,
         text_extents,
         append_spline,
         saved
@@ -506,3 +549,20 @@ def merge_with_cairocffi():
         distance_field_create
     ):
         setattr(cairocffi.Surface, method.__name__, method_wrap(method))
+
+    for const in (
+        "BOLD",
+        "ITALIC",
+        "X_LEFT",
+        "X_CENTER",
+        "X_RIGHT",
+        "X_BASELINE",
+        "Y_TOP",
+        "Y_CENTER",
+        "Y_BOTTOM",
+        "Y_BASELINE",
+        "ALIGN_LEFT",
+        "ALIGN_RIGHT",
+        "ALIGN_JUSTIFY"
+    ):
+        setattr(cairocffi, const, globals()[const])

@@ -82,6 +82,10 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
  * This function appends the current path (in its entirety) to the
  * specified named path. After calling this routine, the current path
  * on the context is cleared.
+ *
+ * Note that this funtion uses "append" in its name (as opposed to create),
+ * due to the fact that you can append multiple Cairo paths to a single named
+ * path object; the first append implicitly "creates" the named path.
  **/
 cairo_bool_t cairocks_append_named_path(cairo_t* cr, const char* named_path);
 
@@ -108,6 +112,16 @@ cairo_bool_t cairocks_append_named_path_preserve(cairo_t* cr, const char* named_
  * @cairocks_remove_named_path.
  **/
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
+
+/**
+ * cairocks_set_named_path_preserve:
+ * @cr: a Cairo context
+ * @named_path: a string representing the name (or key) for the path
+ *
+ * This function behaves exactly as cairocks_set_named_path(), except
+ * that the current path on @cr is NOT cleared.
+ **/
+cairo_bool_t cairocks_set_named_path_preserve(cairo_t* cr, const char* named_path);
 
 /**
  * cairocks_remove_named_path:
