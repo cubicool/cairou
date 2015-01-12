@@ -508,13 +508,16 @@ def append_spline(cr, spline, closed=False):
 
 # From: http://preshing.com/20110920/the-python-with-statement-by-example
 @contextlib.contextmanager
-def saved(cr):
+def saved(cr, named_path=None):
     cr.save()
 
     try:
         yield cr
 
     finally:
+        if named_path:
+            cr.append_named_path(named_path)
+
         cr.restore()
 
 

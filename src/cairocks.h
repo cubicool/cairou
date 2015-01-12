@@ -107,9 +107,12 @@ cairo_bool_t cairocks_append_named_path_preserve(cairo_t* cr, const char* named_
  *
  * This function clears the current path and makes the named path
  * specified by @named_path the current path on the passed-in context.
- * The named path is not deleted, and be reused until either the
+ * The named path is not deleted, and can be reused until either the
  * context to which it is bound is destroyed or the user explicitly calls
  * @cairocks_remove_named_path.
+ *
+ * If a blank string (or NULL) is used as @named_path, the most recently
+ * appended-to named path object is used.
  **/
 cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path);
 
