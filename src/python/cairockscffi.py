@@ -245,14 +245,14 @@ def append_named_path_preserve(cr, named_path):
     )
 
 
-def set_named_path(cr, named_path):
+def set_named_path(cr, named_path=""):
     return _lib.cairocks_set_named_path(
         cr._pointer,
         named_path.encode("utf8")
     )
 
 
-def set_named_path_preserve(cr, named_path):
+def set_named_path_preserve(cr, named_path=""):
     return _lib.cairocks_set_named_path_preserve(
         cr._pointer,
         named_path.encode("utf8")
@@ -508,15 +508,25 @@ def append_spline(cr, spline, closed=False):
 
 # From: http://preshing.com/20110920/the-python-with-statement-by-example
 @contextlib.contextmanager
-def saved(cr, named_path=None):
+def saved(cr):
     cr.save()
 
     try:
         yield cr
 
     finally:
-        if named_path:
-            cr.append_named_path(named_path)
+        cr.restore()
+
+
+@contextlib.contextmanager
+def named_path(cr, name=""):
+    cr.save()
+
+    try:
+        yield cr
+
+    finally:
+        cr.append_named_path(name)
 
         cr.restore()
 
@@ -540,7 +550,8 @@ def merge_with_cairocffi():
         text_path,
         text_extents,
         append_spline,
-        saved
+        saved,
+        named_path
     ):
         setattr(cairocffi.Context, method.__name__, method_wrap(method))
 
