@@ -4,8 +4,17 @@
 #include <list>
 #include <string>
 
-typedef std::list<cairo_path_t*> cairocks_named_path_list_t;
-typedef std::map<std::string, cairocks_named_path_list_t> cairocks_named_path_t;
+struct cairocks_named_path_item_t {
+	cairocks_named_path_item_t(cairo_path_t* _path):
+	path(_path) {
+	}
+
+	cairo_path_t* path;
+	cairo_matrix_t matrix;
+};
+
+typedef std::list<cairocks_named_path_item_t> cairocks_named_path_items_t;
+typedef std::map<std::string, cairocks_named_path_items_t> cairocks_named_path_t;
 
 struct cairocks_named_path_private_t {
 	cairocks_named_path_private_t():
@@ -13,7 +22,7 @@ struct cairocks_named_path_private_t {
 	}
 
 	cairocks_named_path_t paths;
-	cairocks_named_path_list_t* last;
+	cairocks_named_path_items_t* last;
 };
 
 static cairo_user_data_key_t NAMED_PATH_DATA;
@@ -26,8 +35,8 @@ static void cairocks_named_path_private_destroy(void* data) {
 	cairocks_named_path_t* named_path = static_cast<cairocks_named_path_t*>(data);
 
 	for(cairocks_named_path_t::iterator i = named_path->begin(); i != named_path->end(); i++) {
-		for(cairocks_named_path_list_t::iterator j = i->second.begin(); j != i->second.end(); j++) {
-			cairo_path_destroy(*j);
+		for(cairocks_named_path_items_t::iterator j = i->second.begin(); j != i->second.end(); j++) {
+			cairo_path_destroy(j->path);
 		}
 	}
 
@@ -49,6 +58,8 @@ static cairo_bool_t cairocks_named_path_private_append(
 
 	data->paths[named_path].push_back(cairo_copy_path(cr));
 
+	cairo_get_matrix(cr, &data->paths[named_path].back().matrix);
+
 	if(new_path) cairo_new_path(cr);
 
 	// Set the last member for usage with subsequent NULL/implicit named path setting.
@@ -62,7 +73,7 @@ static cairo_bool_t cairocks_named_path_private_set(
 	const char* named_path,
 	bool new_path=true
 ) {
-	const cairocks_named_path_list_t* list = 0;
+	const cairocks_named_path_items_t* list = 0;
 	cairocks_named_path_private_t* data = cairocks_named_path_private_get(cr);
 
 	if(!data) return FALSE;
@@ -84,10 +95,17 @@ static cairo_bool_t cairocks_named_path_private_set(
 	if(new_path) cairo_new_path(cr);
 
 	for(
-		cairocks_named_path_list_t::const_iterator i = list->begin();
+		cairocks_named_path_items_t::const_iterator i = list->begin();
 		i != list->end();
 		i++
-	) cairo_append_path(cr, *i);
+	) {
+		cairo_matrix_t matrix;
+
+		cairo_get_matrix(cr, &matrix);
+		cairo_matrix_multiply(&matrix, &i->matrix, &matrix);
+		cairo_set_matrix(cr, &matrix);
+		cairo_append_path(cr, i->path);
+	}
 
 	return TRUE;
 }
@@ -117,10 +135,10 @@ cairo_bool_t cairocks_remove_named_path(cairo_t* cr, const char* named_path) {
 	if(key_value == data->paths.end()) return FALSE;
 
 	for(
-		cairocks_named_path_list_t::const_iterator i = key_value->second.begin();
+		cairocks_named_path_items_t::const_iterator i = key_value->second.begin();
 		i != key_value->second.end();
 		i++
-	) cairo_path_destroy(*i);
+	) cairo_path_destroy(i->path);
 
 	data->paths.erase(key_value);
 
