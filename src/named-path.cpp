@@ -3,6 +3,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <cstring>
 
 struct cairocks_named_path_item_t {
 	cairocks_named_path_item_t(cairo_path_t* _path):
@@ -48,6 +49,7 @@ static cairo_bool_t cairocks_named_path_private_append(
 	const char* named_path,
 	bool new_path=true
 ) {
+	cairocks_named_path_items_t* list = 0;
 	cairocks_named_path_private_t* data = cairocks_named_path_private_get(cr);
 
 	if(!data) {
@@ -56,14 +58,23 @@ static cairo_bool_t cairocks_named_path_private_append(
 		cairo_set_user_data(cr, &NAMED_PATH_DATA, data, cairocks_named_path_private_destroy);
 	}
 
-	data->paths[named_path].push_back(cairo_copy_path(cr));
+	// If the name isn't specified, we're appending to the most recent (if it exists).
+	if(!named_path || !std::strlen(named_path)) {
+		if(!data->last) return FALSE;
 
-	cairo_get_matrix(cr, &data->paths[named_path].back().matrix);
+		list = data->last;
+	}
+
+	else list = &data->paths[named_path];
+
+	list->push_back(cairo_copy_path(cr));
+
+	cairo_get_matrix(cr, &list->back().matrix);
 
 	if(new_path) cairo_new_path(cr);
 
 	// Set the last member for usage with subsequent NULL/implicit named path setting.
-	data->last = &data->paths[named_path];
+	data->last = list;
 
 	return TRUE;
 }
@@ -78,7 +89,7 @@ static cairo_bool_t cairocks_named_path_private_set(
 
 	if(!data) return FALSE;
 
-	if(!named_path) {
+	if(!named_path || !std::strlen(named_path)) {
 		if(!data->last) return FALSE;
 
 		list = data->last;
