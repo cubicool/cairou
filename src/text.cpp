@@ -156,12 +156,13 @@ static cairo_bool_t cairocks_text_private_draw(
 		std::cout << str << std::endl;
 	}
 
-	cairo_save(cr);
+	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_save(cr);
+
 	cairo_translate(cr, x + tx, y + ty);
 
 	function(cr, utf8);
 
-	cairo_restore(cr);
+	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_restore(cr);
 
 	delete text;
 
