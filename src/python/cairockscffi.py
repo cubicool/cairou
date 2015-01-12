@@ -408,6 +408,7 @@ Y_BASELINE = 1 << 9
 ALIGN_LEFT = 1 << 10
 ALIGN_RIGHT = 1 << 11
 ALIGN_JUSTIFY = 1 << 12
+NO_SAVE_RESTORE = 1 << 13
 
 
 def show_text(
@@ -544,6 +545,7 @@ def merge_with_cairocffi():
         append_named_path,
         append_named_path_preserve,
         set_named_path,
+        set_named_path_preserve,
         remove_named_path,
         map_path_onto,
         show_text,
@@ -577,6 +579,7 @@ def merge_with_cairocffi():
         "Y_BASELINE",
         "ALIGN_LEFT",
         "ALIGN_RIGHT",
-        "ALIGN_JUSTIFY"
+        "ALIGN_JUSTIFY",
+        "NO_SAVE_RESTORE"
     ):
         setattr(cairocffi, const, globals()[const])
