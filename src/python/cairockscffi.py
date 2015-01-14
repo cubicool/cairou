@@ -162,6 +162,11 @@ cairo_bool_t cairocks_append_spline(
 
 _lib = cairocffi.ffi.dlopen("libcairocks.so")
 
+# We need to keep references around to the original methods if we
+# choose to "merge" the cairockscffi API with cairocffi.
+_CONTEXT_METHODS = {}
+_SURFACE_METHODS = {}
+
 
 def _rounded_rectangle(
     libfunction,
@@ -410,6 +415,12 @@ ALIGN_RIGHT = 1 << 11
 ALIGN_JUSTIFY = 1 << 12
 NO_SAVE_RESTORE = 1 << 13
 
+# Our special Python-only flag that tells the wrappers to defer to the Cairo
+# default functions, instead of our (potentially merged) wrappers. This isn't
+# a part of Cairocks itself, since it's written in C and can't hijack or
+# monkey-patch an API.
+USE_DEFAULT = 1 << 31
+
 
 def show_text(
     cr,
@@ -420,6 +431,9 @@ def show_text(
     y=0.0,
     flags=0
 ):
+    if flags & USE_DEFAULT:
+        return _CONTEXT_METHODS["show_text"](cr, utf8)
+
     return _lib.cairocks_show_text(
         cr._pointer,
         utf8.encode("utf8"),
@@ -440,6 +454,9 @@ def text_path(
     y=0.0,
     flags=0
 ):
+    if flags & USE_DEFAULT:
+        return _CONTEXT_METHODS["text_path"](cr, utf8)
+
     return _lib.cairocks_text_path(
         cr._pointer,
         utf8.encode("utf8"),
@@ -461,6 +478,9 @@ def text_extents(
     flags=0,
     rect_extents=False
 ):
+    if flags & USE_DEFAULT:
+        return _CONTEXT_METHODS["text_extents"](cr, utf8)
+
     extents = cairocffi.ffi.new("cairo_text_extents_t*")
     rect_vals = cairocffi.ffi.new("double[4]")
 
@@ -555,7 +575,12 @@ def merge_with_cairocffi():
         saved,
         named_path
     ):
-        setattr(cairocffi.Context, method.__name__, method_wrap(method))
+        mn = method.__name__
+
+        if hasattr(cairocffi.Context, mn):
+            _CONTEXT_METHODS[mn] = getattr(cairocffi.Context, mn)
+
+        setattr(cairocffi.Context, mn, method_wrap(method))
 
     for method in (
         emboss,
@@ -564,7 +589,12 @@ def merge_with_cairocffi():
         a8_invert,
         distance_field_create
     ):
-        setattr(cairocffi.Surface, method.__name__, method_wrap(method))
+        mn = method.__name__
+
+        if hasattr(cairocffi.Surface, mn):
+            _SURFACE_METHODS[mn] = getattr(cairocffi.Surface, mn)
+
+        setattr(cairocffi.Surface, mn, method_wrap(method))
 
     for const in (
         "BOLD",
@@ -580,6 +610,7 @@ def merge_with_cairocffi():
         "ALIGN_LEFT",
         "ALIGN_RIGHT",
         "ALIGN_JUSTIFY",
-        "NO_SAVE_RESTORE"
+        "NO_SAVE_RESTORE",
+        "USE_DEFAULT"
     ):
         setattr(cairocffi, const, globals()[const])
