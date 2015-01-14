@@ -2,7 +2,7 @@
 
 const char* test_name = "named-path";
 
-void test_function(cairo_t* cr) {
+void test_function(int argc, char** argv, cairo_t* cr) {
 	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
 	cairo_paint(cr);
 	cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);

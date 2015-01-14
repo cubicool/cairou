@@ -6,7 +6,7 @@ int main(int argc, char** argv) {
 	cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 512, 512);
 	cairo_t* cr = cairo_create(surface);
 
-	test_function(cr);
+	test_function(argc, argv, cr);
 
 	sprintf(png, "%s.png", test_name);
 

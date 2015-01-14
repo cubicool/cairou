@@ -4,7 +4,7 @@
 #include <cairocks.h>
 #include <stdio.h>
 
-void test_function(cairo_t* cr);
+void test_function(int argc, char** argv, cairo_t* cr);
 
 extern const char* test_name;
 
