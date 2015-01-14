@@ -441,6 +441,7 @@ cairo_bool_t cairocks_text_path(
  * @x: the X position of the text
  * @y: the Y position of the text
  * @flags: a bitfield of cairocks_text_flags_t options
+ * @extents: a pointer to cairo_text_extents_t to be filled
  * @rect_extents: an array of doubles representing the final drawn extents rectangle
  *
  * Similar to the the standard cairo_text_extents function, this routine will return
