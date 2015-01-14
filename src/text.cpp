@@ -17,29 +17,66 @@ namespace UTF8 = utf8;
 // with the Cairo API. We take a fairly easy approach wherein we essentially
 // break the string up into small strings by storing a start position for each
 // substring and replacing the newlines we find in our copy with NULL terminators.
-//
-// TODO: Convert the next()'ing idiom into the standard C++ iterator API.
 class cairocks_text_private_t {
 public:
-	typedef std::vector<unsigned int> starting_points;
+	struct line_t {
+		line_t(const char* _utf8):
+		utf8(_utf8) {
+		}
 
-	cairocks_text_private_t(const char* utf8_ro):
-	utf8(NULL) {
-		unsigned int size = std::strlen(utf8_ro) + 1;
+		const char* utf8;
+		cairo_text_extents_t extents;
+	};
+
+	struct extents_t {
+		extents_t():
+		width(0.0),
+		height(0.0),
+		lfo(0.0),
+		bfo(0.0) {
+		}
+
+		// Converts our own internal extents to something Cairo understands.
+		void to_cairo(cairo_text_extents_t* extents) {
+			memset(extents, 0, sizeof(cairo_text_extents_t));
+
+			extents->width = width;
+			extents->height = height;
+			extents->x_bearing = lfo;
+			extents->y_bearing = -(height - bfo);
+		}
+
+		double width;
+		double height;
+		double lfo;
+		double bfo;
+	};
+
+	typedef std::vector<line_t> lines_t;
+
+	cairocks_text_private_t(const char* _utf8, int _flags):
+	utf8(0),
+	flags(_flags),
+	tx(0.0),
+	ty(0.0) {
+		unsigned int size = std::strlen(_utf8) + 1;
 
 		// Allocate our copy of the UTF8 string.
 		utf8 = new char[size];
 
-		std::strcpy(utf8, utf8_ro);
+		std::strcpy(utf8, _utf8);
 
 		unsigned int pos = 0;
 		unsigned int last = 0;
-		const char* c = utf8_ro;
-		const char* end = utf8_ro + size;
+		const char* c = _utf8;
+		const char* end = _utf8 + size;
 
 		while(c < end) {
-			if(UTF8::next(c, end) == '\n') {
-				starts.push_back(last);
+			// This results in some (weird) behavior, though not necessarily undesirable,
+			// when you end your string explicitly with a newline.
+			// TODO: Determine how this SHOULD be, and perhaps handle it witha flag.
+			if(UTF8::next(c, end) == '\n' || (pos == size - 1 && pos != last)) {
+				lines.push_back(static_cast<const char*>(&utf8[last]));
 
 				utf8[pos] = 0;
 
@@ -48,43 +85,81 @@ public:
 
 			pos++;
 		}
-
-		n = starts.begin();
 	}
 
 	~cairocks_text_private_t() {
 		if(utf8) delete[] utf8;
 	}
 
-	const char* next() {
-		if(n == starts.end()) {
-			n = starts.begin();
+	// TODO: Is size needed, really?
+	void init(cairo_t* cr, double size) {
+		unsigned int n = 0;
 
-			return NULL;
+		for(
+			lines_t::iterator line = lines.begin();
+			line != lines.end();
+			line++
+		) {
+			cairo_text_extents(cr, line->utf8, &line->extents);
+
+			if(line->extents.width > extents.width) extents.width = line->extents.width;
+
+			// If we're the first line, get its height.
+			if(!n) extents.height = -line->extents.y_bearing;
+
+			// Otherwise, if we're the final line (which, coincidentally, might also be the
+			// first line) get the "bottom-from-origin"
+			if(n == lines.size() - 1) {
+				if(!n) extents.bfo = line->extents.height + line->extents.y_bearing;
+
+				else extents.bfo = size + line->extents.y_bearing;
+			}
+
+			// Get our largest "left-from-origin."
+			if(line->extents.x_bearing < extents.lfo) extents.lfo = -line->extents.x_bearing;
+
+			n++;
 		}
 
-		const char* str = static_cast<const char*>(&utf8[*n]);
-
-		n++;
-
-		return str;
+		// Since extents.height was only used to record the topmost line's height,
+		// we need to account for the entire body's height here.
+		extents.height += (size * (n - 1)) + extents.bfo;
 	}
 
-private:
 	char* utf8;
-	starting_points starts;
-	starting_points::const_iterator n;
+	lines_t lines;
+	int flags;
+	extents_t extents;
+	double tx;
+	double ty;
 };
+
+#if 0
+	// Perform X alignment; default is BASELINE.
+	if(flags & CAIROCKS_X_LEFT) *tx = -extents->x_bearing;
+
+	else if(flags & CAIROCKS_X_RIGHT) *tx = -(extents->width + extents->x_bearing);
+
+	else if(flags & CAIROCKS_X_CENTER) *tx = -(extents->width / 2.0) - extents->x_bearing;
+
+	// Now we do Y alignment, who also defaults to BASELINE.
+	if(flags & CAIROCKS_Y_BOTTOM) *ty = -(extents->height + extents->y_bearing);
+
+	else if(flags & CAIROCKS_Y_CENTER) *ty =
+		(extents->height / 2.0) - (extents->height + extents->y_bearing)
+	;
+
+	else if(flags & CAIROCKS_Y_TOP) *ty = -extents->y_bearing;
+#endif
 
 // Initializes the Cairo state for the passed-in context and returns a private
 // structure containing the data necessary to properly draw the string.
 static cairocks_text_private_t* cairocks_text_private_init(
-	cairo_t*              cr,
-	const char*           utf8,
-	const char*           font,
-	double                size,
-	int                   flags,
-	cairo_text_extents_t* extents
+	cairo_t*    cr,
+	const char* utf8,
+	const char* font,
+	double      size,
+	int         flags
 ) {
 	cairo_select_font_face(
 		cr,
@@ -94,42 +169,31 @@ static cairocks_text_private_t* cairocks_text_private_init(
 	);
 
 	cairo_set_font_size(cr, size);
-	cairo_text_extents(cr, utf8, extents);
 
-	cairocks_text_private_t* data = NULL;
+	cairocks_text_private_t* text = 0;
 
+	// Wrap our text alloction in an exception handling block, since they
+	// could potentially be thrown here.
 	try {
-		data = new cairocks_text_private_t(utf8);
+		text = new cairocks_text_private_t(utf8, flags);
 	}
 
 	catch(...) {
-		data = NULL;
+		text = 0;
 	}
 
-	return data;
-}
+	if(!text) return 0;
 
-static void cairocks_text_private_get_translate(
-	int                   flags,
-	cairo_text_extents_t* extents,
-	double*               tx,
-	double*               ty
-) {
-	/* Perform X alignment; default is BASELINE. */
-	if(flags & CAIROCKS_X_LEFT) *tx = -extents->x_bearing;
+	text->init(cr, size);
 
-	else if(flags & CAIROCKS_X_RIGHT) *tx = -(extents->width + extents->x_bearing);
+#if 0
+	std::cout << "WIDTH: " << text->extents.width << std::endl;
+	std::cout << "HEIGHT: " << text->extents.height << std::endl;
+	std::cout << "LEFT-FROM-ORIGIN: " << text->extents.lfo << std::endl;
+	std::cout << "BOTTOM-FROM-ORIGIN: " << text->extents.bfo << std::endl;
+#endif
 
-	else if(flags & CAIROCKS_X_CENTER) *tx = -(extents->width / 2.0) - extents->x_bearing;
-
-	/* Now we do Y alignment, who also defaults to BASELINE. */
-	if(flags & CAIROCKS_Y_BOTTOM) *ty = -(extents->height + extents->y_bearing);
-
-	else if(flags & CAIROCKS_Y_CENTER) *ty = (extents->height / 2.0) -
-		(extents->height + extents->y_bearing)
-	;
-
-	else if(flags & CAIROCKS_Y_TOP) *ty = -extents->y_bearing;
+	return text;
 }
 
 static cairo_bool_t cairocks_text_private_draw(
@@ -142,25 +206,26 @@ static cairo_bool_t cairocks_text_private_draw(
 	int         flags,
 	void        (*function)(cairo_t*, const char*)
 ) {
-	double tx = 0.0;
-	double ty = 0.0;
+	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
 
-	cairo_text_extents_t extents;
-
-	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags, &extents);
-
-	cairocks_text_private_get_translate(flags, &extents, &tx, &ty);
-
-	// TODO: Print shit...
-	for(const char* str = text->next(); str; str = text->next()) {
-		std::cout << str << std::endl;
-	}
+	if(!text) return FALSE;
 
 	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_save(cr);
 
-	cairo_translate(cr, x + tx, y + ty);
+	cairo_translate(cr, x, y);
 
-	function(cr, utf8);
+	for(
+		cairocks_text_private_t::lines_t::iterator i = text->lines.begin();
+		i != text->lines.end();
+		i++
+	) {
+		std::cout << "Handling: " << i->utf8 << std::endl;
+
+		function(cr, i->utf8);
+
+		cairo_translate(cr, 0.0, size);
+		cairo_move_to(cr, 0.0, 0.0);
+	}
 
 	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_restore(cr);
 
@@ -206,7 +271,18 @@ cairo_bool_t cairocks_text_extents(
 	cairo_text_extents_t* extents,
 	double*               rect_extents
 ) {
-	cairocks_text_private_init(cr, utf8, font, size, flags, extents);
+	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
+
+	if(!text) return FALSE;
+
+	text->extents.to_cairo(extents);
+
+	std::cout
+		<< "x_bearing: " << extents->x_bearing << std::endl
+		<< "y_bearing: " << extents->y_bearing << std::endl
+		<< "width: " << extents->width << std::endl
+		<< "height: " << extents->height << std::endl
+	;
 
 	if(rect_extents) {
 		double rx = 0.0;
@@ -237,6 +313,8 @@ cairo_bool_t cairocks_text_extents(
 		rect_extents[2] = extents->width;
 		rect_extents[3] = extents->height;
 	}
+
+	delete text;
 
 	return TRUE;
 }
