@@ -26,16 +26,16 @@ unsigned char minc(double d) {
 
 static cairo_surface_t* _cairocks_create_embossed_surface(
 	cairo_surface_t* surface,
-	double           azimuth,
-	double           elevation,
-	double           height,
-	double           ambient,
-	double           diffuse
+	double azimuth,
+	double elevation,
+	double height,
+	double ambient,
+	double diffuse
 ) {
-	unsigned char* src    = cairo_image_surface_get_data(surface);
-	int            w      = cairo_image_surface_get_width(surface);
-	int            h      = cairo_image_surface_get_height(surface);
-	int            stride = cairo_image_surface_get_stride(surface);
+	unsigned char* src = cairo_image_surface_get_data(surface);
+	int w = cairo_image_surface_get_width(surface);
+	int h = cairo_image_surface_get_height(surface);
+	int stride = cairo_image_surface_get_stride(surface);
 
 	cairo_surface_t* dst_surface = cairo_image_surface_create(CAIRO_FORMAT_A8, w, h);
 
@@ -59,13 +59,13 @@ static cairo_surface_t* _cairocks_create_embossed_surface(
 
 	for(y = 0; y < h; y++) {
 		for(x = 0; x < w; x++) {
-			double       Nx;
-			double       Ny;
-			double       Nz;
-			double       NdotL;
-			double       d[3][3];
-			int          i;
-			int          j;
+			double Nx;
+			double Ny;
+			double Nz;
+			double NdotL;
+			double d[3][3];
+			int i;
+			int j;
 
 			for(i = 0; i < 3; i++) {
 				for(j = 0; j < 3; j++) {
@@ -103,11 +103,11 @@ dirty_ret:
 // similarly named function above. */
 cairo_surface_t* cairocks_emboss_create(
 	cairo_surface_t* surface,
-	double           azimuth,
-	double           elevation,
-	double           height,
-	double           ambient,
-	double           diffuse
+	double azimuth,
+	double elevation,
+	double height,
+	double ambient,
+	double diffuse
 ) {
 	if(cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
 		printf("This routine only supports embossing A8 surfaces.\n");
@@ -129,14 +129,14 @@ cairo_surface_t* cairocks_emboss_create(
 // similarly named function above. */
 cairo_bool_t cairocks_emboss(
 	cairo_surface_t* surface,
-	double           azimuth,
-	double           elevation,
-	double           height,
-	double           ambient,
-	double           diffuse
+	double azimuth,
+	double elevation,
+	double height,
+	double ambient,
+	double diffuse
 ) {
-	unsigned int     h      = cairo_image_surface_get_height(surface);
-	unsigned int     stride = cairo_image_surface_get_stride(surface);
+	unsigned int h = cairo_image_surface_get_height(surface);
+	unsigned int stride = cairo_image_surface_get_stride(surface);
 	cairo_surface_t* tmp;
 
 	if(cairo_image_surface_get_format(surface) != CAIRO_FORMAT_A8) {
@@ -166,3 +166,4 @@ cairo_bool_t cairocks_emboss(
 
 	return TRUE;
 }
+
