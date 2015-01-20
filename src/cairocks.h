@@ -1,3 +1,8 @@
+#ifndef CAIROCKS_H
+#define CAIROCKS_H 1
+
+#include "cairocks-glyphicons.h"
+
 #include <cairo.h>
 
 #ifndef FALSE
@@ -17,8 +22,8 @@
 #endif
 
 #define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  4
-#define CAIROCKS_VERSION_BUGFIX 1
+#define CAIROCKS_VERSION_MINOR  5
+#define CAIROCKS_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +78,18 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 	double              radius,
 	const cairo_bool_t* corners
 );
+
+typedef struct _cairocks_grid_t cairocks_grid_t;
+
+cairocks_grid_t* cairocks_grid_create(
+	cairo_t*     cr,
+	unsigned int cols,
+	unsigned int rows,
+	double       cell_width,
+	double       cell_height
+);
+
+/* TODO: cairocks_grid_get_cell() */
 
 /**
  * cairocks_append_named_path:
@@ -333,20 +350,20 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
 
 /**
  * cairocks_text_flags_t:
- * @CAIROCKS_BOLD: enables the bold Cairo font weight.
- * @CAIROCKS_ITACLI: enables the italic Cairo font slant.
- * @CAIROCKS_X_LEFT: aligns the entire text body to the right of the X position.
- * @CAIROCKS_X_CENTER: aligns the entire text body in the middle of the X position.
- * @CAIROCKS_X_RIGHT: aligns the entire text body to the left of the X position.
- * @CAIROCKS_X_BASELINE: the default, natural X text alignment.
- * @CAIROCKS_Y_TOP: aligns the entire text body below the Y position.
- * @CAIROCKS_Y_CENTER: aligns the entire text body in the middle of the Y position.
- * @CAIROCKS_Y_BOTTOM: aligns the entire text body above the Y position.
- * @CAIROCKS_Y_BASELINE: the default, natural Y text alignment.
- * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the left.
- * @CAIROCKS_ALIGN_RIGHT: aligns each line of text in the text body to the right.
- * @CAIROCKS_ALIGN_LEFT: aligns each line of text in the text body to the center.
- * @CAIROCKS_NO_SAVE_RESTORE: do NOT protect text drawing with cairo_save()/cairo_restore(),
+ * @CAIROCKS_TEXT_BOLD: enables the bold Cairo font weight.
+ * @CAIROCKS_TEXT_ITALIC: enables the italic Cairo font slant.
+ * @CAIROCKS_TEXT_X_LEFT: aligns the entire text body to the right of the X position.
+ * @CAIROCKS_TEXT_X_CENTER: aligns the entire text body in the middle of the X position.
+ * @CAIROCKS_TEXT_X_RIGHT: aligns the entire text body to the left of the X position.
+ * @CAIROCKS_TEXT_X_BASELINE: the default, natural X text alignment.
+ * @CAIROCKS_TEXT_Y_TOP: aligns the entire text body below the Y position.
+ * @CAIROCKS_TEXT_Y_CENTER: aligns the entire text body in the middle of the Y position.
+ * @CAIROCKS_TEXT_Y_BOTTOM: aligns the entire text body above the Y position.
+ * @CAIROCKS_TEXT_Y_BASELINE: the default, natural Y text alignment.
+ * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the left.
+ * @CAIROCKS_TEXT_ALIGN_RIGHT: aligns each line of text in the text body to the right.
+ * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the center.
+ * @CAIROCKS_TEXT_NO_SAVE_RESTORE: do NOT protect text drawing with cairo_save()/cairo_restore(),
  * which is normally the default behavior. This can be useful when using text with named
  * paths.
  *
@@ -362,21 +379,21 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
  * the ability use Harfbuzz for layout and the ability to install callbacks to
  * override the rendering of each glyph.
  **/
-typedef enum _cairocks_text_flags {
-	CAIROCKS_BOLD = 1 << 0,
-	CAIROCKS_ITALIC = 1 << 1,
-	CAIROCKS_X_LEFT = 1 << 2,
-	CAIROCKS_X_CENTER = 1 << 3,
-	CAIROCKS_X_RIGHT = 1 << 4,
-	CAIROCKS_X_BASELINE = 1 << 5,
-	CAIROCKS_Y_TOP = 1 << 6,
-	CAIROCKS_Y_CENTER = 1 << 7,
-	CAIROCKS_Y_BOTTOM = 1 << 8,
-	CAIROCKS_Y_BASELINE = 1 << 9,
-	CAIROCKS_ALIGN_LEFT = 1 << 10,
-	CAIROCKS_ALIGN_RIGHT = 1 << 11,
-	CAIROCKS_ALIGN_JUSTIFY = 1 << 12,
-	CAIROCKS_NO_SAVE_RESTORE = 1 << 13
+typedef enum _cairocks_text_flags_t {
+	CAIROCKS_TEXT_BOLD = 1 << 0,
+	CAIROCKS_TEXT_ITALIC = 1 << 1,
+	CAIROCKS_TEXT_X_LEFT = 1 << 2,
+	CAIROCKS_TEXT_X_CENTER = 1 << 3,
+	CAIROCKS_TEXT_X_RIGHT = 1 << 4,
+	CAIROCKS_TEXT_X_BASELINE = 1 << 5,
+	CAIROCKS_TEXT_Y_TOP = 1 << 6,
+	CAIROCKS_TEXT_Y_CENTER = 1 << 7,
+	CAIROCKS_TEXT_Y_BOTTOM = 1 << 8,
+	CAIROCKS_TEXT_Y_BASELINE = 1 << 9,
+	CAIROCKS_TEXT_ALIGN_LEFT = 1 << 10,
+	CAIROCKS_TEXT_ALIGN_RIGHT = 1 << 11,
+	CAIROCKS_TEXT_ALIGN_JUSTIFY = 1 << 12,
+	CAIROCKS_TEXT_NO_SAVE_RESTORE = 1 << 13
 } cairocks_text_flags_t;
 
 /**
@@ -400,13 +417,13 @@ typedef enum _cairocks_text_flags {
  * flags documentation.
  **/
 cairo_bool_t cairocks_show_text(
-	cairo_t*    cr,
-	const char* utf8,
-	const char* font,
-	double      size,
-	double      x,
-	double      y,
-	int         flags
+	cairo_t*     cr,
+	const char*  utf8,
+	const char*  font,
+	double       size,
+	double       x,
+	double       y,
+	unsigned int flags
 );
 
 /**
@@ -487,7 +504,105 @@ cairo_bool_t cairocks_append_spline(
 	cairo_bool_t      closed
 );
 
+/**
+ * cairocks_icon_flags_t:
+ * @CAIROCKS_ICON_X_LEFT: aligns the icon to the right of the X position.
+ * @CAIROCKS_ICON_X_CENTER: aligns the icon in the middle of the X position.
+ * @CAIROCKS_ICON_X_RIGHT: aligns the icon to the left of the X position.
+ * @CAIROCKS_ICON_Y_TOP: aligns the icon below the Y position.
+ * @CAIROCKS_ICON_Y_CENTER: aligns the icon in the middle of the Y position.
+ * @CAIROCKS_ICON_Y_BOTTOM: aligns the icon above the Y position.
+ *
+ * #cairocks_icon_flags_t behaves identically to #cairocks_text_flags_t, although
+ * there is only a subset of available enumerations. Though the icon implementation
+ * mary vary in the future (and currently only uses Glyphicons), there is no reason
+ * to include BOLD, ITALIC, or BASELINE flags (among others).
+ **/
+typedef enum _cairocks_icon_flags_t {
+	CAIROCKS_ICON_X_LEFT = 1 << 2,
+	CAIROCKS_ICON_X_CENTER = 1 << 3,
+	CAIROCKS_ICON_X_RIGHT = 1 << 4,
+	CAIROCKS_ICON_Y_TOP = 1 << 6,
+	CAIROCKS_ICON_Y_CENTER = 1 << 7,
+	CAIROCKS_ICON_Y_BOTTOM = 1 << 8
+} cairocks_icon_flags_t;
+
+/**
+ * cairocks_show_icon:
+ * @cr: a Cairo context
+ * @icon: the icon enumeration
+ *
+ * This function is part of an API wrapping the incredibly useful Glyphicons
+ * font, which can be found here:
+ *
+ * http://glyphicons.com
+ *
+ * It provides an easy way to dray a glyph in this font using an enumeration
+ * corresponding to the particular desired icon. It returns FALSE if the
+ * Glyphicons font is not found by Cairo, as this is NOT a totally free font.
+ */
+cairo_bool_t cairocks_show_icon(
+	cairo_t*        cr,
+	cairocks_icon_t icon,
+	double          size,
+	double          x,
+	double          y,
+	unsigned int    flags
+);
+
+/**
+ * cairocks_icon_path:
+ * @cr: a Cairo context
+ * @icon: the icon enumeration
+ *
+ * This function behaves like cairocks_show_icon(), except that the path is
+ * not automatically filled.
+ */
+cairo_bool_t cairocks_icon_path(
+	cairo_t*        cr,
+	cairocks_icon_t icon,
+	double          size,
+	double          x,
+	double          y,
+	unsigned int    flags
+);
+
+/**
+ * cairocks_icon_extents:
+ * @cr: a Cairo context
+ * @icon: the icon enumeration
+ * @size: the icon size, in user coordinates
+ * @x: the X position of the icon
+ * @y: the Y position of the icon
+ * @flags: a bitfield of cairocks_icon_flags_t options
+ * @extents: an array of doubles representing the final drawn extents rectangle
+ *
+ * This function returns the extents (similar to rect_extents in the text API)
+ * of the rectangular region affected by this icon and the associated flags.
+ */
+cairo_bool_t cairocks_icon_extents(
+	cairo_t*        cr,
+	cairocks_icon_t icon,
+	double          size,
+	double          x,
+	double          y,
+	unsigned int    flags,
+	double*         extents
+);
+
+/**
+ * cairocks_icon_from_string:
+ * @icon: a string matching a known Glyphicons glyph name
+ *
+ * Finds the nearest match to the passed-in string @icon. The matching
+ * heuristic used is trivially simple: all known enumerations are
+ * converted to lowercase, and the first substring match that occurs
+ * is used. On failure, CAIROCKS_ICON_ERROR is returned.
+ */
+cairocks_icon_t cairocks_icon_from_string(const char* icon);
+
 #ifdef __cplusplus
 }
 #endif
 
+#endif
