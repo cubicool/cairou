@@ -49,6 +49,7 @@ Features
 * Support for loading image surfaces from GIF files (with access to each individual
   GIF frame).
 * Support for loading image surfaces from JPEG images.
+* A useful wrapper for loading PNG images from memory.
 * An API wrapping and simplifying using the `Glyphicons`_ font, with support
   for interchangable icon backends in the future.
 * Drastically simplified text functions wrapping the Cairo "toy" API with support
