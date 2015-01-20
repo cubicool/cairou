@@ -44,7 +44,7 @@ Features
 
 .. _Glyphicons: http://glyphicons.com
 
-* Generate "signed distance field" surfaces (as popularized by Valve).
+* Generate "unsigned distance field" surfaces (as popularized by Valve).
 * Emboss, gaussian blur, and surface inversion filters.
 * Support for loading image surfaces from GIF files (with access to each individual
   GIF frame).

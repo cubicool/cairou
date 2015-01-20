@@ -278,7 +278,7 @@ cairo_surface_t* cairocks_distance_field_create(
  * @file: path to a JPEG file on disk
  *
  * This routine will return a new cairo_surface_t* initialized from a JPEG file on disk.
- * Current, the only supported format is RGB24.
+ * Current, the only supported Cairo format is RGB24.
  **/
 cairo_surface_t* cairocks_surface_from_jpeg(const char* file);
 
@@ -500,7 +500,7 @@ typedef struct _cairocks_point_t {
 cairo_bool_t cairocks_append_spline(
 	cairo_t*          cr,
 	cairocks_point_t* points,
-	int               n_points,
+	int               num_points,
 	cairo_bool_t      closed
 );
 
