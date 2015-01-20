@@ -11,6 +11,7 @@ namespace UTF8 = utf8;
 
 // TODO: REMOVE ME!
 #include <iostream>
+#include <cstdio>
 
 // This structure holds all the data we need to easily account for newlines in
 // blocks of text and to use those substrings (as delimited by those newlines)
@@ -66,25 +67,26 @@ public:
 
 		std::strcpy(utf8, _utf8);
 
-		unsigned int pos = 0;
 		unsigned int last = 0;
 		const char* c = _utf8;
 		const char* end = _utf8 + size;
 
+		// Next through each newline occurance.
 		while(c < end) {
-			// This results in some (weird) behavior, though not necessarily undesirable,
-			// when you end your string explicitly with a newline.
-			// TODO: Determine how this SHOULD be, and perhaps handle it witha flag.
-			if(UTF8::next(c, end) == '\n' || (pos == size - 1 && pos != last)) {
-				lines.push_back(static_cast<const char*>(&utf8[last]));
+			if(UTF8::next(c, end) == '\n') {
+				unsigned int p = c - _utf8 - 1;
 
-				utf8[pos] = 0;
+				utf8[p] = 0;
 
-				last = pos + 1;
+				lines.push_back(utf8 + last);
+
+				last += p + 1;
 			}
-
-			pos++;
 		}
+
+		// If the string doesn't end in a newline, go ahead and push the remainder
+		// as a new line of text
+		if(last < size) lines.push_back(utf8 + last);
 	}
 
 	~cairocks_text_private_t() {
@@ -128,7 +130,7 @@ public:
 
 	char* utf8;
 	lines_t lines;
-	int flags;
+	unsigned int flags;
 	extents_t extents;
 	double tx;
 	double ty;
@@ -136,36 +138,36 @@ public:
 
 #if 0
 	// Perform X alignment; default is BASELINE.
-	if(flags & CAIROCKS_X_LEFT) *tx = -extents->x_bearing;
+	if(flags & CAIROCKS_TEXT_X_LEFT) *tx = -extents->x_bearing;
 
-	else if(flags & CAIROCKS_X_RIGHT) *tx = -(extents->width + extents->x_bearing);
+	else if(flags & CAIROCKS_TEXT_X_RIGHT) *tx = -(extents->width + extents->x_bearing);
 
-	else if(flags & CAIROCKS_X_CENTER) *tx = -(extents->width / 2.0) - extents->x_bearing;
+	else if(flags & CAIROCKS_TEXT_X_CENTER) *tx = -(extents->width / 2.0) - extents->x_bearing;
 
 	// Now we do Y alignment, who also defaults to BASELINE.
-	if(flags & CAIROCKS_Y_BOTTOM) *ty = -(extents->height + extents->y_bearing);
+	if(flags & CAIROCKS_TEXT_Y_BOTTOM) *ty = -(extents->height + extents->y_bearing);
 
-	else if(flags & CAIROCKS_Y_CENTER) *ty =
+	else if(flags & CAIROCKS_TEXT_Y_CENTER) *ty =
 		(extents->height / 2.0) - (extents->height + extents->y_bearing)
 	;
 
-	else if(flags & CAIROCKS_Y_TOP) *ty = -extents->y_bearing;
+	else if(flags & CAIROCKS_TEXT_Y_TOP) *ty = -extents->y_bearing;
 #endif
 
 // Initializes the Cairo state for the passed-in context and returns a private
 // structure containing the data necessary to properly draw the string.
 static cairocks_text_private_t* cairocks_text_private_init(
-	cairo_t*    cr,
-	const char* utf8,
-	const char* font,
-	double      size,
-	int         flags
+	cairo_t*     cr,
+	const char*  utf8,
+	const char*  font,
+	double       size,
+	unsigned int flags
 ) {
 	cairo_select_font_face(
 		cr,
 		font,
-		flags & CAIROCKS_ITALIC ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL,
-		flags & CAIROCKS_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL
+		flags & CAIROCKS_TEXT_ITALIC ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL,
+		flags & CAIROCKS_TEXT_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL
 	);
 
 	cairo_set_font_size(cr, size);
@@ -210,7 +212,7 @@ static cairo_bool_t cairocks_text_private_draw(
 
 	if(!text) return FALSE;
 
-	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_save(cr);
+	if(!(flags & CAIROCKS_TEXT_NO_SAVE_RESTORE)) cairo_save(cr);
 
 	cairo_translate(cr, x, y);
 
@@ -227,7 +229,7 @@ static cairo_bool_t cairocks_text_private_draw(
 		cairo_move_to(cr, 0.0, 0.0);
 	}
 
-	if(!(flags & CAIROCKS_NO_SAVE_RESTORE)) cairo_restore(cr);
+	if(!(flags & CAIROCKS_TEXT_NO_SAVE_RESTORE)) cairo_restore(cr);
 
 	delete text;
 
@@ -237,13 +239,13 @@ static cairo_bool_t cairocks_text_private_draw(
 extern "C" {
 
 cairo_bool_t cairocks_show_text(
-	cairo_t*    cr,
-	const char* utf8,
-	const char* font,
-	double      size,
-	double      x,
-	double      y,
-	int         flags
+	cairo_t*     cr,
+	const char*  utf8,
+	const char*  font,
+	double       size,
+	double       x,
+	double       y,
+	unsigned int flags
 ) {
 	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_show_text);
 }
@@ -289,20 +291,20 @@ cairo_bool_t cairocks_text_extents(
 		double ry = 0.0;
 
 		/* Calculate the rect X origin. */
-		if(flags & CAIROCKS_X_LEFT) rx = 0.0;
+		if(flags & CAIROCKS_TEXT_X_LEFT) rx = 0.0;
 
-		else if(flags & CAIROCKS_X_CENTER) rx = extents->width / 2.0;
+		else if(flags & CAIROCKS_TEXT_X_CENTER) rx = extents->width / 2.0;
 
-		else if(flags & CAIROCKS_X_RIGHT) rx = extents->width;
+		else if(flags & CAIROCKS_TEXT_X_RIGHT) rx = extents->width;
 
 		else rx = -extents->x_bearing;
 
 		/* Calculate the rect Y origin. */
-		if(flags & CAIROCKS_Y_BOTTOM) ry = extents->height;
+		if(flags & CAIROCKS_TEXT_Y_BOTTOM) ry = extents->height;
 
-		else if(flags & CAIROCKS_Y_CENTER) ry = extents->height / 2.0;
+		else if(flags & CAIROCKS_TEXT_Y_CENTER) ry = extents->height / 2.0;
 
-		else if(flags & CAIROCKS_Y_TOP) ry = 0.0;
+		else if(flags & CAIROCKS_TEXT_Y_TOP) ry = 0.0;
 
 		else ry = -extents->y_bearing;
 

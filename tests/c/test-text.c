@@ -3,7 +3,7 @@
 const char* test_name = "text";
 
 void test_function(int argc, char** argv, cairo_t* cr) {
-	cairo_text_extents_t extents;
+	/* cairo_text_extents_t extents; */
 
 	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
 	cairo_paint(cr);
@@ -16,15 +16,15 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 	cairo_stroke(cr);
 
 	cairocks_show_text(cr, "JEREMY", "Lato", 40.0, 256.0, 256.0, (
-		CAIROCKS_X_BASELINE |
-		CAIROCKS_Y_BASELINE |
-		CAIROCKS_BOLD
+		CAIROCKS_TEXT_X_BASELINE |
+		CAIROCKS_TEXT_Y_BASELINE |
+		CAIROCKS_TEXT_BOLD
 	));
 
-	cairocks_text_extents(cr, "JEREMY", "Lato", 40.0, 256.0, 256.0, (
-		CAIROCKS_X_BASELINE |
-		CAIROCKS_Y_BASELINE |
-		CAIROCKS_BOLD
-	), &extents, NULL);
+	/* cairocks_text_extents(cr, "JEREMY", "Lato", 40.0, 256.0, 256.0, (
+		CAIROCKS_TEXT_X_BASELINE |
+		CAIROCKS_TEXT_Y_BASELINE |
+		CAIROCKS_TEXT_BOLD
+	), &extents, NULL); */
 }
 
