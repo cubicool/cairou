@@ -9,12 +9,12 @@
  * proved immeasurably useful for me. */
 
 static double* create_kernel(double radius, double deviation) {
-	int     size    = 2 * (int)(radius) + 1;
-	double* kernel  = (double*)(malloc(sizeof(double) * (size + 1)));
-	double  radiusf = fabs(radius) + 1.0f;
-	double  value   = -radius;
-	double  sum     = 0.0f;
-	int     i;
+	int size = 2 * (int)(radius) + 1;
+	double* kernel = (double*)(malloc(sizeof(double) * (size + 1)));
+	double radiusf = fabs(radius) + 1.0f;
+	double value = -radius;
+	double sum = 0.0f;
+	int i;
 
 	if(!kernel) return 0;
 
@@ -30,7 +30,7 @@ static double* create_kernel(double radius, double deviation) {
 			exp(-((value * value) / (2.0f * (deviation * deviation))))
 		;
 
-		sum   += kernel[1 + i];
+		sum += kernel[1 + i];
 		value += 1.0f;
 	}
 
@@ -41,13 +41,13 @@ static double* create_kernel(double radius, double deviation) {
 
 cairo_surface_t* cairocks_gaussian_blur_create(
 	cairo_surface_t* surface,
-	double           radius,
-	double           deviation
+	double radius,
+	double deviation
 ) {
 	cairo_format_t format = cairo_image_surface_get_format(surface);
-	unsigned int   width  = cairo_image_surface_get_width(surface);
-	unsigned int   height = cairo_image_surface_get_height(surface);
-	unsigned int   stride = cairo_image_surface_get_stride(surface);
+	unsigned int width = cairo_image_surface_get_width(surface);
+	unsigned int height = cairo_image_surface_get_height(surface);
+	unsigned int stride = cairo_image_surface_get_stride(surface);
 
 	cairo_surface_t* tmp = cairo_image_surface_create(format, width, height);
 
@@ -66,26 +66,26 @@ cairo_surface_t* cairocks_gaussian_blur_create(
 
 cairo_bool_t cairocks_gaussian_blur(
 	cairo_surface_t* surface,
-	double           radius,
-	double           deviation
+	double radius,
+	double deviation
 ) {
-	double*        horzBlur = 0;
-	double*        vertBlur = 0;
-	double*        kernel   = 0;
-	unsigned char* data     = 0;
+	double* horzBlur = 0;
+	double* vertBlur = 0;
+	double* kernel = 0;
+	unsigned char* data = 0;
 	cairo_format_t format;
-	int            width;
-	int            height;
-	int            stride;
-	unsigned int   channels;
-	int            iY;
-	int            iX;
+	int width;
+	int height;
+	int stride;
+	unsigned int channels;
+	int iY;
+	int iX;
 
 	if(cairo_surface_status(surface)) return FALSE;
 
-	data   = cairo_image_surface_get_data(surface);
+	data = cairo_image_surface_get_data(surface);
 	format = cairo_image_surface_get_format(surface);
-	width  = cairo_image_surface_get_width(surface);
+	width = cairo_image_surface_get_width(surface);
 	height = cairo_image_surface_get_height(surface);
 	stride = cairo_image_surface_get_stride(surface);
 
@@ -99,25 +99,25 @@ cairo_bool_t cairocks_gaussian_blur(
 
 	horzBlur = (double*)(malloc(sizeof(double) * height * stride));
 	vertBlur = (double*)(malloc(sizeof(double) * height * stride));
-	kernel   = create_kernel(radius, deviation);
+	kernel = create_kernel(radius, deviation);
 
 	if(!horzBlur || !vertBlur || !kernel) return FALSE;
 
 	/* Horizontal pass. */
 	for(iY = 0; iY < height; iY++) {
 		for(iX = 0; iX < width; iX++) {
-			double red    = 0.0f;
-			double green  = 0.0f;
-			double blue   = 0.0f;
-			double alpha  = 0.0f;
-			int    offset = (int)(kernel[0]) / -2;
-			int    baseOffset;
-			int    i;
+			double red = 0.0f;
+			double green = 0.0f;
+			double blue = 0.0f;
+			double alpha = 0.0f;
+			int offset = (int)(kernel[0]) / -2;
+			int baseOffset;
+			int i;
 
 			for(i = 0; i < (int)(kernel[0]); i++) {
 				unsigned char* dataPtr = 0;
-				int            x       = iX + offset;
-				double         kernip1;
+				int x = iX + offset;
+				double kernip1;
 
 				if(x < 0 || x >= width) continue;
 
@@ -129,9 +129,9 @@ cairo_bool_t cairocks_gaussian_blur(
 				else {
 					if(channels == 4) alpha += kernip1 * dataPtr[3];
 
-					red   += kernip1 * dataPtr[2];
+					red += kernip1 * dataPtr[2];
 					green += kernip1 * dataPtr[1];
-					blue  += kernip1 * dataPtr[0];
+					blue+= kernip1 * dataPtr[0];
 				}
 
 				offset++;
@@ -146,7 +146,7 @@ cairo_bool_t cairocks_gaussian_blur(
 
 				horzBlur[baseOffset + 2] = red;
 				horzBlur[baseOffset + 1] = green;
-				horzBlur[baseOffset]     = blue;
+				horzBlur[baseOffset] = blue;
 			}
 		}
 	}
@@ -154,18 +154,18 @@ cairo_bool_t cairocks_gaussian_blur(
 	/* Vertical pass. */
 	for(iY = 0; iY < height; iY++) {
 		for(iX = 0; iX < width; iX++) {
-			double red    = 0.0f;
-			double green  = 0.0f;
-			double blue   = 0.0f;
-			double alpha  = 0.0f;
-			int    offset = (int)(kernel[0]) / -2;
-			int    baseOffset;
-			int    i;
+			double red = 0.0f;
+			double green = 0.0f;
+			double blue = 0.0f;
+			double alpha = 0.0f;
+			int offset = (int)(kernel[0]) / -2;
+			int baseOffset;
+			int i;
 
 			for(i = 0; i < (int)(kernel[0]); i++) {
 				double* dataPtr = 0;
-				int     y       = iY + offset;
-				double  kernip1;
+				int y = iY + offset;
+				double kernip1;
 
 				if(y < 0 || y >= height) {
 					offset++;
@@ -181,9 +181,9 @@ cairo_bool_t cairocks_gaussian_blur(
 				else {
 					if(channels == 4) alpha += kernip1 * dataPtr[3];
 
-					red   += kernip1 * dataPtr[2];
+					red += kernip1 * dataPtr[2];
 					green += kernip1 * dataPtr[1];
-					blue  += kernip1 * dataPtr[0];
+					blue += kernip1 * dataPtr[0];
 				}
 
 				offset++;
@@ -198,7 +198,7 @@ cairo_bool_t cairocks_gaussian_blur(
 
 				vertBlur[baseOffset + 2] = red;
 				vertBlur[baseOffset + 1] = green;
-				vertBlur[baseOffset]     = blue;
+				vertBlur[baseOffset] = blue;
 			}
 		}
 	}
@@ -218,7 +218,7 @@ cairo_bool_t cairocks_gaussian_blur(
 
 				data[i + 2] = (unsigned char)(vertBlur[i + 2]);
 				data[i + 1] = (unsigned char)(vertBlur[i + 1]);
-				data[i]     = (unsigned char)(vertBlur[i]);
+				data[i] = (unsigned char)(vertBlur[i]);
 			}
 		}
 	}
