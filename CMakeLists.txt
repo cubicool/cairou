@@ -14,10 +14,12 @@ FIND_PACKAGE(GIF REQUIRED)
 
 SET(CAIROCKS_SRC_FILES
 	# Standard C files.
+	"src/cairocks-glyphicons.c"
 	"src/distance-field.c"
 	"src/emboss.c"
 	"src/gaussian-blur.c"
 	"src/gif-surface.c"
+	"src/icon.c"
 	"src/invert.c"
 	"src/map-path-onto.c"
 	"src/rounded.c"
@@ -30,7 +32,10 @@ SET(CAIROCKS_SRC_FILES
 	"src/text.cpp"
 )
 
-SET(CAIROCKS_HEADER_FILE "src/cairocks.h")
+SET(CAIROCKS_HEADER_FILES
+	"src/cairocks.h"
+	"src/cairocks-glyphicons.h"
+)
 
 INCLUDE_DIRECTORIES(
 	src
@@ -41,10 +46,10 @@ INCLUDE_DIRECTORIES(
 
 LINK_DIRECTORIES(${CAIRO_LIBRARY_DIRS})
 
-SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILE})
+SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
 
-ADD_LIBRARY(cairocks SHARED ${CAIROCKS_HEADER_FILE} ${CAIROCKS_SRC_FILES})
+ADD_LIBRARY(cairocks SHARED ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
 
 TARGET_LINK_LIBRARIES(cairocks cairo ${JPEG_LIBRARIES} ${GIF_LIBRARIES})
 
@@ -59,7 +64,7 @@ INSTALL(TARGETS cairocks
 )
 
 INSTALL(
-	FILES ${CAIROCKS_HEADER_FILE}
+	FILES ${CAIROCKS_HEADER_FILES}
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/include
 )
 
