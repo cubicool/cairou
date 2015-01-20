@@ -21,23 +21,23 @@
 static cairo_user_data_key_t GIF_DATA;
 
 typedef struct _cairocks_gif_private_t {
-	unsigned char*   data;
-	cairo_bool_t     alloc;
-	GifFileType*     gif_file;
-	int              bytes_read;
-	unsigned int     num_frames;
+	unsigned char* data;
+	cairo_bool_t alloc;
+	GifFileType* gif_file;
+	int bytes_read;
+	unsigned int num_frames;
 	cairo_surface_t* surface;
 } cairocks_gif_private_t;
 
 static cairocks_gif_private_t* cairocks_gif_private_create() {
 	cairocks_gif_private_t* gif_data = (cairocks_gif_private_t*)(malloc(sizeof(cairocks_gif_private_t)));
 
-	gif_data->data       = NULL;
-	gif_data->alloc      = FALSE;
-	gif_data->gif_file   = NULL;
+	gif_data->data = NULL;
+	gif_data->alloc = FALSE;
+	gif_data->gif_file = NULL;
 	gif_data->bytes_read = 0;
 	gif_data->num_frames = 0;
-	gif_data->surface    = NULL;
+	gif_data->surface = NULL;
 
 	return gif_data;
 }
@@ -78,30 +78,30 @@ static void cairocks_gif_private_reset(cairocks_gif_private_t* gif_data) {
 	if(gif_data->gif_file) DGifCloseFile(gif_data->gif_file, &err);
 
 	gif_data->bytes_read = 0;
-	gif_data->gif_file   = DGifOpen(gif_data, cairocks_gif_private_read, &err);
+	gif_data->gif_file = DGifOpen(gif_data, cairocks_gif_private_read, &err);
 }
 
 static void cairocks_gif_private_decode_row(
-	GifFileType*   gif_file,
+	GifFileType* gif_file,
 	unsigned char* buffer,
 	unsigned char* rowdata,
-	int            x,
-	int            y,
-	int            len,
-	int            transparent
+	int x,
+	int y,
+	int len,
+	int transparent
 ) {
-	GifColorType*   cmentry;
+	GifColorType* cmentry;
 	ColorMapObject* colormap;
-	int             colormapsize;
-	unsigned char   col;
-	unsigned char*  ptr;
+	int colormapsize;
+	unsigned char col;
+	unsigned char* ptr;
 
 	/* The following code would load the image upside down:
 	y = gif_file->SHeight - (y + 1);
 	TODO: Investigate make this an option to simplify usage with OpenGL. */
 
-	ptr          = buffer + (gif_file->SWidth * y + x) * 4;
-	colormap     = gif_file->Image.ColorMap ? gif_file->Image.ColorMap : gif_file->SColorMap;
+	ptr = buffer + (gif_file->SWidth * y + x) * 4;
+	colormap = gif_file->Image.ColorMap ? gif_file->Image.ColorMap : gif_file->SColorMap;
 	colormapsize = colormap ? colormap->ColorCount : 255;
 
 	while(len--) {
@@ -138,16 +138,16 @@ typedef enum _cairocks_gif_private_next_result {
 } cairocks_gif_private_next_result;
 
 static cairocks_gif_private_next_result _cairocks_gif_private_next(
-	cairo_surface_t*        surface,
+	cairo_surface_t* surface,
 	cairocks_gif_private_t* gif_data,
-	cairo_bool_t            set_bg,
-	cairo_bool_t            load_data,
-	unsigned int*           delay
+	cairo_bool_t set_bg,
+	cairo_bool_t load_data,
+	unsigned int* delay
 ) {
 	int i;
 
 	unsigned char* rowdata = 0;
-	unsigned char* buffer  = 0;
+	unsigned char* buffer = 0;
 
 	GifRecordType record;
 
@@ -157,7 +157,7 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 
 	/* The way an interlaced image should be read - offsets and jumps */
 	static int interlacedoffset[] = { 0, 4, 2, 1 };
-	static int interlacedjumps[]  = { 8, 8, 4, 2 };
+	static int interlacedjumps[] = { 8, 8, 4, 2 };
 
 	if(load_data) buffer = cairo_image_surface_get_data(gif_data->surface);
 
@@ -171,7 +171,7 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 			GifColorType* bgcolor = &gif_data->gif_file->SColorMap->Colors[bg];
 
 			for(i = 0; i < size; i++) {
-				buffer[(i * 4)]     = bgcolor->Blue;
+				buffer[(i * 4)] = bgcolor->Blue;
 				buffer[(i * 4) + 1] = bgcolor->Green;
 				buffer[(i * 4) + 2] = bgcolor->Red;
 				buffer[(i * 4) + 3] = 0xFF;
@@ -192,9 +192,9 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 
 			if(DGifGetImageDesc(gif_data->gif_file) == GIF_ERROR) break;
 
-			row    = gif_data->gif_file->Image.Top;
-			col    = gif_data->gif_file->Image.Left;
-			width  = gif_data->gif_file->Image.Width;
+			row = gif_data->gif_file->Image.Top;
+			col = gif_data->gif_file->Image.Left;
+			width = gif_data->gif_file->Image.Width;
 			height = gif_data->gif_file->Image.Height;
 
 			if(gif_data->gif_file->Image.Interlace) {
@@ -299,16 +299,16 @@ static unsigned int cairocks_gif_private_get_num_frames(cairocks_gif_private_t* 
 
 static cairo_surface_t* cairocks_gif_private_surface_create(cairocks_gif_private_t* gif_data) {
 	cairo_surface_t* surface;
-	int              width;
-	int              height;
-	int              err;
+	int width;
+	int height;
+	int err;
 
 	gif_data->gif_file = DGifOpen(gif_data, cairocks_gif_private_read, &err);
 
 	if(!gif_data->gif_file) return NULL;
 
-	width   = gif_data->gif_file->SWidth;
-	height  = gif_data->gif_file->SHeight;
+	width = gif_data->gif_file->SWidth;
+	height = gif_data->gif_file->SHeight;
 	surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, width, height);
 
 	/* This is where the ACTUAL compositing of GIF frame to frame is done; next() simply copies
@@ -333,8 +333,8 @@ static cairo_surface_t* cairocks_gif_private_surface_create(cairocks_gif_private
 
 cairo_surface_t* cairocks_gif_surface_create(const char* file) {
 	cairocks_gif_private_t* gif_data;
-	FILE*                   fp;
-	size_t                  size;
+	FILE* fp;
+	size_t size;
 
 	fp = fopen(file, "rb");
 
@@ -346,7 +346,7 @@ cairo_surface_t* cairocks_gif_surface_create(const char* file) {
 
 	size = ftell(fp);
 
-	gif_data->data  = (unsigned char*)(malloc(size));
+	gif_data->data = (unsigned char*)(malloc(size));
 	gif_data->alloc = TRUE;
 
 	fseek(fp, 0, SEEK_SET);
@@ -358,7 +358,7 @@ cairo_surface_t* cairocks_gif_surface_create(const char* file) {
 cairo_surface_t* cairocks_gif_surface_create_for_data(unsigned char* data, unsigned int size) {
 	cairocks_gif_private_t* gif_data = cairocks_gif_private_create();
 
-	gif_data->data  = (unsigned char*)(malloc(size));
+	gif_data->data = (unsigned char*)(malloc(size));
 	gif_data->alloc = TRUE;
 
 	memcpy(gif_data->data, data, size);
@@ -367,9 +367,9 @@ cairo_surface_t* cairocks_gif_surface_create_for_data(unsigned char* data, unsig
 }
 
 int cairocks_gif_surface_next(cairo_surface_t* surface) {
-	cairocks_gif_private_t*          gif_data;
+	cairocks_gif_private_t* gif_data;
 	cairocks_gif_private_next_result r;
-	unsigned int                     delay = 0;
+	unsigned int delay = 0;
 
 	gif_data = cairocks_gif_private_get(surface);
 
