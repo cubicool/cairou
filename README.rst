@@ -29,7 +29,8 @@ A special thanks to the following people
 * Behdad Esfahbod
 * Mirco Mueller
 * John Schlag, "Graphics Gems IV"
-* ranma42, pippin, joonas (Andrea Canciani, Oyvind Kolas, M. Joonas Pilhaja) in IRC; so much fantastic help! Great community! 
+* ranma42, pippin, joonas (Andrea Canciani, Oyvind Kolas, M. Joonas Pilhaja) in IRC;
+  so much fantastic help from a great community
 
 License
 =======
@@ -38,9 +39,29 @@ There is no strict license accompanying Cairocks, and the code I have borrowed
 from others (that is, that code I did not write myself) was all released with
 no license of any kind.  However, I encourage you to do unto others...
 
+Features
+========
+
+.. _Glyphicons: http://glyphicons.com
+
+* Generate "signed distance field" surfaces (as popularized by Valve).
+* Emboss, gaussian blur, and surface inversion filters.
+* Support for loading image surfaces from GIF files (with access to each individual
+  GIF frame).
+* Support for loading image surfaces from JPEG images.
+* An API wrapping and simplifying using the `Glyphicons`_ font, with support
+  for interchangable icon backends in the future.
+* Drastically simplified text functions wrapping the Cairo "toy" API with support
+  for multiple lines and advanced XY positioning (based on the extents of the entire
+  body of text).
+* Routines for drawing common shapes like grids, rounded-rectangles, etc.
+* Support for splines (by creating large groups of 2D points as control structures).
+* Map paths onto other paths; for example, rendering text along arcs, etc.
+* Introduces the concept of context-specific, persistent "named paths", which can be
+  used to push and pop saved (named) paths to and from the associated context.
+
 TODO
 ====
 
-- Add spline code.
-- Finish the text/alignment API.
-- Add harfbuzz layout support.
+* Add harfbuzz layout support.
+* Finish the grid API.
