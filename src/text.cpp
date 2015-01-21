@@ -200,7 +200,7 @@ static cairo_bool_t cairocks_text_private_draw(
 		i != text->lines.end();
 		i++
 	) {
-		std::cout << "Handling: " << i->utf8 << std::endl;
+		// std::cout << "Handling: " << i->utf8 << std::endl;
 
 		function(cr, i->utf8);
 
