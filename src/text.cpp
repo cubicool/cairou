@@ -143,10 +143,10 @@ public:
 // Initializes the Cairo state for the passed-in context and returns a private
 // structure containing the data necessary to properly draw the string.
 static cairocks_text_private_t* cairocks_text_private_init(
-	cairo_t*     cr,
-	const char*  utf8,
-	const char*  font,
-	double       size,
+	cairo_t* cr,
+	const char* utf8,
+	const char* font,
+	double size,
 	unsigned int flags
 ) {
 	cairo_select_font_face(
@@ -178,14 +178,14 @@ static cairocks_text_private_t* cairocks_text_private_init(
 }
 
 static cairo_bool_t cairocks_text_private_draw(
-	cairo_t*    cr,
+	cairo_t* cr,
 	const char* utf8,
 	const char* font,
-	double      size,
-	double      x,
-	double      y,
-	int         flags,
-	void        (*function)(cairo_t*, const char*)
+	double size,
+	double x,
+	double y,
+	int flags,
+	void (*function)(cairo_t*, const char*)
 ) {
 	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
 
@@ -218,39 +218,39 @@ static cairo_bool_t cairocks_text_private_draw(
 extern "C" {
 
 cairo_bool_t cairocks_show_text(
-	cairo_t*     cr,
-	const char*  utf8,
-	const char*  font,
-	double       size,
-	double       x,
-	double       y,
+	cairo_t* cr,
+	const char* utf8,
+	const char* font,
+	double size,
+	double x,
+	double y,
 	unsigned int flags
 ) {
 	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_show_text);
 }
 
 cairo_bool_t cairocks_text_path(
-	cairo_t*    cr,
+	cairo_t* cr,
 	const char* utf8,
 	const char* font,
-	double      size,
-	double      x,
-	double      y,
-	int         flags
+	double size,
+	double x,
+	double y,
+	int flags
 ) {
 	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_text_path);
 }
 
 cairo_bool_t cairocks_text_extents(
-	cairo_t*              cr,
-	const char*           utf8,
-	const char*           font,
-	double                size,
-	double                x,
-	double                y,
-	int                   flags,
+	cairo_t* cr,
+	const char* utf8,
+	const char* font,
+	double size,
+	double x,
+	double y,
+	int flags,
 	cairo_text_extents_t* extents,
-	double*               rect_extents
+	double* rect_extents
 ) {
 	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
 
