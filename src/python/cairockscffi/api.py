@@ -158,6 +158,37 @@ cairo_bool_t cairocks_append_spline(
     cairo_bool_t closed
 );
 
+typedef enum _cairocks_icon_t cairocks_icon_t;
+
+cairo_bool_t cairocks_show_icon(
+    cairo_t* cr,
+    cairocks_icon_t icon,
+    double size,
+    double x,
+    double y,
+    unsigned int flags
+);
+
+cairo_bool_t cairocks_icon_path(
+    cairo_t* cr,
+    cairocks_icon_t icon,
+    double size,
+    double x,
+    double y,
+    unsigned int flags
+);
+
+cairo_bool_t cairocks_icon_extents(
+    cairo_t* cr,
+    cairocks_icon_t icon,
+    double size,
+    double x,
+    double y,
+    unsigned int flags,
+    double* extents
+);
+
+cairocks_icon_t cairocks_icon_from_string(const char* icon);
 """)
 
 _lib = cairocffi.ffi.dlopen("libcairocks.so")
@@ -400,26 +431,26 @@ class GIFSurface(cairocffi.Surface):
     get_stride = cairocffi.ImageSurface.get_stride
 
 
-BOLD = 1 << 0
-ITALIC = 1 << 1
-X_LEFT = 1 << 2
-X_CENTER = 1 << 3
-X_RIGHT = 1 << 4
-X_BASELINE = 1 << 5
-Y_TOP = 1 << 6
-Y_CENTER = 1 << 7
-Y_BOTTOM = 1 << 8
-Y_BASELINE = 1 << 9
-ALIGN_LEFT = 1 << 10
-ALIGN_RIGHT = 1 << 11
-ALIGN_JUSTIFY = 1 << 12
-NO_SAVE_RESTORE = 1 << 13
+TEXT_BOLD = 1 << 0
+TEXT_ITALIC = 1 << 1
+TEXT_X_LEFT = 1 << 2
+TEXT_X_CENTER = 1 << 3
+TEXT_X_RIGHT = 1 << 4
+TEXT_X_BASELINE = 1 << 5
+TEXT_Y_TOP = 1 << 6
+TEXT_Y_CENTER = 1 << 7
+TEXT_Y_BOTTOM = 1 << 8
+TEXT_Y_BASELINE = 1 << 9
+TEXT_ALIGN_LEFT = 1 << 10
+TEXT_ALIGN_RIGHT = 1 << 11
+TEXT_ALIGN_JUSTIFY = 1 << 12
+TEXT_NO_SAVE_RESTORE = 1 << 13
 
 # Our special Python-only flag that tells the wrappers to defer to the Cairo
 # default functions, instead of our (potentially merged) wrappers. This isn't
 # a part of Cairocks itself, since it's written in C and can't hijack or
 # monkey-patch an API.
-USE_DEFAULT = 1 << 31
+TEXT_USE_DEFAULT = 1 << 31
 
 
 def show_text(
@@ -431,7 +462,7 @@ def show_text(
     y=0.0,
     flags=0
 ):
-    if flags & USE_DEFAULT:
+    if flags & TEXT_USE_DEFAULT:
         return _CONTEXT_METHODS["show_text"](cr, utf8)
 
     return _lib.cairocks_show_text(
@@ -454,7 +485,7 @@ def text_path(
     y=0.0,
     flags=0
 ):
-    if flags & USE_DEFAULT:
+    if flags & TEXT_USE_DEFAULT:
         return _CONTEXT_METHODS["text_path"](cr, utf8)
 
     return _lib.cairocks_text_path(
@@ -478,7 +509,7 @@ def text_extents(
     flags=0,
     rect_extents=False
 ):
-    if flags & USE_DEFAULT:
+    if flags & TEXT_USE_DEFAULT:
         return _CONTEXT_METHODS["text_extents"](cr, utf8)
 
     extents = cairocffi.ffi.new("cairo_text_extents_t*")
@@ -527,6 +558,82 @@ def append_spline(cr, spline, closed=False):
     _lib.cairocks_append_spline(cr._pointer, points, len(spline), closed)
 
 
+ICON_X_LEFT = 1 << 2
+ICON_X_CENTER = 1 << 3
+ICON_X_RIGHT = 1 << 4
+ICON_Y_TOP = 1 << 6
+ICON_Y_CENTER = 1 << 7
+ICON_Y_BOTTOM = 1 << 8
+
+
+def show_icon(
+    cr,
+    icon,
+    size=10.0,
+    x=0.0,
+    y=0.0,
+    flags=0
+):
+    return _lib.cairocks_show_icon(
+        cr._pointer,
+        icon,
+        size,
+        x,
+        y,
+        flags
+    )
+
+
+def icon_path(
+    cr,
+    icon,
+    size=10.0,
+    x=0.0,
+    y=0.0,
+    flags=0
+):
+    return _lib.cairocks_icon_path(
+        cr._pointer,
+        icon,
+        size,
+        x,
+        y,
+        flags
+    )
+
+
+def icon_extents(
+    cr,
+    icon,
+    size=10.0,
+    x=0.0,
+    y=0.0,
+    flags=0
+):
+    extents = cairocffi.ffi.new("double[4]")
+
+    return _lib.cairocks_icon_extents(
+        cr._pointer,
+        icon,
+        size,
+        x,
+        y,
+        flags,
+        extents
+    )
+
+    return (
+        extents[0],
+        extents[1],
+        extents[2],
+        extents[3]
+    )
+
+
+def icon_from_string(icon):
+    return _lib.cairocks_icon_from_string(icon.encode("ascii"))
+
+
 # From: http://preshing.com/20110920/the-python-with-statement-by-example
 @contextlib.contextmanager
 def saved(cr):
@@ -572,6 +679,10 @@ def merge_with_cairocffi():
         text_path,
         text_extents,
         append_spline,
+        show_icon,
+        icon_path,
+        icon_extents,
+        icon_from_string,
         saved,
         named_path
     ):
@@ -597,20 +708,26 @@ def merge_with_cairocffi():
         setattr(cairocffi.Surface, mn, method_wrap(method))
 
     for const in (
-        "BOLD",
-        "ITALIC",
-        "X_LEFT",
-        "X_CENTER",
-        "X_RIGHT",
-        "X_BASELINE",
-        "Y_TOP",
-        "Y_CENTER",
-        "Y_BOTTOM",
-        "Y_BASELINE",
-        "ALIGN_LEFT",
-        "ALIGN_RIGHT",
-        "ALIGN_JUSTIFY",
-        "NO_SAVE_RESTORE",
-        "USE_DEFAULT"
+        "TEXT_BOLD",
+        "TEXT_ITALIC",
+        "TEXT_X_LEFT",
+        "TEXT_X_CENTER",
+        "TEXT_X_RIGHT",
+        "TEXT_X_BASELINE",
+        "TEXT_Y_TOP",
+        "TEXT_Y_CENTER",
+        "TEXT_Y_BOTTOM",
+        "TEXT_Y_BASELINE",
+        "TEXT_ALIGN_LEFT",
+        "TEXT_ALIGN_RIGHT",
+        "TEXT_ALIGN_JUSTIFY",
+        "TEXT_NO_SAVE_RESTORE",
+        "TEXT_USE_DEFAULT",
+        "ICON_X_LEFT",
+        "ICON_X_CENTER",
+        "ICON_X_RIGHT",
+        "ICON_Y_TOP",
+        "ICON_Y_CENTER",
+        "ICON_Y_BOTTOM"
     ):
         setattr(cairocffi, const, globals()[const])

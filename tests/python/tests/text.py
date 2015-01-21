@@ -1,8 +1,9 @@
 from . import common
 
 import math
-
+import cairocffi as cairo
 import cairockscffi as cairocks
+
 
 cairocks.merge_with_cairocffi()
 
@@ -11,14 +12,14 @@ font = "Glyphicons"
 size = 200
 size2 = size / 2.0
 flags = (
-    cairocks.Y_BOTTOM | cairocks.X_LEFT,
-    cairocks.Y_BOTTOM | cairocks.X_CENTER,
-    cairocks.Y_BOTTOM | cairocks.X_RIGHT,
-    cairocks.Y_TOP | cairocks.X_LEFT,
-    cairocks.Y_TOP | cairocks.X_CENTER,
-    cairocks.Y_TOP | cairocks.X_RIGHT,
-    cairocks.Y_CENTER | cairocks.X_CENTER,
-    cairocks.Y_BASELINE | cairocks.X_BASELINE
+    cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_LEFT,
+    cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_CENTER,
+    cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_RIGHT,
+    cairo.TEXT_Y_TOP | cairo.TEXT_X_LEFT,
+    cairo.TEXT_Y_TOP | cairo.TEXT_X_CENTER,
+    cairo.TEXT_Y_TOP | cairo.TEXT_X_RIGHT,
+    cairo.TEXT_Y_CENTER | cairo.TEXT_X_CENTER,
+    cairo.TEXT_Y_BASELINE | cairo.TEXT_X_BASELINE
 )
 
 
@@ -97,9 +98,9 @@ def test_text1(cr, w, h):
     # We set these up here so we don't have to duplicate them to both
     # the drawing AND extents calls.
     args = "Jeremy", "Lato", size, x, y, (
-        cairocks.X_BASELINE |
-        cairocks.Y_BASELINE |
-        cairocks.BOLD
+        cairo.TEXT_X_BASELINE |
+        cairo.TEXT_Y_BASELINE |
+        cairo.TEXT_BOLD
     )
 
     ext, (tx, ty, tw, th) = cr.text_extents(*args, rect_extents=True)
@@ -110,9 +111,9 @@ def test_text1(cr, w, h):
     cr.fill()
 
     cr.show_text("Moles", "Lato", size, x, y + fe[2], (
-        cairocks.X_BASELINE |
-        cairocks.Y_BASELINE |
-        cairocks.BOLD
+        cairo.TEXT_X_BASELINE |
+        cairo.TEXT_Y_BASELINE |
+        cairo.TEXT_BOLD
     ))
 
 
@@ -124,6 +125,6 @@ def test_text1(cr, w, h):
 )
 def test_text2(cr, w, h):
     cr.show_text("Foo\nBar\nBaz", "Lato", 40.0, 256.0, 100.0, (
-        cairocks.X_CENTER |
-        cairocks.BOLD
+        cairo.TEXT_X_CENTER |
+        cairo.TEXT_BOLD
     ))

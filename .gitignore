@@ -1,4 +1,4 @@
-src/python/__pycache__
-src/python/cairockscffi.pyc
+src/python/cairockscffi/__pycache__
+src/python/cairockscffi/*.pyc
 tests/python/test_output
 tests/python/tests/__pycache__
