@@ -635,6 +635,7 @@ def icon_from_string(icon):
 
 
 # From: http://preshing.com/20110920/the-python-with-statement-by-example
+# Wraps the subsequent code in save/restore calls.
 @contextlib.contextmanager
 def saved(cr):
     cr.save()
@@ -646,6 +647,8 @@ def saved(cr):
         cr.restore()
 
 
+# Wraps the subsequent code in save/restore calls, and appends the current
+# path to the specified named path.
 @contextlib.contextmanager
 def named_path(cr, name=""):
     cr.save()
@@ -659,6 +662,7 @@ def named_path(cr, name=""):
         cr.restore()
 
 
+# Monkey-patches the Cairockscffi API into the Cairocffi namespace.
 def merge_with_cairocffi():
     def method_wrap(func):
         def method_wrapped_func(self, *args, **kwargs):
