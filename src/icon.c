@@ -20,13 +20,9 @@ const int ICON_MASK_Y =
 ;
 
 static unsigned int _cairocks_icon_get_flags(unsigned int flags) {
-	printf("PRE: %x\n", flags);
-
 	if(!(flags & ICON_MASK_X)) flags |= CAIROCKS_ICON_X_CENTER;
 
 	if(!(flags & ICON_MASK_Y)) flags |= CAIROCKS_ICON_Y_CENTER;
-
-	printf("POST: %x\n", flags);
 
 	return flags & (ICON_MASK_X | ICON_MASK_Y);
 }
