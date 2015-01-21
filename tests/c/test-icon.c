@@ -15,13 +15,11 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 	cairo_line_to(cr, 512.0, 256.0);
 	cairo_stroke(cr);
 
-	printf("BEFORE\n");
-
 	if(!cairocks_show_icon(cr, CAIROCKS_ICON_LEAF, 200.0, 256.0, 256.0, 0)) {
-		printf("Some funky error!\n");
-	}
+		printf("There was ome funky error!\n");
 
-	printf("AFTER\n");
+		return;
+	}
 
 	/* cairocks_icon_extents(cr, CAIROCKS_ICON_LEAF, 200.0, 256.0, 256.0, 0, extents); */
 }
