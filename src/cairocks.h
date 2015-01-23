@@ -79,18 +79,6 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 	const cairo_bool_t* corners
 );
 
-typedef struct _cairocks_grid_t cairocks_grid_t;
-
-cairocks_grid_t* cairocks_grid_create(
-	cairo_t*     cr,
-	unsigned int cols,
-	unsigned int rows,
-	double       cell_width,
-	double       cell_height
-);
-
-/* TODO: cairocks_grid_get_cell() */
-
 /**
  * cairocks_append_named_path:
  * @cr: a Cairo context

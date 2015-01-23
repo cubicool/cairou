@@ -55,7 +55,6 @@ Features
 * Drastically simplified text functions wrapping the Cairo "toy" API with support
   for multiple lines and advanced XY positioning (based on the extents of the entire
   body of text).
-* Routines for drawing common shapes like grids, rounded-rectangles, etc.
 * Support for splines (by creating large groups of 2D points as control structures).
 * Map paths onto other paths; for example, rendering text along arcs, etc.
 * Introduces the concept of context-specific, persistent "named paths", which can be
@@ -65,4 +64,5 @@ TODO
 ====
 
 * Add harfbuzz layout support.
-* Finish the grid API.
+* Add spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
+  at all times.
