@@ -23,7 +23,7 @@
 
 #define CAIROCKS_VERSION_MAJOR  0
 #define CAIROCKS_VERSION_MINOR  5
-#define CAIROCKS_VERSION_BUGFIX 0
+#define CAIROCKS_VERSION_BUGFIX 1
 
 #ifdef __cplusplus
 extern "C" {
