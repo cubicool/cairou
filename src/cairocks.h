@@ -597,16 +597,6 @@ cairo_bool_t cairocks_icon_extents(
  */
 cairocks_icon_t cairocks_icon_from_string(const char* icon);
 
-/** -------------------------------------------------------------------------------------------- */
-typedef struct _cairocks_table_t cairocks_table_t;
-
-cairocks_table_t* cairocks_table_create(unsigned int columns, unsigned int rows);
-void cairocks_table_destroy(cairocks_table_t* table);
-void cairocks_table_set_size(cairocks_table_t* table, double width, double height);
-cairo_bool_t cairocks_table_set_cell_span(unsigned int column_span, unsigned int row_span);
-/* cairo_bool_t cairocks_table_get_cell_extents( */
-
-
 #ifdef __cplusplus
 }
 #endif
