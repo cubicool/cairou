@@ -348,12 +348,18 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
  * @CAIROCKS_TEXT_Y_CENTER: aligns the entire text body in the middle of the Y position.
  * @CAIROCKS_TEXT_Y_BOTTOM: aligns the entire text body above the Y position.
  * @CAIROCKS_TEXT_Y_BASELINE: the default, natural Y text alignment.
- * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the left.
+ * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the left; default.
  * @CAIROCKS_TEXT_ALIGN_RIGHT: aligns each line of text in the text body to the right.
- * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the center.
+ * @CAIROCKS_TEXT_ALIGN_CENTER: aligns each line of text in the text body to the center.
+ * @CAIROCKS_TEXT_ALIGN_JUSTIFY: aligns each line of text with enough padding (in each space)
+ * such that the text aligns flat along the left and right edges. This method slower than
+ * any of the other alignment methods, as it involves breaking up each line and calling
+ * show_text repeatedly, rather than once.
  * @CAIROCKS_TEXT_NO_SAVE_RESTORE: do NOT protect text drawing with cairo_save()/cairo_restore(),
  * which is normally the default behavior. This can be useful when using text with named
  * paths.
+ * @CAIROCKS_TEXT_PIXEL_ALIGN: rounds all calculated X and Y values so that they occur on
+ * pixel boundaries; useful for very small text.
  *
  * #cairo_text_flags_t is used a bitfield to combine one or more text flags into
  * a single parameter. Note that the ALIGN flags differ from the X/Y flags in that
@@ -380,8 +386,10 @@ typedef enum _cairocks_text_flags_t {
 	CAIROCKS_TEXT_Y_BASELINE = 1 << 9,
 	CAIROCKS_TEXT_ALIGN_LEFT = 1 << 10,
 	CAIROCKS_TEXT_ALIGN_RIGHT = 1 << 11,
-	CAIROCKS_TEXT_ALIGN_JUSTIFY = 1 << 12,
-	CAIROCKS_TEXT_NO_SAVE_RESTORE = 1 << 13
+	CAIROCKS_TEXT_ALIGN_CENTER = 1 << 12,
+	CAIROCKS_TEXT_ALIGN_JUSTIFY = 1 << 13,
+	CAIROCKS_TEXT_NO_SAVE_RESTORE = 1 << 14,
+	CAIROCKS_TEXT_PIXEL_ALIGN = 1 << 15
 } cairocks_text_flags_t;
 
 /**
@@ -588,6 +596,16 @@ cairo_bool_t cairocks_icon_extents(
  * is used. On failure, CAIROCKS_ICON_ERROR is returned.
  */
 cairocks_icon_t cairocks_icon_from_string(const char* icon);
+
+/** -------------------------------------------------------------------------------------------- */
+typedef struct _cairocks_table_t cairocks_table_t;
+
+cairocks_table_t* cairocks_table_create(unsigned int columns, unsigned int rows);
+void cairocks_table_destroy(cairocks_table_t* table);
+void cairocks_table_set_size(cairocks_table_t* table, double width, double height);
+cairo_bool_t cairocks_table_set_cell_span(unsigned int column_span, unsigned int row_span);
+/* cairo_bool_t cairocks_table_get_cell_extents( */
+
 
 #ifdef __cplusplus
 }

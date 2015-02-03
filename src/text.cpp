@@ -1,6 +1,7 @@
 #include "cairocks.h"
 #include "utf8.h"
 
+#include <math.h>
 #include <cstring>
 #include <vector>
 
@@ -22,11 +23,15 @@ class cairocks_text_private_t {
 public:
 	struct line_t {
 		line_t(const char* _utf8):
-		utf8(_utf8) {
+		utf8(_utf8),
+		tx(0.0),
+		ty(0.0) {
 		}
 
 		const char* utf8;
 		cairo_text_extents_t extents;
+		double tx;
+		double ty;
 	};
 
 	typedef std::vector<line_t> lines_t;
@@ -107,7 +112,9 @@ public:
 			}
 
 			// Get our largest x_bearing.
-			if(line->extents.x_bearing < extents.x_bearing) extents.x_bearing = line->extents.x_bearing;
+			if(line->extents.x_bearing < extents.x_bearing) {
+				extents.x_bearing = line->extents.x_bearing;
+			}
 
 			n++;
 		}
@@ -128,8 +135,40 @@ public:
 
 		else if(flags & CAIROCKS_TEXT_Y_TOP) ty = -extents.y_bearing;
 
-		// Finally, adjust our origin to account for multiple lines.
+		// Adjust our origin to account for multiple lines.
 		ty -= (lines.size() - 1) * size;
+
+		// If the user has requested pixel-alignment, do so now. Unfortunately,
+		// this doesn't guarantee that every character also occurs on pixel
+		// boundaries; that will require using harfbuzz, which will eventually be
+		// added to Cairocks.
+		if(flags & CAIROCKS_TEXT_PIXEL_ALIGN) {
+			tx = round(tx);
+			ty = round(ty);
+		}
+
+		// Now we'll adjust each line individually, based on what kind of paragraph
+		// alignment we're using. We need to do this last; or, more specifically, after
+		// having iterated over each line to determine to the master paragraph width.
+		for(lines_t::iterator line = lines.begin(); line != lines.end(); line++) {
+			double ew = extents.width;
+			double lw = line->extents.width;
+
+			if(flags & CAIROCKS_TEXT_ALIGN_RIGHT) line->tx = ew - lw;
+				
+			else if(flags & CAIROCKS_TEXT_ALIGN_CENTER) line->tx = (ew - lw) / 2.0;
+
+			else if(flags & CAIROCKS_TEXT_ALIGN_JUSTIFY) {
+				// TODO: Oh man, this will be annoying.
+			}
+
+			// The final (untested) option is LEFT, which requires no modification.
+			// All we need to do now is handle pixel-alignment.
+			if(flags & CAIROCKS_TEXT_PIXEL_ALIGN) {
+				line->tx = round(line->tx);
+				line->ty = round(line->ty);
+			}
+		}
 	}
 
 	char* utf8;
@@ -196,14 +235,17 @@ static cairo_bool_t cairocks_text_private_draw(
 	cairo_translate(cr, x + text->tx, y + text->ty);
 
 	for(
-		cairocks_text_private_t::lines_t::iterator i = text->lines.begin();
-		i != text->lines.end();
-		i++
+		cairocks_text_private_t::lines_t::iterator line = text->lines.begin();
+		line != text->lines.end();
+		line++
 	) {
-		// std::cout << "Handling: " << i->utf8 << std::endl;
+		cairo_save(cr);
+		cairo_translate(cr, line->tx, line->ty);
+		cairo_move_to(cr, 0.0, 0.0);
 
-		function(cr, i->utf8);
-
+		function(cr, line->utf8);
+		
+		cairo_restore(cr);
 		cairo_translate(cr, 0.0, size);
 		cairo_move_to(cr, 0.0, 0.0);
 	}

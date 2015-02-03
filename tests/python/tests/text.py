@@ -1,6 +1,5 @@
 from . import common
 
-import math
 import cairocffi as cairo
 import cairockscffi as cairocks
 
@@ -8,10 +7,7 @@ import cairockscffi as cairocks
 cairocks.merge_with_cairocffi()
 
 
-font = "Glyphicons"
-size = 200
-size2 = size / 2.0
-flags = (
+FLAGS = (
     cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_LEFT,
     cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_CENTER,
     cairo.TEXT_Y_BOTTOM | cairo.TEXT_X_RIGHT,
@@ -22,16 +18,32 @@ flags = (
     cairo.TEXT_Y_BASELINE | cairo.TEXT_X_BASELINE
 )
 
+LOREM_IPSUM = """\
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras efficitur dui
+risus, ac elementum orci rhoncus ac. Praesent risus lacus, pretium in enim at,
+fringilla viverra eros. Ut non tincidunt quam. Donec aliquam fermentum lectus,
+eget porttitor metus fringilla quis. Duis nulla augue, commodo mattis eros at,
+fermentum pellentesque dolor. Integer convallis nisi nec metus consequat, at
+eleifend enim mollis. Sed faucibus, ligula eget cursus maximus, risus diam
+finibus arcu, sed tincidunt urna nisi et nisi. Suspendisse cursus nisl
+fermentum ex porttitor fermentum. Cras sed feugiat mi. Vivamus congue
+condimentum leo vitae auctor. Sed fringilla lobortis leo eleifend aliquet. In
+hac habitasse platea dictumst. Maecenas ac arcu et metus luctus malesuada."""
+
+
+SIZE = 200
+SIZE2 = SIZE / 2.0
+
 
 def draw_character(cr, c, x, y, flag):
     cr.translate(x, y)
-    cr.rectangle(-size2, -size2, size, size)
+    cr.rectangle(-SIZE2, -SIZE2, SIZE, SIZE)
     cr.stroke()
-    cr.move_to(-size2, 0.0)
-    cr.line_to(size2, 0.0)
+    cr.move_to(-SIZE2, 0.0)
+    cr.line_to(SIZE2, 0.0)
     cr.stroke()
-    cr.move_to(0.0, -size2)
-    cr.line_to(0.0, size2)
+    cr.move_to(0.0, -SIZE2)
+    cr.line_to(0.0, SIZE2)
     cr.stroke()
 
     # These are the common arguments for each text function.
@@ -39,8 +51,8 @@ def draw_character(cr, c, x, y, flag):
     # and over.
     text_args = (
         c,
-        font,
-        size * 0.4,
+        "Glyphicons",
+        SIZE * 0.4,
         0.0,
         0.0,
         flag
@@ -49,7 +61,9 @@ def draw_character(cr, c, x, y, flag):
     ex, r_ex = cr.text_extents(*text_args, rect_extents=True)
 
     with cr.saved():
-        cr.show_text(*text_args)
+        # cr.show_text(*text_args)
+        cr.text_path(*text_args)
+        cr.fill()
 
     cr.rectangle(*r_ex)
     cr.set_source_rgba(1.0, 1.0, 0.0, 1.0)
@@ -70,7 +84,7 @@ def test_text0(cr, w, h):
             cr.save()
             cr.translate(x * 256, y * 256)
 
-            draw_character(cr, "\ue218", 128, 128, flags[i])
+            draw_character(cr, "\ue218", 128, 128, FLAGS[i])
 
             cr.restore()
 
@@ -79,52 +93,23 @@ def test_text0(cr, w, h):
 
 @common.test_function(
     "text1",
+    1025,
     512,
-    512,
-    description="tests the rect_extents calculations"
-)
-def test_text1(cr, w, h):
-    cr.set_line_width(1.0)
-    cr.move_to(0.0, 100.5)
-    cr.line_to(w, 100.5)
-    cr.stroke()
-    cr.move_to(50.5, 0.0)
-    cr.line_to(50.5, h)
-    cr.stroke()
-
-    x, y = 50, 100
-    size = 50
-
-    # We set these up here so we don't have to duplicate them to both
-    # the drawing AND extents calls.
-    args = "Jeremy", "Lato", size, x, y, (
-        cairo.TEXT_X_BASELINE |
-        cairo.TEXT_Y_BASELINE |
-        cairo.TEXT_BOLD
-    )
-
-    ext, (tx, ty, tw, th) = cr.text_extents(*args, rect_extents=True)
-    fe = cr.font_extents()
-
-    cr.show_text(*args)
-    cr.arc(x, y, 4.0, 0.0, 2.0 * math.pi)
-    cr.fill()
-
-    cr.show_text("Moles", "Lato", size, x, y + fe[2], (
-        cairo.TEXT_X_BASELINE |
-        cairo.TEXT_Y_BASELINE |
-        cairo.TEXT_BOLD
-    ))
-
-
-@common.test_function(
-    "text2",
-    512,
-    512,
-    description="tests breaking text up by newline"
+    description="tests breaking one large text buffer"
 )
 def test_text2(cr, w, h):
-    cr.show_text("Foo\nBar\nBaz", "Lato", 40.0, 256.0, 100.0, (
+    cr.set_source_rgb(1.0, 0.5, 0.0)
+    cr.paint()
+    cr.set_source_rgb(1.0, 1.0, 1.0)
+    cr.rectangle(1.0, 1.0, w - 2.0, h - 2.0)
+    cr.move_to(0.0, h // 2)
+    cr.line_to(w, h // 2)
+    cr.stroke()
+    cr.move_to(w // 2, 0.0)
+    cr.line_to(w // 2, h)
+    cr.stroke()
+    cr.show_text(LOREM_IPSUM, "Lato", 20.0, w // 2, h // 2, (
         cairo.TEXT_X_CENTER |
+        cairo.TEXT_Y_CENTER |
         cairo.TEXT_BOLD
     ))
