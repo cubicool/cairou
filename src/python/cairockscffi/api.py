@@ -444,9 +444,8 @@ TEXT_Y_BASELINE = 1 << 9
 TEXT_ALIGN_LEFT = 1 << 10
 TEXT_ALIGN_RIGHT = 1 << 11
 TEXT_ALIGN_CENTER = 1 << 12
-TEXT_ALIGN_JUSTIFY = 1 << 13
-TEXT_NO_SAVE_RESTORE = 1 << 14
-TEXT_PIXEL_ALIGN = 1 << 15
+TEXT_NO_SAVE_RESTORE = 1 << 13
+TEXT_PIXEL_ALIGN = 1 << 14
 
 # Our special Python-only flag that tells the wrappers to defer to the Cairo
 # default functions, instead of our (potentially merged) wrappers. This isn't
@@ -727,7 +726,6 @@ def merge_with_cairocffi():
         "TEXT_ALIGN_LEFT",
         "TEXT_ALIGN_RIGHT",
         "TEXT_ALIGN_CENTER",
-        "TEXT_ALIGN_JUSTIFY",
         "TEXT_NO_SAVE_RESTORE",
         "TEXT_PIXEL_ALIGN",
         "TEXT_USE_DEFAULT",

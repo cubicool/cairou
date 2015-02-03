@@ -158,10 +158,6 @@ public:
 				
 			else if(flags & CAIROCKS_TEXT_ALIGN_CENTER) line->tx = (ew - lw) / 2.0;
 
-			else if(flags & CAIROCKS_TEXT_ALIGN_JUSTIFY) {
-				// TODO: Oh man, this will be annoying.
-			}
-
 			// The final (untested) option is LEFT, which requires no modification.
 			// All we need to do now is handle pixel-alignment.
 			if(flags & CAIROCKS_TEXT_PIXEL_ALIGN) {

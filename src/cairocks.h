@@ -351,10 +351,6 @@ unsigned int cairocks_gif_surface_get_num_frames(cairo_surface_t* surface);
  * @CAIROCKS_TEXT_ALIGN_LEFT: aligns each line of text in the text body to the left; default.
  * @CAIROCKS_TEXT_ALIGN_RIGHT: aligns each line of text in the text body to the right.
  * @CAIROCKS_TEXT_ALIGN_CENTER: aligns each line of text in the text body to the center.
- * @CAIROCKS_TEXT_ALIGN_JUSTIFY: aligns each line of text with enough padding (in each space)
- * such that the text aligns flat along the left and right edges. This method slower than
- * any of the other alignment methods, as it involves breaking up each line and calling
- * show_text repeatedly, rather than once.
  * @CAIROCKS_TEXT_NO_SAVE_RESTORE: do NOT protect text drawing with cairo_save()/cairo_restore(),
  * which is normally the default behavior. This can be useful when using text with named
  * paths.
@@ -387,9 +383,8 @@ typedef enum _cairocks_text_flags_t {
 	CAIROCKS_TEXT_ALIGN_LEFT = 1 << 10,
 	CAIROCKS_TEXT_ALIGN_RIGHT = 1 << 11,
 	CAIROCKS_TEXT_ALIGN_CENTER = 1 << 12,
-	CAIROCKS_TEXT_ALIGN_JUSTIFY = 1 << 13,
-	CAIROCKS_TEXT_NO_SAVE_RESTORE = 1 << 14,
-	CAIROCKS_TEXT_PIXEL_ALIGN = 1 << 15
+	CAIROCKS_TEXT_NO_SAVE_RESTORE = 1 << 13,
+	CAIROCKS_TEXT_PIXEL_ALIGN = 1 << 14
 } cairocks_text_flags_t;
 
 /**
