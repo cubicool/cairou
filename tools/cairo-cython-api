@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+
+import collections
+import pycparser
+
+STRUCT_TEMPLATE = """\
+cdef class {class_name}:
+    cdef {class_type}* {class_instance}
+
+    def __cinit__({class_name} self, *args):
+        self.{class_instance} =
+
+    def __dealloc__({class_name} self):
+        pass
+
+"""
+
+Type = collections.namedtuple("Type", "type name")
+Function = collections.namedtuple("Function", "ret_val name args")
+Struct = collections.namedtuple("Struct", "name members")
+Enum = collections.namedtuple("Enum", "name values")
+
+TYPEDEFS = []
+FUNCTIONS = []
+STRUCTS = []
+ENUMS = []
+FUNC_PTRS = []
+
+
+def resolve_type(node, target, level=-1, result=[(None, None)]):
+    if isinstance(node.type, target):
+        result[0] = node.type, level
+
+    else:
+        resolve_type(node.type, target, level + 1, result)
+
+    return result[0]
+
+
+# Returns a string representing the "type" of of this node;
+# i.e., int*, char**, double, etc.
+def identifier_type(node, level=-1):
+    ty, ptr = resolve_type(node, pycparser.c_ast.IdentifierType)
+
+    if ty:
+        return "%s%s" % (" ".join(ty.names), ptr > 0 and "*" * ptr or "")
+
+    else:
+        return ""
+
+
+def get_args(args):
+    return [Type(identifier_type(p), p.name) for p in args if p.name]
+
+
+def class_name_instance_type(struct):
+    if struct.name == "cairo_t":
+        ci = "cr"
+        cn = ["context"]
+
+    else:
+        ci = struct.name.replace("cairo_", "").replace("_t", "")
+        cn = ci.split("_")
+
+    return (
+        "".join(c[0].upper() + c[1:] for c in cn),
+        ci,
+        struct.name
+    )
+
+
+class FunctionVisitor(pycparser.c_ast.NodeVisitor):
+    def visit_FuncDecl(self, node):
+        name = resolve_type(node, pycparser.c_ast.TypeDecl)[0].declname
+        ret = identifier_type(node)
+
+        FUNCTIONS.append(Function(
+            ret,
+            name,
+            # [Type(identifier_type(p), p.name) for p in node.args.params if p.name]
+            get_args(node.args.params)
+        ))
+
+
+class TypedefVisitor(pycparser.c_ast.NodeVisitor):
+    def visit_Typedef(self, node):
+        t = node.type.type
+
+        if isinstance(t, pycparser.c_ast.Enum):
+            ENUMS.append(Enum(
+                node.name,
+                [val.name for val in node.type.type.values.enumerators]
+            ))
+
+        elif isinstance(t, pycparser.c_ast.Struct):
+            members = []
+
+            if t.decls:
+                # members.extend(Type(identifier_type(d), d.name) for d in t.decls)
+                members.extend(get_args(t.decls))
+
+            STRUCTS.append(Struct(node.name, members))
+
+        # Standard typedefs; int, double, etc.
+        elif isinstance(t, pycparser.c_ast.IdentifierType):
+            TYPEDEFS.append(Type(identifier_type(node.type), node.name))
+
+        # Function pointer
+        elif isinstance(t, pycparser.c_ast.FuncDecl):
+            FUNC_PTRS.append(Function(
+                identifier_type(t),
+                node.name,
+                # [Type(identifier_type(p), p.name) for p in t.args.params if p.name]
+                get_args(t.args.params)
+            ))
+
+        # cairo_path_data is a union. :/
+        # elif isinstance(t, Union):
+        #    print("\t---", t)
+
+
+if __name__ == "__main__":
+    ast = pycparser.parse_file("/usr/include/cairo/cairo.h", use_cpp=True)
+
+    pxd, pyx = open("cairo_defs.pxd", "w"), open("cairo.pyx", "w")
+
+    pxd.write("cdef extern from \"cairo.h\"\n")
+
+    fv = FunctionVisitor()
+    tv = TypedefVisitor()
+
+    fv.visit(ast)
+    tv.visit(ast)
+
+    # Write the PXD file.
+    for enum in ENUMS:
+        pxd.write("\tctypedef enum %s:\n" % enum.name)
+
+        for val in enum.values:
+            pxd.write("\t\t%s\n" % val)
+
+        pxd.write("\n")
+
+    for typedef in TYPEDEFS:
+        pxd.write("\tctypedef %s %s\n\n" % (typedef.type, typedef.name))
+
+    for func_ptr in FUNC_PTRS:
+        pxd.write("\tctypedef %s (*%s)(%s)\n\n" % (
+            func_ptr.ret_val,
+            func_ptr.name,
+            ", ".join(a.type for a in func_ptr.args)
+        ))
+
+    for struct in STRUCTS:
+        pxd.write("\tctypedef struct %s:\n" % struct.name)
+
+        if len(struct.members):
+            for m in struct.members:
+                pxd.write("\t\t%s %s\n" % (m.type, m.name))
+
+            pxd.write("\n")
+
+        else:
+            pxd.write("\t\tpass\n\n")
+
+    for func in FUNCTIONS:
+        pxd.write("\t%s %s(%s)\n" % (
+            func.ret_val,
+            func.name,
+            ", ".join(a.type for a in func.args)
+        ))
+
+    # Write the PYX file.
+    pyx.write("from cairo_defs cimport *\n\n")
+
+    for enum in ENUMS:
+        longest = sorted([len(v) for v in enum.values])
+        fmt = "%%-%ds" % (longest[-1] - 6)
+
+        for val in enum.values:
+            pyx.write((fmt + " = %s\n") % (
+                val.replace("CAIRO_", ""),
+                val
+            ))
+
+        pyx.write("\n")
+
+    functions = {func.name: False for func in FUNCTIONS}
+
+    for struct in STRUCTS:
+        (
+            class_name,
+            class_instance,
+            class_type
+        ) = class_name_instance_type(struct)
+
+        pyx.write(STRUCT_TEMPLATE.format(
+            class_name=class_name,
+            class_instance=class_instance,
+            class_type=class_type
+        ))
+
+        for func in FUNCTIONS:
+            if not len(func.args) or class_type not in func.args[0].type:
+                continue
+
+            pyx.write("\t# def %s(%s self" % (
+                func.name.replace("cairo_", ""),
+                class_name
+            ))
+
+            functions[func.name] = True
+
+            if len(func.args) == 1:
+                pyx.write("):\n")
+
+            else:
+                pyx.write(", ")
+                pyx.write(", ".join(
+                    "%s %s" % (a.type, a.name) for a in func.args[1:]
+                ))
+                pyx.write("):\n")
+
+            pyx.write("\t#\treturn %s(self.%s, %s)\n\n" % (
+                func.name,
+                class_instance,
+                ", ".join(a.name for a in func.args[1:])
+            ))
+
+    # Print remaining functions.
+    for func in FUNCTIONS:
+        if functions[func.name]:
+            continue
+
+        pyx.write("# def %s(%s):\n" % (
+            func.name.replace("cairo_", ""),
+            ", ".join("%s %s" % (a.type, a.name) for a in func.args)
+        ))
+
+        pyx.write("#\treturn %s(%s)\n\n" % (
+            func.name,
+            ", ".join(a.name for a in func.args[1:])
+        ))
