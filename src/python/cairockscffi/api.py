@@ -451,7 +451,7 @@ TEXT_PIXEL_ALIGN = 1 << 14
 # default functions, instead of our (potentially merged) wrappers. This isn't
 # a part of Cairocks itself, since it's written in C and can't hijack or
 # monkey-patch an API.
-TEXT_USE_DEFAULT = 1 << 31
+TEXT_USE_DEFAULT = 1 << 30
 
 
 def show_text(
