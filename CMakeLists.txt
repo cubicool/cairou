@@ -4,9 +4,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic")
-SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror")
+SET(CAIROCKS_BUILD_TESTS FALSE CACHE BOOL "Enable building of tests.")
+
+IF(NOT WIN32)
+	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic")
+	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror")
+ENDIF()
 
 FIND_PACKAGE(Cairo REQUIRED)
 FIND_PACKAGE(JPEG REQUIRED)
@@ -55,7 +58,9 @@ TARGET_LINK_LIBRARIES(cairocks cairo ${JPEG_LIBRARIES} ${GIF_LIBRARIES})
 
 # Add the C/C++ compiled examples (though Python is generally the preferred
 # testing approach.
-ADD_SUBDIRECTORY("tests/c")
+IF(CAIROCKS_BUILD_TESTS)
+	ADD_SUBDIRECTORY("tests/c")
+ENDIF()
 
 INSTALL(TARGETS cairocks
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
