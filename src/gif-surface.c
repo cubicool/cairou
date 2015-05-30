@@ -164,8 +164,8 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 	rowdata = (unsigned char*)(malloc(gif_data->gif_file->SWidth));
 
 	if(load_data && set_bg) {
-		unsigned char bg   = gif_data->gif_file->SBackGroundColor;
-		int           size = gif_data->gif_file->SWidth * gif_data->gif_file->SHeight;
+		unsigned char bg = gif_data->gif_file->SBackGroundColor;
+		int size = gif_data->gif_file->SWidth * gif_data->gif_file->SHeight;
 
 		if(gif_data->gif_file->SColorMap && bg < gif_data->gif_file->SColorMap->ColorCount) {
 			GifColorType* bgcolor = &gif_data->gif_file->SColorMap->Colors[bg];
@@ -239,7 +239,7 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 		}
 
 		else if(record == EXTENSION_RECORD_TYPE) {
-			int          extcode;
+			int extcode;
 			GifByteType* extension;
 
 			if(DGifGetExtension(gif_data->gif_file, &extcode, &extension) == GIF_ERROR) break;
@@ -265,7 +265,7 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 
 	free(rowdata);
 
-	/* Do the finaly copy from internal, hidden surface to the external surface and
+	/* Do the final copy from internal, hidden surface to the external surface and
 	mark it as dirty. */
 	if(load_data) {
 		memcpy(
@@ -281,10 +281,10 @@ static cairocks_gif_private_next_result _cairocks_gif_private_next(
 }
 
 static cairocks_gif_private_next_result cairocks_gif_private_next(
-	cairo_surface_t*        surface,
+	cairo_surface_t* surface,
 	cairocks_gif_private_t* gif_data,
-	cairo_bool_t            set_bg,
-	unsigned int*           delay
+	cairo_bool_t set_bg,
+	unsigned int* delay
 ) {
 	return _cairocks_gif_private_next(surface, gif_data, set_bg, TRUE, delay);
 }
