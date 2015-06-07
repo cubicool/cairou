@@ -1,10 +1,9 @@
 from . import common
 
-import cairocffi as cairo
 import cairockscffi as cairocks
-import math
 
 
+"""
 @common.test_function("rounded_rectangle")
 def test_rounded_rectangle(cr):
     cr.set_line_width(4.0)
@@ -72,3 +71,27 @@ def test_rounded_rectangle_apply(cr):
 
     cr.set_source_surface(s, 400, 200)
     cr.paint()
+"""
+
+
+@common.test_function(
+    "rounded_rectangle_center",
+    512,
+    512,
+    description="fuckoff!"
+)
+def test_rounded_rectangle_center(cr, w, h):
+    cr.set_line_width(4.0)
+    cr.set_source_rgb(0.5, 0.5, 0.5)
+
+    cairocks.rounded_rectangle_center(
+        cr,
+        w / 2.0,
+        h / 2.0,
+        w / 3.0,
+        w / 3.0,
+        30.0,
+        (True, False, True, False)
+    )
+
+    cr.stroke()

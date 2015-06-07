@@ -5,12 +5,12 @@
 static const cairo_bool_t _cairocks_default_corners[4] = { TRUE, TRUE, TRUE, TRUE };
 
 cairo_bool_t cairocks_rounded_rectangle(
-	cairo_t*            cr,
-	double              x,
-	double              y,
-	double              width,
-	double              height,
-	double              radius,
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
 	const cairo_bool_t* corners
 ) {
 	if(cairo_status(cr)) return FALSE;
@@ -88,12 +88,12 @@ cairo_bool_t cairocks_rounded_rectangle(
 }
 
 cairo_bool_t cairocks_rounded_rectangle_apply(
-	cairo_t*            cr,
-	double              x,
-	double              y,
-	double              width,
-	double              height,
-	double              radius,
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
 	const cairo_bool_t* corners
 ) {
 	if(cairo_status(cr)) return FALSE;
@@ -118,3 +118,46 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 
 	return TRUE;
 }
+
+cairo_bool_t cairocks_rounded_rectangle_center(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+) {
+	if(cairo_status(cr)) return FALSE;
+
+	cairo_save(cr);
+	cairo_translate(cr, x - width, y - height);
+
+	cairocks_rounded_rectangle(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
+
+	cairo_restore(cr);
+
+	return TRUE;
+}
+
+cairo_bool_t cairocks_rounded_rectangle_center_apply(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+) {
+	if(cairo_status(cr)) return FALSE;
+
+	cairo_save(cr);
+	cairo_translate(cr, x - width, y - height);
+
+	cairocks_rounded_rectangle_apply(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
+
+	cairo_restore(cr);
+
+	return TRUE;
+}
+

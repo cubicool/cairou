@@ -3,7 +3,7 @@ from . import (
     # gaussian,
     # image,
     # path,
-    # rectangle,
-    spline,
-    text
+    rectangle
+    # spline,
+    # text
 )

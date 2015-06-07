@@ -7,7 +7,10 @@ sys.path.extend(("../src", "../tests"))
 from gi.repository import Gtk, Gdk, Pango, GtkSource
 
 import cairocffi as cairo
+import cairockscffi as cairocks
 import os
+
+cairocks.merge_with_cairocffi()
 
 DEFAULT_BUFFER = """\
 # This is a Python script to quickly test Cairo stuff!
@@ -27,13 +30,6 @@ cr.fill_preserve()
 cr.set_source_rgb(0.1, 0.1, 0.1)
 cr.stroke()
 """
-
-
-def cr_cast(cr):
-    return cairo.Context._from_pointer(
-        cairo.ffi.cast("cairo_t **", id(cr) + object.__basicsize__)[0],
-        incref=True
-    )
 
 
 class CairoDrawingArea(Gtk.DrawingArea):
@@ -62,7 +58,7 @@ class CairoDrawingArea(Gtk.DrawingArea):
         if self._win:
             self._win.set_status(w, h)
 
-        self._eval(self._buffer, cr_cast(cr), w, h)
+        self._eval(self._buffer, cairocks.cr_cast(cr), w, h)
 
         return True
 

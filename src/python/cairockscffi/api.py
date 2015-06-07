@@ -8,26 +8,6 @@ import cairocffi
 import contextlib
 
 cairocffi.ffi.cdef(r"""
-cairo_bool_t cairocks_rounded_rectangle(
-    cairo_t* cr,
-    double x,
-    double y,
-    double width,
-    double height,
-    double radius,
-    const cairo_bool_t* corners
-);
-
-cairo_bool_t cairocks_rounded_rectangle_apply(
-    cairo_t* cr,
-    double x,
-    double y,
-    double width,
-    double height,
-    double radius,
-    const cairo_bool_t* corners
-);
-
 cairo_bool_t cairocks_append_named_path(
     cairo_t* cr,
     const char* named_path
@@ -189,6 +169,47 @@ cairo_bool_t cairocks_icon_extents(
 );
 
 cairocks_icon_t cairocks_icon_from_string(const char* icon);
+
+cairo_bool_t cairocks_rounded_rectangle(
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
+    const cairo_bool_t* corners
+);
+
+cairo_bool_t cairocks_rounded_rectangle_apply(
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
+    const cairo_bool_t* corners
+);
+
+cairo_bool_t cairocks_rounded_rectangle_center(
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
+    const cairo_bool_t* corners
+);
+
+cairo_bool_t cairocks_rounded_rectangle_center_apply(
+    cairo_t* cr,
+    double x,
+    double y,
+    double width,
+    double height,
+    double radius,
+    const cairo_bool_t* corners
+);
+
 """)
 
 _lib = cairocffi.ffi.dlopen("libcairocks.so")
@@ -197,74 +218,6 @@ _lib = cairocffi.ffi.dlopen("libcairocks.so")
 # choose to "merge" the cairockscffi API with cairocffi.
 _CONTEXT_METHODS = {}
 _SURFACE_METHODS = {}
-
-
-def _rounded_rectangle(
-    libfunction,
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    corners_vals = cairocffi.ffi.new("cairo_bool_t[4]")
-
-    for i, c in enumerate(corners):
-        corners_vals[i] = c
-
-    return libfunction(
-        cr._pointer,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners_vals
-    )
-
-
-def rounded_rectangle(
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    return _rounded_rectangle(
-        _lib.cairocks_rounded_rectangle,
-        cr,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners
-    )
-
-
-def rounded_rectangle_apply(
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    return _rounded_rectangle(
-        _lib.cairocks_rounded_rectangle_apply,
-        cr,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners
-    )
 
 
 def append_named_path(cr, named_path):
@@ -635,6 +588,116 @@ def icon_from_string(icon):
     return _lib.cairocks_icon_from_string(icon.encode("ascii"))
 
 
+def _rounded_rectangle(
+    libfunction,
+    cr,
+    x,
+    y,
+    width,
+    height,
+    radius,
+    corners=(True, True, True, True)
+):
+    corners_vals = cairocffi.ffi.new("cairo_bool_t[4]")
+
+    for i, c in enumerate(corners):
+        corners_vals[i] = c
+
+    return libfunction(
+        cr._pointer,
+        x,
+        y,
+        width,
+        height,
+        radius,
+        corners_vals
+    )
+
+
+def rounded_rectangle(
+    cr,
+    x,
+    y,
+    width,
+    height,
+    radius,
+    corners=(True, True, True, True)
+):
+    return _rounded_rectangle(
+        _lib.cairocks_rounded_rectangle,
+        cr,
+        x,
+        y,
+        width,
+        height,
+        radius,
+        corners
+    )
+
+
+def rounded_rectangle_apply(
+    cr,
+    x,
+    y,
+    width,
+    height,
+    radius,
+    corners=(True, True, True, True)
+):
+    return _rounded_rectangle(
+        _lib.cairocks_rounded_rectangle_apply,
+        cr,
+        x,
+        y,
+        width,
+        height,
+        radius,
+        corners
+    )
+
+
+def rounded_rectangle_center(
+    cr,
+    x,
+    y,
+    width,
+    height,
+    radius,
+    corners=(True, True, True, True)
+):
+    return _rounded_rectangle(
+        _lib.cairocks_rounded_rectangle_center,
+        cr,
+        x,
+        y,
+        width,
+        height,
+        radius,
+        corners
+    )
+
+
+def rounded_rectangle_center_apply(
+    cr,
+    x,
+    y,
+    width,
+    height,
+    radius,
+    corners=(True, True, True, True)
+):
+    return _rounded_rectangle(
+        _lib.cairocks_rounded_rectangle_center_apply,
+        cr,
+        x,
+        y,
+        width,
+        height,
+        radius,
+        corners
+    )
+
+
 # From: http://preshing.com/20110920/the-python-with-statement-by-example
 # Wraps the subsequent code in save/restore calls.
 @contextlib.contextmanager
@@ -663,6 +726,16 @@ def named_path(cr, name=""):
         cr.restore()
 
 
+# Casts the old pycairo Context in an object compatible with this module
+# instead.
+# TODO: Might also work with other objects?
+def cr_cast(cr):
+    return cairocffi.Context._from_pointer(
+        cairocffi.ffi.cast("cairo_t **", id(cr) + object.__basicsize__)[0],
+        incref=True
+    )
+
+
 # Monkey-patches the Cairockscffi API into the Cairocffi namespace.
 def merge_with_cairocffi():
     def method_wrap(func):
@@ -672,8 +745,6 @@ def merge_with_cairocffi():
         return method_wrapped_func
 
     for method in (
-        rounded_rectangle,
-        rounded_rectangle_apply,
         append_named_path,
         append_named_path_preserve,
         set_named_path,
@@ -689,7 +760,11 @@ def merge_with_cairocffi():
         icon_extents,
         icon_from_string,
         saved,
-        named_path
+        named_path,
+        rounded_rectangle,
+        rounded_rectangle_apply,
+        rounded_rectangle_center,
+        rounded_rectangle_center_apply
     ):
         mn = method.__name__
 
@@ -737,3 +812,5 @@ def merge_with_cairocffi():
         "ICON_Y_BOTTOM"
     ):
         setattr(cairocffi, const, globals()[const])
+
+    setattr(cairocffi, "cr_cast", cr_cast)

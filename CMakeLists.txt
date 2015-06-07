@@ -5,18 +5,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
 SET(CAIROCKS_BUILD_TESTS FALSE CACHE BOOL "Enable building of tests.")
-
-IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic -Wno-error=unused-command-line-argument")
-	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror")
-ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused-parameter -Werror -ansi -pedantic")
-	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused-parameter -Werror")
-ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-	MESSAGE("TODO: Test this compiler!")
-ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-	MESSAGE("TODO: What a shitty compiler.")
-ENDIF()
+SET(CAIROCKS_STATIC FALSE CACHE BOOL "Enable static build of Cairocks.")
 
 FIND_PACKAGE(Cairo REQUIRED)
 FIND_PACKAGE(JPEG REQUIRED)
@@ -24,15 +13,15 @@ FIND_PACKAGE(GIF REQUIRED)
 
 SET(CAIROCKS_SRC_FILES
 	# Standard C files.
-	"src/cairocks-glyphicons.c"
 	"src/distance-field.c"
 	"src/emboss.c"
 	"src/gaussian-blur.c"
 	"src/gif-surface.c"
+	"src/glyphicons.c"
 	"src/icon.c"
 	"src/invert.c"
 	"src/map-path-onto.c"
-	"src/rounded.c"
+	"src/rounded-rectangle.c"
 	"src/spline.c"
 	"src/surface-from-jpeg.c"
 	"src/surface-from-png.c"
@@ -59,7 +48,14 @@ LINK_DIRECTORIES(${CAIRO_LIBRARY_DIRS})
 SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
 
-ADD_LIBRARY(cairocks ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
+# Setup the static/shared library variable.
+SET(CAIROCKS_LIBRARY_TYPE SHARED)
+
+IF(CAIROCKS_STATIC)
+	SET(CAIROCKS_LIBRARY_TYPE STATIC)
+ENDIF()
+
+ADD_LIBRARY(cairocks ${CAIROCKS_LIBRARY_TYPE} ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
 
 TARGET_LINK_LIBRARIES(cairocks cairo ${JPEG_LIBRARIES} ${GIF_LIBRARIES})
 

@@ -21,63 +21,13 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-#define CAIROCKS_VERSION_MAJOR  0
-#define CAIROCKS_VERSION_MINOR  5
-#define CAIROCKS_VERSION_BUGFIX 2
+#define CAIROCKS_VERSION_MAJOR 1
+#define CAIROCKS_VERSION_MINOR 0
+#define CAIROCKS_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * cairocks_rounded_rectangle:
- * @cr: a Cairo context
- * @x: the x coordinate
- * @y: the y coordinate
- * @width: the width value
- * @height: the height value
- * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL
- *
- * This function creates a common rounded-rectangle shape, with the caveat that each
- * round corner can be optionally turned off by using an array of 4 cairo_bool_t values.
- * These values correspond to: top-left, top-right, bottom-right, and bottom-left corners.
- * By default (when using NULL), all four corners are rounded.
- **/
-cairo_bool_t cairocks_rounded_rectangle(
-	cairo_t*            cr,
-	double              x,
-	double              y,
-	double              width,
-	double              height,
-	double              radius,
-	const cairo_bool_t* corners
-);
-
-/**
- * cairocks_rounded_rectangle_apply:
- * @cr: a Cairo context
- * @x: the x coordinate
- * @y: the y coordinate
- * @width: the width value
- * @height: the height value
- * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL
- *
- * This function, whose signature is identical to cairocks_rounded_rectangle,
- * applies the resultant rounded rectangle and "punches out" the edges of the
- * context passed in as @cr. This can be thougt of as applying a "border" to an
- * existing context/surface, almost like a traditional picture.
- **/
-cairo_bool_t cairocks_rounded_rectangle_apply(
-	cairo_t*            cr,
-	double              x,
-	double              y,
-	double              width,
-	double              height,
-	double              radius,
-	const cairo_bool_t* corners
-);
 
 /**
  * cairocks_append_named_path:
@@ -151,7 +101,7 @@ cairo_bool_t cairocks_remove_named_path(cairo_t* cr, const char* named_path);
  * and then pass the previously saved path into @path.
  **/
 cairo_bool_t cairocks_map_path_onto(
-	cairo_t*      cr,
+	cairo_t* cr,
 	cairo_path_t* path
 );
 
@@ -172,11 +122,11 @@ cairo_bool_t cairocks_map_path_onto(
  **/
 cairo_surface_t* cairocks_emboss_create(
 	cairo_surface_t* surface,
-	double           azimuth,
-	double           elevation,
-	double           height,
-	double           ambient,
-	double           diffuse
+	double azimuth,
+	double elevation,
+	double height,
+	double ambient,
+	double diffuse
 );
 
 /**
@@ -194,11 +144,11 @@ cairo_surface_t* cairocks_emboss_create(
  **/
 cairo_bool_t cairocks_emboss(
 	cairo_surface_t* surface,
-	double           azimuth,
-	double           elevation,
-	double           height,
-	double           ambient,
-	double           diffuse
+	double azimuth,
+	double elevation,
+	double height,
+	double ambient,
+	double diffuse
 );
 
 /**
@@ -212,8 +162,8 @@ cairo_bool_t cairocks_emboss(
  **/
 cairo_surface_t* cairocks_gaussian_blur_create(
 	cairo_surface_t* surface,
-	double           radius,
-	double           deviation
+	double radius,
+	double deviation
 );
 
 /**
@@ -228,8 +178,8 @@ cairo_surface_t* cairocks_gaussian_blur_create(
  **/
 cairo_bool_t cairocks_gaussian_blur(
 	cairo_surface_t* surface,
-	double           radius,
-	double           deviation
+	double radius,
+	double deviation
 );
 
 /**
@@ -257,8 +207,8 @@ cairo_bool_t cairocks_a8_invert(cairo_surface_t* surface);
  **/
 cairo_surface_t* cairocks_distance_field_create(
 	cairo_surface_t* surface,
-	int              scan_size,
-	int              block_size
+	int scan_size,
+	int block_size
 );
 
 /**
@@ -408,12 +358,12 @@ typedef enum _cairocks_text_flags_t {
  * flags documentation.
  **/
 cairo_bool_t cairocks_show_text(
-	cairo_t*     cr,
-	const char*  utf8,
-	const char*  font,
-	double       size,
-	double       x,
-	double       y,
+	cairo_t* cr,
+	const char* utf8,
+	const char* font,
+	double size,
+	double x,
+	double y,
 	unsigned int flags
 );
 
@@ -431,13 +381,13 @@ cairo_bool_t cairocks_show_text(
  * as the underlying Cairo function.
  **/
 cairo_bool_t cairocks_text_path(
-	cairo_t*    cr,
+	cairo_t* cr,
 	const char* utf8,
 	const char* font,
-	double      size,
-	double      x,
-	double      y,
-	int         flags
+	double size,
+	double x,
+	double y,
+	int flags
 );
 
 /**
@@ -458,15 +408,15 @@ cairo_bool_t cairocks_text_path(
  * defines the final, inked rectangle extents of the text body.
  **/
 cairo_bool_t cairocks_text_extents(
-	cairo_t*              cr,
-	const char*           utf8,
-	const char*           font,
-	double                size,
-	double                x,
-	double                y,
-	int                   flags,
+	cairo_t* cr,
+	const char* utf8,
+	const char* font,
+	double size,
+	double x,
+	double y,
+	int flags,
 	cairo_text_extents_t* extents,
-	double*               rect_extents
+	double* rect_extents
 );
 
 /**
@@ -489,10 +439,10 @@ typedef struct _cairocks_point_t {
  * The points define a spline, which is optionally @closed or otherwise.
  */
 cairo_bool_t cairocks_append_spline(
-	cairo_t*          cr,
+	cairo_t* cr,
 	cairocks_point_t* points,
-	int               num_points,
-	cairo_bool_t      closed
+	int num_points,
+	cairo_bool_t closed
 );
 
 /**
@@ -533,12 +483,12 @@ typedef enum _cairocks_icon_flags_t {
  * Glyphicons font is not found by Cairo, as this is NOT a totally free font.
  */
 cairo_bool_t cairocks_show_icon(
-	cairo_t*        cr,
+	cairo_t* cr,
 	cairocks_icon_t icon,
-	double          size,
-	double          x,
-	double          y,
-	unsigned int    flags
+	double size,
+	double x,
+	double y,
+	unsigned int flags
 );
 
 /**
@@ -550,12 +500,12 @@ cairo_bool_t cairocks_show_icon(
  * not automatically filled.
  */
 cairo_bool_t cairocks_icon_path(
-	cairo_t*        cr,
+	cairo_t* cr,
 	cairocks_icon_t icon,
-	double          size,
-	double          x,
-	double          y,
-	unsigned int    flags
+	double size,
+	double x,
+	double y,
+	unsigned int flags
 );
 
 /**
@@ -572,13 +522,13 @@ cairo_bool_t cairocks_icon_path(
  * of the rectangular region affected by this icon and the associated flags.
  */
 cairo_bool_t cairocks_icon_extents(
-	cairo_t*        cr,
+	cairo_t* cr,
 	cairocks_icon_t icon,
-	double          size,
-	double          x,
-	double          y,
-	unsigned int    flags,
-	double*         extents
+	double size,
+	double x,
+	double y,
+	unsigned int flags,
+	double* extents
 );
 
 /**
@@ -591,6 +541,104 @@ cairo_bool_t cairocks_icon_extents(
  * is used. On failure, CAIROCKS_ICON_ERROR is returned.
  */
 cairocks_icon_t cairocks_icon_from_string(const char* icon);
+
+/**
+ * cairocks_rounded_rectangle:
+ * @cr: a Cairo context
+ * @x: the x coordinate
+ * @y: the y coordinate
+ * @width: the width value
+ * @height: the height value
+ * @radius: the radius of each arc
+ * @corners: a 4-value cairo_bool_t array, or NULL
+ *
+ * This function creates a common rounded-rectangle shape, with the caveat that each
+ * round corner can be optionally turned off by using an array of 4 cairo_bool_t values.
+ * These values correspond to: top-left, top-right, bottom-right, and bottom-left corners.
+ * By default (when using NULL), all four corners are rounded.
+ **/
+cairo_bool_t cairocks_rounded_rectangle(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+);
+
+/**
+ * cairocks_rounded_rectangle_apply:
+ * @cr: a Cairo context
+ * @x: the x coordinate
+ * @y: the y coordinate
+ * @width: the width value
+ * @height: the height value
+ * @radius: the radius of each arc
+ * @corners: a 4-value cairo_bool_t array, or NULL
+ *
+ * This function, whose signature is identical to cairocks_rounded_rectangle,
+ * applies the resultant rounded rectangle and "punches out" the edges of the
+ * context passed in as @cr. This can be thougt of as applying a "border" to an
+ * existing context/surface, almost like a traditional picture.
+ **/
+cairo_bool_t cairocks_rounded_rectangle_apply(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+);
+
+/**
+ * cairocks_rounded_rectangle_center:
+ * @cr: a Cairo context
+ * @x: the center x coordinate
+ * @y: the center y coordinate
+ * @width: the width value, equal to the left and right of the @x position
+ * @height: the height value, equal above and below the @y position
+ * @radius: the radius of each arc
+ * @corners: a 4-value cairo_bool_t array, or NULL
+ *
+ * This function creates a common rounded-rectangle shape similar to the normal
+ * @cairocks_rounded_rectangle function above, except that the @x and @y coordinates
+ * specify the center of the shape and the @width and @height represent the equidistant
+ * lenghts from the center. The remaining parameters behave as in @cairo_rounded_rectangle.
+ **/
+cairo_bool_t cairocks_rounded_rectangle_center(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+);
+
+/**
+ * cairocks_rounded_rectangle_center_apply:
+ * @cr: a Cairo context
+ * @x: the center x coordinate
+ * @y: the center y coordinate
+ * @width: the width value, equal to the left and right of the @x position
+ * @height: the height value, equal above and below the @y position
+ * @radius: the radius of each arc
+ * @corners: a 4-value cairo_bool_t array, or NULL
+ *
+ * Behaves exactly as @cairocks_rounded_rectangle_apply, with sizing and positioning
+ * parameters behaving as they do in @cairocks_rounded_rectangle_center.
+ **/
+cairo_bool_t cairocks_rounded_rectangle_center_apply(
+	cairo_t* cr,
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius,
+	const cairo_bool_t* corners
+);
 
 #ifdef __cplusplus
 }
