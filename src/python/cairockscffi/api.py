@@ -4,6 +4,11 @@ Cairocks for use with Python3. It may be helpful as a starting point for your
 own bindings, though I personally tend to prefer Cython.
 """
 
+# TODO: Convert this to a cairocks_get_version() or similar function!
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_BUGFIX = 0
+
 import cairocffi
 import contextlib
 
