@@ -2,7 +2,7 @@
 
 const char* test_name = "text";
 
-const char* test_string = 
+const char* test_string =
 	"Lorem ipsum dolor sit amet, consectetur\n"
 	"adipiscing elit.  Cras efficitur dui risus,\n"
 	"ac elementum orci rhoncus ac.  Praesent risus\n"
