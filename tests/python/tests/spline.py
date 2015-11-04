@@ -1,9 +1,9 @@
 from . import common
 
 import math
-import cairockscffi as cairocks
+import cairoucffi as cairou
 
-cairocks.merge_with_cairocffi()
+cairou.merge_with_cairocffi()
 
 
 @common.test_function("spline", 512, 512)

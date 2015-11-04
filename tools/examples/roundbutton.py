@@ -1,5 +1,5 @@
 import math
-import cairo
+import cairocffi as cairo
 
 lw = 6.0
 r  = 60.0

@@ -1,11 +1,11 @@
 # This file tests the "merge" feature; that is,
-# merging the cairocks API with the Context and Surface
+# merging the cairou API with the Context and Surface
 # classes in cairocffi.
 
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 
-cairocks.merge_with_cairocffi()
+cairou.merge_with_cairocffi()
 
 if __name__ == "__main__":
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 256, 256)

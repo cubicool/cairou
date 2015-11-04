@@ -15,12 +15,12 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 	cairo_line_to(cr, 512.0, 256.0);
 	cairo_stroke(cr);
 
-	if(!cairocks_show_icon(cr, CAIROCKS_ICON_LEAF, 200.0, 256.0, 256.0, 0)) {
+	if(!cairou_show_icon(cr, CAIROU_ICON_LEAF, 200.0, 256.0, 256.0, 0)) {
 		printf("There was ome funky error!\n");
 
 		return;
 	}
 
-	/* cairocks_icon_extents(cr, CAIROCKS_ICON_LEAF, 200.0, 256.0, 256.0, 0, extents); */
+	/* cairou_icon_extents(cr, CAIROU_ICON_LEAF, 200.0, 256.0, 256.0, 0, extents); */
 }
 

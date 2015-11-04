@@ -1,13 +1,13 @@
 from . import common
 
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 import math
 
 
 @common.test_function("emboss")
 def test_emboss(cr):
-    text = "Cairocks"
+    text = "Cairou"
     text_size = 30
     w, h = 200, 200
     s = cairo.ImageSurface(cairo.FORMAT_A8, w, h)
@@ -21,7 +21,7 @@ def test_emboss(cr):
     c.move_to(((w - extents[2]) / 2.0) - extents[0], (h - extents[1]) / 2.0)
     c.show_text(text)
 
-    emboss = cairocks.emboss_create(
+    emboss = cairou.emboss_create(
         s,
         130.0 * (math.pi / 180.0),
         45.0 * (math.pi / 180.0),

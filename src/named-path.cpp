@@ -1,12 +1,12 @@
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <map>
 #include <list>
 #include <string>
 #include <cstring>
 
-struct cairocks_named_path_item_t {
-	cairocks_named_path_item_t(cairo_path_t* _path):
+struct cairou_named_path_item_t {
+	cairou_named_path_item_t(cairo_path_t* _path):
 	path(_path) {
 	}
 
@@ -14,29 +14,29 @@ struct cairocks_named_path_item_t {
 	cairo_matrix_t matrix;
 };
 
-typedef std::list<cairocks_named_path_item_t> cairocks_named_path_items_t;
-typedef std::map<std::string, cairocks_named_path_items_t> cairocks_named_path_t;
+typedef std::list<cairou_named_path_item_t> cairou_named_path_items_t;
+typedef std::map<std::string, cairou_named_path_items_t> cairou_named_path_t;
 
-struct cairocks_named_path_private_t {
-	cairocks_named_path_private_t():
+struct cairou_named_path_private_t {
+	cairou_named_path_private_t():
 	last(0) {
 	}
 
-	cairocks_named_path_t paths;
-	cairocks_named_path_items_t* last;
+	cairou_named_path_t paths;
+	cairou_named_path_items_t* last;
 };
 
 static cairo_user_data_key_t NAMED_PATH_DATA;
 
-static cairocks_named_path_private_t* cairocks_named_path_private_get(cairo_t* cr) {
-	return static_cast<cairocks_named_path_private_t*>(cairo_get_user_data(cr, &NAMED_PATH_DATA));
+static cairou_named_path_private_t* cairou_named_path_private_get(cairo_t* cr) {
+	return static_cast<cairou_named_path_private_t*>(cairo_get_user_data(cr, &NAMED_PATH_DATA));
 }
 
-static void cairocks_named_path_private_destroy(void* data) {
-	cairocks_named_path_t* named_path = static_cast<cairocks_named_path_t*>(data);
+static void cairou_named_path_private_destroy(void* data) {
+	cairou_named_path_t* named_path = static_cast<cairou_named_path_t*>(data);
 
-	for(cairocks_named_path_t::iterator i = named_path->begin(); i != named_path->end(); i++) {
-		for(cairocks_named_path_items_t::iterator j = i->second.begin(); j != i->second.end(); j++) {
+	for(cairou_named_path_t::iterator i = named_path->begin(); i != named_path->end(); i++) {
+		for(cairou_named_path_items_t::iterator j = i->second.begin(); j != i->second.end(); j++) {
 			cairo_path_destroy(j->path);
 		}
 	}
@@ -44,18 +44,18 @@ static void cairocks_named_path_private_destroy(void* data) {
 	delete named_path;
 }
 
-static cairo_bool_t cairocks_named_path_private_append(
+static cairo_bool_t cairou_named_path_private_append(
 	cairo_t* cr,
 	const char* named_path,
 	bool new_path=true
 ) {
-	cairocks_named_path_items_t* list = 0;
-	cairocks_named_path_private_t* data = cairocks_named_path_private_get(cr);
+	cairou_named_path_items_t* list = 0;
+	cairou_named_path_private_t* data = cairou_named_path_private_get(cr);
 
 	if(!data) {
-		data = new cairocks_named_path_private_t();
+		data = new cairou_named_path_private_t();
 
-		cairo_set_user_data(cr, &NAMED_PATH_DATA, data, cairocks_named_path_private_destroy);
+		cairo_set_user_data(cr, &NAMED_PATH_DATA, data, cairou_named_path_private_destroy);
 	}
 
 	// If the name isn't specified, we're appending to the most recent (if it exists).
@@ -79,13 +79,13 @@ static cairo_bool_t cairocks_named_path_private_append(
 	return TRUE;
 }
 
-static cairo_bool_t cairocks_named_path_private_set(
+static cairo_bool_t cairou_named_path_private_set(
 	cairo_t* cr,
 	const char* named_path,
 	bool new_path=true
 ) {
-	const cairocks_named_path_items_t* list = 0;
-	cairocks_named_path_private_t* data = cairocks_named_path_private_get(cr);
+	const cairou_named_path_items_t* list = 0;
+	cairou_named_path_private_t* data = cairou_named_path_private_get(cr);
 
 	if(!data) return FALSE;
 
@@ -96,7 +96,7 @@ static cairo_bool_t cairocks_named_path_private_set(
 	}
 
 	else {
-		cairocks_named_path_t::const_iterator key_value = data->paths.find(named_path);
+		cairou_named_path_t::const_iterator key_value = data->paths.find(named_path);
 
 		if(key_value == data->paths.end()) return FALSE;
 
@@ -106,7 +106,7 @@ static cairo_bool_t cairocks_named_path_private_set(
 	if(new_path) cairo_new_path(cr);
 
 	for(
-		cairocks_named_path_items_t::const_iterator i = list->begin();
+		cairou_named_path_items_t::const_iterator i = list->begin();
 		i != list->end();
 		i++
 	) {
@@ -123,30 +123,30 @@ static cairo_bool_t cairocks_named_path_private_set(
 
 extern "C" {
 
-cairo_bool_t cairocks_append_named_path(cairo_t* cr, const char* named_path) {
-	return cairocks_named_path_private_append(cr, named_path);
+cairo_bool_t cairou_append_named_path(cairo_t* cr, const char* named_path) {
+	return cairou_named_path_private_append(cr, named_path);
 }
 
-cairo_bool_t cairocks_append_named_path_preserve(cairo_t* cr, const char* named_path) {
-	return cairocks_named_path_private_append(cr, named_path, false);
+cairo_bool_t cairou_append_named_path_preserve(cairo_t* cr, const char* named_path) {
+	return cairou_named_path_private_append(cr, named_path, false);
 }
 
-cairo_bool_t cairocks_set_named_path(cairo_t* cr, const char* named_path) {
-	return cairocks_named_path_private_set(cr, named_path);
+cairo_bool_t cairou_set_named_path(cairo_t* cr, const char* named_path) {
+	return cairou_named_path_private_set(cr, named_path);
 }
 
-cairo_bool_t cairocks_set_named_path_preserve(cairo_t* cr, const char* named_path) {
-	return cairocks_named_path_private_set(cr, named_path, true);
+cairo_bool_t cairou_set_named_path_preserve(cairo_t* cr, const char* named_path) {
+	return cairou_named_path_private_set(cr, named_path, true);
 }
 
-cairo_bool_t cairocks_remove_named_path(cairo_t* cr, const char* named_path) {
-	cairocks_named_path_private_t* data = cairocks_named_path_private_get(cr);
-	cairocks_named_path_t::iterator key_value = data->paths.find(named_path);
+cairo_bool_t cairou_remove_named_path(cairo_t* cr, const char* named_path) {
+	cairou_named_path_private_t* data = cairou_named_path_private_get(cr);
+	cairou_named_path_t::iterator key_value = data->paths.find(named_path);
 
 	if(key_value == data->paths.end()) return FALSE;
 
 	for(
-		cairocks_named_path_items_t::const_iterator i = key_value->second.begin();
+		cairou_named_path_items_t::const_iterator i = key_value->second.begin();
 		i != key_value->second.end();
 		i++
 	) cairo_path_destroy(i->path);

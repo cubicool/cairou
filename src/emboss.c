@@ -5,7 +5,7 @@
  * 	Further refined by: Andrea Canciani <ranma42@gmail.com>
  */
 
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -24,7 +24,7 @@ unsigned char minc(double d) {
 #define OFFSET(x, y, w, h, stride) \
 	((x < 0) ? 0 : ((x > w - 1) ? w - 1 : x)) + ((y < 0) ? 0 : ((y > h - 1) ? h - 1 : y)) * stride
 
-static cairo_surface_t* _cairocks_create_embossed_surface(
+static cairo_surface_t* _cairou_create_embossed_surface(
 	cairo_surface_t* surface,
 	double azimuth,
 	double elevation,
@@ -101,7 +101,7 @@ dirty_ret:
 
 /* This function only supports A8 surfaces at the moment, and delegates work to the
 // similarly named function above. */
-cairo_surface_t* cairocks_emboss_create(
+cairo_surface_t* cairou_emboss_create(
 	cairo_surface_t* surface,
 	double azimuth,
 	double elevation,
@@ -115,7 +115,7 @@ cairo_surface_t* cairocks_emboss_create(
 		return 0;
 	}
 
-	else return _cairocks_create_embossed_surface(
+	else return _cairou_create_embossed_surface(
 		surface,
 		azimuth,
 		elevation,
@@ -127,7 +127,7 @@ cairo_surface_t* cairocks_emboss_create(
 
 /* This function only supports A8 surfaces at the moment, and delegates work to the
 // similarly named function above. */
-cairo_bool_t cairocks_emboss(
+cairo_bool_t cairou_emboss(
 	cairo_surface_t* surface,
 	double azimuth,
 	double elevation,
@@ -145,7 +145,7 @@ cairo_bool_t cairocks_emboss(
 		return FALSE;
 	}
 
-	tmp = _cairocks_create_embossed_surface(
+	tmp = _cairou_create_embossed_surface(
 		surface,
 		azimuth,
 		elevation,

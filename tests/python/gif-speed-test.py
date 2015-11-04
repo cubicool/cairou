@@ -1,4 +1,4 @@
-import cairocks
+import cairou
 import time
 
 def time_test(surface, mult):
@@ -13,7 +13,7 @@ def time_test(surface, mult):
 	))
 
 if __name__ == "__main__":
-	surface = cairocks.GIFSurface("../data/test.gif")
+	surface = cairou.GIFSurface("../data/test.gif")
 
 	time_test(surface, 1)
 

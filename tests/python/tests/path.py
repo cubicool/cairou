@@ -1,7 +1,7 @@
 from . import common
 
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 import math
 
 
@@ -10,9 +10,9 @@ def test_named_path(cr):
     for i in range(5):
         cr.arc(100.0 * i, 100.0 * i, 75.0, 0.0, 2.0 * math.pi)
 
-        cairocks.append_named_path(cr, "circles")
+        cairou.append_named_path(cr, "circles")
 
-    cairocks.set_named_path(cr, "circles")
+    cairou.set_named_path(cr, "circles")
 
     cr.set_line_width(10.0)
     cr.stroke()
@@ -33,9 +33,9 @@ def test_map_path_onto(cr):
         cairo.FONT_WEIGHT_NORMAL
     )
 
-    cr.text_path("cairocks_map_path_onto")
+    cr.text_path("cairou_map_path_onto")
 
-    cairocks.map_path_onto(cr, p)
+    cairou.map_path_onto(cr, p)
 
     cr.set_source_rgb(0.5, 0.5, 0.5)
     cr.stroke()

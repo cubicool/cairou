@@ -1,4 +1,4 @@
-#include "cairocks.h"
+#include "cairou.h"
 #include "utf8.h"
 
 #include <math.h>
@@ -19,7 +19,7 @@ namespace UTF8 = utf8;
 // with the Cairo API. We take a fairly easy approach wherein we essentially
 // break the string up into small strings by storing a start position for each
 // substring and replacing the newlines we find in our copy with NULL terminators.
-class cairocks_text_private_t {
+class cairou_text_private_t {
 public:
 	struct line_t {
 		line_t(const char* _utf8):
@@ -36,7 +36,7 @@ public:
 
 	typedef std::vector<line_t> lines_t;
 
-	cairocks_text_private_t(const char* _utf8, int _flags):
+	cairou_text_private_t(const char* _utf8, int _flags):
 	utf8(0),
 	flags(_flags),
 	tx(0.0),
@@ -72,7 +72,7 @@ public:
 		memset(&extents, 0, sizeof(cairo_text_extents_t));
 	}
 
-	~cairocks_text_private_t() {
+	~cairou_text_private_t() {
 		if(utf8) delete[] utf8;
 	}
 
@@ -120,20 +120,20 @@ public:
 		}
 
 		// Perform X alignment; default is BASELINE.
-		if(flags & CAIROCKS_TEXT_X_LEFT) tx = -extents.x_bearing;
+		if(flags & CAIROU_TEXT_X_LEFT) tx = -extents.x_bearing;
 
-		else if(flags & CAIROCKS_TEXT_X_RIGHT) tx = -(extents.width + extents.x_bearing);
+		else if(flags & CAIROU_TEXT_X_RIGHT) tx = -(extents.width + extents.x_bearing);
 
-		else if(flags & CAIROCKS_TEXT_X_CENTER) tx = -(extents.width / 2.0) - extents.x_bearing;
+		else if(flags & CAIROU_TEXT_X_CENTER) tx = -(extents.width / 2.0) - extents.x_bearing;
 
 		// Now we do Y alignment, who also defaults to BASELINE.
-		if(flags & CAIROCKS_TEXT_Y_BOTTOM) ty = -(extents.height + extents.y_bearing);
+		if(flags & CAIROU_TEXT_Y_BOTTOM) ty = -(extents.height + extents.y_bearing);
 
-		else if(flags & CAIROCKS_TEXT_Y_CENTER) ty =
+		else if(flags & CAIROU_TEXT_Y_CENTER) ty =
 			(extents.height / 2.0) - (extents.height + extents.y_bearing)
 		;
 
-		else if(flags & CAIROCKS_TEXT_Y_TOP) ty = -extents.y_bearing;
+		else if(flags & CAIROU_TEXT_Y_TOP) ty = -extents.y_bearing;
 
 		// Adjust our origin to account for multiple lines.
 		ty -= (lines.size() - 1) * size;
@@ -141,8 +141,8 @@ public:
 		// If the user has requested pixel-alignment, do so now. Unfortunately,
 		// this doesn't guarantee that every character also occurs on pixel
 		// boundaries; that will require using harfbuzz, which will eventually be
-		// added to Cairocks.
-		if(flags & CAIROCKS_TEXT_PIXEL_ALIGN) {
+		// added to Cairou.
+		if(flags & CAIROU_TEXT_PIXEL_ALIGN) {
 			tx = round(tx);
 			ty = round(ty);
 		}
@@ -154,13 +154,13 @@ public:
 			double ew = extents.width;
 			double lw = line->extents.width;
 
-			if(flags & CAIROCKS_TEXT_ALIGN_RIGHT) line->tx = ew - lw;
+			if(flags & CAIROU_TEXT_ALIGN_RIGHT) line->tx = ew - lw;
 				
-			else if(flags & CAIROCKS_TEXT_ALIGN_CENTER) line->tx = (ew - lw) / 2.0;
+			else if(flags & CAIROU_TEXT_ALIGN_CENTER) line->tx = (ew - lw) / 2.0;
 
 			// The final (untested) option is LEFT, which requires no modification.
 			// All we need to do now is handle pixel-alignment.
-			if(flags & CAIROCKS_TEXT_PIXEL_ALIGN) {
+			if(flags & CAIROU_TEXT_PIXEL_ALIGN) {
 				line->tx = round(line->tx);
 				line->ty = round(line->ty);
 			}
@@ -177,7 +177,7 @@ public:
 
 // Initializes the Cairo state for the passed-in context and returns a private
 // structure containing the data necessary to properly draw the string.
-static cairocks_text_private_t* cairocks_text_private_init(
+static cairou_text_private_t* cairou_text_private_init(
 	cairo_t* cr,
 	const char* utf8,
 	const char* font,
@@ -187,18 +187,18 @@ static cairocks_text_private_t* cairocks_text_private_init(
 	cairo_select_font_face(
 		cr,
 		font,
-		flags & CAIROCKS_TEXT_ITALIC ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL,
-		flags & CAIROCKS_TEXT_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL
+		flags & CAIROU_TEXT_ITALIC ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL,
+		flags & CAIROU_TEXT_BOLD ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL
 	);
 
 	cairo_set_font_size(cr, size);
 
-	cairocks_text_private_t* text = 0;
+	cairou_text_private_t* text = 0;
 
 	// Wrap our text alloction in an exception handling block, since they
 	// could potentially be thrown here.
 	try {
-		text = new cairocks_text_private_t(utf8, flags);
+		text = new cairou_text_private_t(utf8, flags);
 	}
 
 	catch(...) {
@@ -212,7 +212,7 @@ static cairocks_text_private_t* cairocks_text_private_init(
 	return text;
 }
 
-static cairo_bool_t cairocks_text_private_draw(
+static cairo_bool_t cairou_text_private_draw(
 	cairo_t* cr,
 	const char* utf8,
 	const char* font,
@@ -222,16 +222,16 @@ static cairo_bool_t cairocks_text_private_draw(
 	int flags,
 	void (*function)(cairo_t*, const char*)
 ) {
-	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
+	cairou_text_private_t* text = cairou_text_private_init(cr, utf8, font, size, flags);
 
 	if(!text) return FALSE;
 
-	if(!(flags & CAIROCKS_TEXT_NO_SAVE_RESTORE)) cairo_save(cr);
+	if(!(flags & CAIROU_TEXT_NO_SAVE_RESTORE)) cairo_save(cr);
 
 	cairo_translate(cr, x + text->tx, y + text->ty);
 
 	for(
-		cairocks_text_private_t::lines_t::iterator line = text->lines.begin();
+		cairou_text_private_t::lines_t::iterator line = text->lines.begin();
 		line != text->lines.end();
 		line++
 	) {
@@ -246,7 +246,7 @@ static cairo_bool_t cairocks_text_private_draw(
 		cairo_move_to(cr, 0.0, 0.0);
 	}
 
-	if(!(flags & CAIROCKS_TEXT_NO_SAVE_RESTORE)) cairo_restore(cr);
+	if(!(flags & CAIROU_TEXT_NO_SAVE_RESTORE)) cairo_restore(cr);
 
 	delete text;
 
@@ -255,7 +255,7 @@ static cairo_bool_t cairocks_text_private_draw(
 
 extern "C" {
 
-cairo_bool_t cairocks_show_text(
+cairo_bool_t cairou_show_text(
 	cairo_t* cr,
 	const char* utf8,
 	const char* font,
@@ -264,10 +264,10 @@ cairo_bool_t cairocks_show_text(
 	double y,
 	unsigned int flags
 ) {
-	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_show_text);
+	return cairou_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_show_text);
 }
 
-cairo_bool_t cairocks_text_path(
+cairo_bool_t cairou_text_path(
 	cairo_t* cr,
 	const char* utf8,
 	const char* font,
@@ -276,10 +276,10 @@ cairo_bool_t cairocks_text_path(
 	double y,
 	int flags
 ) {
-	return cairocks_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_text_path);
+	return cairou_text_private_draw(cr, utf8, font, size, x, y, flags, cairo_text_path);
 }
 
-cairo_bool_t cairocks_text_extents(
+cairo_bool_t cairou_text_extents(
 	cairo_t* cr,
 	const char* utf8,
 	const char* font,
@@ -290,7 +290,7 @@ cairo_bool_t cairocks_text_extents(
 	cairo_text_extents_t* extents,
 	double* rect_extents
 ) {
-	cairocks_text_private_t* text = cairocks_text_private_init(cr, utf8, font, size, flags);
+	cairou_text_private_t* text = cairou_text_private_init(cr, utf8, font, size, flags);
 
 	if(!text) return FALSE;
 
@@ -301,20 +301,20 @@ cairo_bool_t cairocks_text_extents(
 		double ry = 0.0;
 
 		/* Calculate the rect X origin. */
-		if(flags & CAIROCKS_TEXT_X_LEFT) rx = 0.0;
+		if(flags & CAIROU_TEXT_X_LEFT) rx = 0.0;
 
-		else if(flags & CAIROCKS_TEXT_X_CENTER) rx = extents->width / 2.0;
+		else if(flags & CAIROU_TEXT_X_CENTER) rx = extents->width / 2.0;
 
-		else if(flags & CAIROCKS_TEXT_X_RIGHT) rx = extents->width;
+		else if(flags & CAIROU_TEXT_X_RIGHT) rx = extents->width;
 
 		else rx = -extents->x_bearing;
 
 		/* Calculate the rect Y origin. */
-		if(flags & CAIROCKS_TEXT_Y_BOTTOM) ry = extents->height;
+		if(flags & CAIROU_TEXT_Y_BOTTOM) ry = extents->height;
 
-		else if(flags & CAIROCKS_TEXT_Y_CENTER) ry = extents->height / 2.0;
+		else if(flags & CAIROU_TEXT_Y_CENTER) ry = extents->height / 2.0;
 
-		else if(flags & CAIROCKS_TEXT_Y_TOP) ry = 0.0;
+		else if(flags & CAIROU_TEXT_Y_TOP) ry = 0.0;
 
 		else ry = -extents->y_bearing;
 

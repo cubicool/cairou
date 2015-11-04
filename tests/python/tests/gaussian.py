@@ -1,7 +1,7 @@
 from . import common
 
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 import math
 
 
@@ -17,7 +17,7 @@ def test_gaussian_blur(cr):
         c.arc(w / 2, h / 2, (i + 1) * 15.0, 0.0, 2.0 * math.pi)
         c.stroke()
 
-    cairocks.gaussian_blur(surface, 8.0, 0.0)
+    cairou.gaussian_blur(surface, 8.0, 0.0)
 
     cr.set_source_surface(surface, 200, 200)
     cr.paint()

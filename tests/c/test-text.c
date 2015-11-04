@@ -18,12 +18,12 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 	double rect_extents[4];
 	double dashes[2] = { 2.0, 2.0 };
 	unsigned int flags = (
-		CAIROCKS_TEXT_ALIGN_CENTER |
-		CAIROCKS_TEXT_PIXEL_ALIGN |
-		CAIROCKS_TEXT_X_CENTER |
-		CAIROCKS_TEXT_Y_CENTER |
-		CAIROCKS_TEXT_ITALIC |
-		CAIROCKS_TEXT_BOLD
+		CAIROU_TEXT_ALIGN_CENTER |
+		CAIROU_TEXT_PIXEL_ALIGN |
+		CAIROU_TEXT_X_CENTER |
+		CAIROU_TEXT_Y_CENTER |
+		CAIROU_TEXT_ITALIC |
+		CAIROU_TEXT_BOLD
 	);
 
 	cairo_set_source_rgb(cr, 1.0, 0.0, 0.0);
@@ -38,8 +38,8 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 	cairo_line_to(cr, 512.0, 256.5);
 	cairo_stroke(cr);
 
-	cairocks_show_text(cr, test_string, "Sans", 15.0, 256.0, 256.0, flags);
-	cairocks_text_extents(cr, test_string, "Sans", 15.0, 256.0, 256.0, flags, &extents, rect_extents);
+	cairou_show_text(cr, test_string, "Sans", 15.0, 256.0, 256.0, flags);
+	cairou_text_extents(cr, test_string, "Sans", 15.0, 256.0, 256.0, flags, &extents, rect_extents);
 
 	printf("extents: x_bearing=%3.1f y_bearing=%3.1f width=%3.1f height=%3.1f\n",
 		extents.x_bearing,

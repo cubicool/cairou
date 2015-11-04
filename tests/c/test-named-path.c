@@ -9,8 +9,8 @@ void test_function(int argc, char** argv, cairo_t* cr) {
 
 	cairo_arc(cr, 0.0, 0.0, 50.0, 0.0, 2.0 * 3.14159);
 
-	cairocks_append_named_path(cr, "circle");
-	cairocks_set_named_path(cr, "circle");
+	cairou_append_named_path(cr, "circle");
+	cairou_set_named_path(cr, "circle");
 
 	cairo_set_line_width(cr, 10.0);
 	cairo_stroke(cr);

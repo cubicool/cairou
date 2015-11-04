@@ -1,11 +1,11 @@
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <jpeglib.h>
 
-static cairo_surface_t* cairocks_surface_from_jpeg_private(struct jpeg_decompress_struct* cinfo) {
+static cairo_surface_t* cairou_surface_from_jpeg_private(struct jpeg_decompress_struct* cinfo) {
 	cairo_surface_t* surface = 0;
 	unsigned char*   data    = 0;
 	unsigned char*   rgb     = 0;
@@ -43,7 +43,7 @@ static cairo_surface_t* cairocks_surface_from_jpeg_private(struct jpeg_decompres
 	return surface;
 }
 
-cairo_surface_t* cairocks_surface_from_jpeg(const char* file) {
+cairo_surface_t* cairou_surface_from_jpeg(const char* file) {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr         jerr;
 	cairo_surface_t*              surface;
@@ -56,14 +56,14 @@ cairo_surface_t* cairocks_surface_from_jpeg(const char* file) {
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, infile);
 
-	surface = cairocks_surface_from_jpeg_private(&cinfo);
+	surface = cairou_surface_from_jpeg_private(&cinfo);
 
 	fclose(infile);
 
 	return surface;
 }
 
-cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* inbuffer, unsigned int insize) {
+cairo_surface_t* cairou_surface_from_jpeg_data(unsigned char* inbuffer, unsigned int insize) {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr         jerr;
 	cairo_surface_t*              surface;
@@ -73,7 +73,7 @@ cairo_surface_t* cairocks_surface_from_jpeg_data(unsigned char* inbuffer, unsign
 	jpeg_create_decompress(&cinfo);
 	jpeg_mem_src(&cinfo, inbuffer, insize);
 
-	surface = cairocks_surface_from_jpeg_private(&cinfo);
+	surface = cairou_surface_from_jpeg_private(&cinfo);
 
 	return surface;
 }

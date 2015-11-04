@@ -1,6 +1,6 @@
 from . import common
 
-import cairockscffi as cairocks
+import cairoucffi as cairou
 
 
 """
@@ -9,7 +9,7 @@ def test_rounded_rectangle(cr):
     cr.set_line_width(4.0)
     cr.set_source_rgb(0.5, 0.5, 0.5)
 
-    cairocks.rounded_rectangle(
+    cairou.rounded_rectangle(
         cr,
         10.0,
         10.0,
@@ -54,7 +54,7 @@ def test_rounded_rectangle_apply(cr):
         c.set_source_rgb(0.0, 1.0, 0.5)
         c.paint()
 
-    # cairocks.rounded_rectangle_apply(c, 20.0, 20.0, 160.0, 160.0, 30.0)
+    # cairou.rounded_rectangle_apply(c, 20.0, 20.0, 160.0, 160.0, 30.0)
 
     # TODO: The code below does the exact same thing as the call
     # to rounded_rectangle_apply.
@@ -64,7 +64,7 @@ def test_rounded_rectangle_apply(cr):
     c.set_operator(cairo.OPERATOR_DEST_IN)
     c.set_source(p2)
 
-    cairocks.rounded_rectangle(c, 20.0, 20.0, 160.0, 160.0, 30.0)
+    cairou.rounded_rectangle(c, 20.0, 20.0, 160.0, 160.0, 30.0)
 
     c.fill()
     c.restore()
@@ -84,7 +84,7 @@ def test_rounded_rectangle_center(cr, w, h):
     cr.set_line_width(4.0)
     cr.set_source_rgb(0.5, 0.5, 0.5)
 
-    cairocks.rounded_rectangle_center(
+    cairou.rounded_rectangle_center(
         cr,
         w / 2.0,
         h / 2.0,

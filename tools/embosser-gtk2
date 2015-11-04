@@ -17,7 +17,7 @@ pygtk.require("2.0")
 import gtk
 import cairocffi
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 import math
 
 # cairocffi.install_as_pycairo()
@@ -54,7 +54,7 @@ class CairoDrawingArea(gtk.DrawingArea):
 
             self._draw_cairo(c, w, h)
 
-            cairocks.emboss(
+            cairou.emboss(
                 s,
                 float(self.azimuth) * (math.pi / 180.0),
                 float(self.elevation) * (math.pi / 180.0),

@@ -1,4 +1,4 @@
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -39,7 +39,7 @@ static double* create_kernel(double radius, double deviation) {
 	return kernel;
 }
 
-cairo_surface_t* cairocks_gaussian_blur_create(
+cairo_surface_t* cairou_gaussian_blur_create(
 	cairo_surface_t* surface,
 	double radius,
 	double deviation
@@ -59,12 +59,12 @@ cairo_surface_t* cairocks_gaussian_blur_create(
 		height * stride
 	);
 
-	if(cairocks_gaussian_blur(surface, radius, deviation)) return tmp;
+	if(cairou_gaussian_blur(surface, radius, deviation)) return tmp;
 
 	return 0;
 }
 
-cairo_bool_t cairocks_gaussian_blur(
+cairo_bool_t cairou_gaussian_blur(
 	cairo_surface_t* surface,
 	double radius,
 	double deviation

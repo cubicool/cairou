@@ -12,7 +12,7 @@ cr.move_to(((w - extents[2]) / 2.0) - extents[0], (h - extents[1]) / 2.0)
 cr.text_path(text)
 
 # A simpler draw test; off for now.
-# cairocks.rounded_rectangle(cr, s, s, w - (s * 2.0), h - (s * 2.0), s)
+# cairou.rounded_rectangle(cr, s, s, w - (s * 2.0), h - (s * 2.0), s)
 
 cr.set_operator(cairo.OPERATOR_SOURCE)
 

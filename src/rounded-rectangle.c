@@ -1,10 +1,10 @@
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <math.h>
 
-static const cairo_bool_t _cairocks_default_corners[4] = { TRUE, TRUE, TRUE, TRUE };
+static const cairo_bool_t _cairou_default_corners[4] = { TRUE, TRUE, TRUE, TRUE };
 
-cairo_bool_t cairocks_rounded_rectangle(
+cairo_bool_t cairou_rounded_rectangle(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -15,7 +15,7 @@ cairo_bool_t cairocks_rounded_rectangle(
 ) {
 	if(cairo_status(cr)) return FALSE;
 
-	if(!corners) corners = _cairocks_default_corners;
+	if(!corners) corners = _cairou_default_corners;
 
 	/* top border */
 	cairo_move_to(cr, x + radius, y);
@@ -87,7 +87,7 @@ cairo_bool_t cairocks_rounded_rectangle(
 	return TRUE;
 }
 
-cairo_bool_t cairocks_rounded_rectangle_apply(
+cairo_bool_t cairou_rounded_rectangle_apply(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -98,12 +98,12 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 ) {
 	if(cairo_status(cr)) return FALSE;
 
-	if(!corners) corners = _cairocks_default_corners;
+	if(!corners) corners = _cairou_default_corners;
 
 	cairo_save(cr);
 	cairo_set_operator(cr, CAIRO_OPERATOR_DEST_IN);
 
-	cairocks_rounded_rectangle(
+	cairou_rounded_rectangle(
 		cr,
 		x,
 		y,
@@ -119,7 +119,7 @@ cairo_bool_t cairocks_rounded_rectangle_apply(
 	return TRUE;
 }
 
-cairo_bool_t cairocks_rounded_rectangle_center(
+cairo_bool_t cairou_rounded_rectangle_center(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -133,14 +133,14 @@ cairo_bool_t cairocks_rounded_rectangle_center(
 	cairo_save(cr);
 	cairo_translate(cr, x - width, y - height);
 
-	cairocks_rounded_rectangle(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
+	cairou_rounded_rectangle(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
 
 	cairo_restore(cr);
 
 	return TRUE;
 }
 
-cairo_bool_t cairocks_rounded_rectangle_center_apply(
+cairo_bool_t cairou_rounded_rectangle_center_apply(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -154,7 +154,7 @@ cairo_bool_t cairocks_rounded_rectangle_center_apply(
 	cairo_save(cr);
 	cairo_translate(cr, x - width, y - height);
 
-	cairocks_rounded_rectangle_apply(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
+	cairou_rounded_rectangle_apply(cr, 0.0, 0.0, width * 2.0, height * 2.0, radius, corners);
 
 	cairo_restore(cr);
 

@@ -1,4 +1,4 @@
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -320,7 +320,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	}
 }
 
-cairo_bool_t cairocks_map_path_onto(cairo_t* cr, cairo_path_t* path) {
+cairo_bool_t cairou_map_path_onto(cairo_t* cr, cairo_path_t* path) {
 	cairo_path_t* cur_path = 0;
 
 	parametrized_path_t param;

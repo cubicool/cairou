@@ -2,7 +2,7 @@
  * http://www.xnainfo.com/content.php?content=44
  */
 
-#include "cairocks.h"
+#include "cairou.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -94,7 +94,7 @@ static double find_signed_distance(
 	}
 }
 
-cairo_surface_t* cairocks_distance_field_create(
+cairo_surface_t* cairou_distance_field_create(
 	cairo_surface_t* surface,
 	int scan_size,
 	int block_size

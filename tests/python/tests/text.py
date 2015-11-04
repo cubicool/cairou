@@ -1,10 +1,10 @@
 from . import common
 
 import cairocffi as cairo
-import cairockscffi as cairocks
+import cairoucffi as cairou
 
 
-cairocks.merge_with_cairocffi()
+cairou.merge_with_cairocffi()
 
 
 FLAGS = (
