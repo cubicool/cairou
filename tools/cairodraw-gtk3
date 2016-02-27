@@ -2,7 +2,12 @@
 
 import sys
 
-sys.path.extend(("../src", "../tests"))
+sys.path.extend(("../src/python", "../tests"))
+
+import gi
+
+for req in ("Gtk", "Gdk", "GtkSource"):
+    gi.require_version(req, "3.0")
 
 from gi.repository import Gtk, Gdk, Pango, GtkSource
 
@@ -115,6 +120,11 @@ class SourceView(GtkSource.View):
         style_manager = GtkSource.StyleSchemeManager.get_default()
         lang_manager = GtkSource.LanguageManager.get_default()
 
+        style_manager.prepend_search_path(os.path.join(
+            os.path.dirname(os.path.abspath(sys.argv[0])),
+            "styles"
+        ))
+
         buf.set_text(text)
         buf.set_style_scheme(style_manager.get_scheme("cubicool"))
         buf.set_highlight_syntax(True)
@@ -204,18 +214,18 @@ class CairoWindow(Gtk.Window):
 
             tool.pack_start(button, False, False, 0)
 
-        fontSizeLabel = Gtk.Label("Font Size:")
-        fontSize = Gtk.ComboBoxText()
+        font_size_label = Gtk.Label("Font Size:")
+        font_size = Gtk.ComboBoxText()
 
-        fontSizeLabel.set_alignment(1.0, 0.5)
+        font_size_label.set_alignment(1.0, 0.5)
 
-        [fontSize.append_text("%i" % i) for i in range(10, 20)]
+        [font_size.append_text("%i" % i) for i in range(10, 20)]
 
-        fontSize.connect("changed", self._set_font)
-        fontSize.set_active(0)
+        font_size.connect("changed", self._set_font)
+        font_size.set_active(0)
 
-        tool.pack_start(fontSizeLabel, True, True, 5)
-        tool.pack_start(fontSize, False, False, 0)
+        tool.pack_start(font_size_label, True, True, 5)
+        tool.pack_start(font_size, False, False, 5)
 
         self.set_title("cairodraw")
         self.add(vbox)
