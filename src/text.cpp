@@ -155,7 +155,7 @@ public:
 			double lw = line->extents.width;
 
 			if(flags & CAIROU_TEXT_ALIGN_RIGHT) line->tx = ew - lw;
-				
+
 			else if(flags & CAIROU_TEXT_ALIGN_CENTER) line->tx = (ew - lw) / 2.0;
 
 			// The final (untested) option is LEFT, which requires no modification.
@@ -240,7 +240,7 @@ static cairo_bool_t cairou_text_private_draw(
 		cairo_move_to(cr, 0.0, 0.0);
 
 		function(cr, line->utf8);
-		
+
 		cairo_restore(cr);
 		cairo_translate(cr, 0.0, size);
 		cairo_move_to(cr, 0.0, 0.0);
