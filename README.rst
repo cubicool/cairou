@@ -73,6 +73,10 @@ Features
 TODO
 ====
 
-* Add harfbuzz layout support.
-* Add spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
+* Harfbuzz layout support.
+* Spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
   at all times.
+* Add rounded_rectangle method that accepts a center position and radius.
+* Add cairou_object_path/cairou_show_object.
+* Implement cairou_state_t structure, or cairou_{save/restore} with meta-synatax; specifically,
+  something like: cairou_save(CAIROU_TRANSLATE, 1.0, 1.0, 1.0, CAIROU_SCALE, 1.0, 0.0).
