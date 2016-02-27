@@ -3,8 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <stdio.h>
-
 /* This is used to make sure we don't pass any valid text flags (that don't make sense
  * for our icon API. */
 const int ICON_MASK_X =
