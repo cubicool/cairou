@@ -10,10 +10,6 @@
 // our code.
 namespace UTF8 = utf8;
 
-// TODO: REMOVE ME!
-#include <iostream>
-#include <cstdio>
-
 // This structure holds all the data we need to easily account for newlines in
 // blocks of text and to use those substrings (as delimited by those newlines)
 // with the Cairo API. We take a fairly easy approach wherein we essentially
