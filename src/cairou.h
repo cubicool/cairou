@@ -93,7 +93,7 @@ cairo_bool_t cairou_remove_named_path(cairo_t* cr, const char* named_path);
 /**
  * cairou_map_path_onto:
  * @cr: a Cairo context
- * @corners: a cairo path onto which the CURRENT cr path will be mapped
+ * @path: a cairo path onto which the CURRENT cr path will be mapped
  *
  * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map
  * the current path on @cr to the path provided by @path. In the common case you can
