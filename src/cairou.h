@@ -21,9 +21,11 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-/* When I changed the project name from Cairocks to Cairou, I also reverted the version. */
-#define CAIROU_VERSION_MAJOR 0
-#define CAIROU_VERSION_MINOR 1
+/* When the project named changed from "Cairocks" to "Cairou", I debated on whether or not to also
+ * introduce a full version reset. However, in order to keep the numeric tags consistent, I've opted
+ * to simply do a MINOR bump, and proceed with business as usual. */
+#define CAIROU_VERSION_MAJOR 1
+#define CAIROU_VERSION_MINOR 2
 #define CAIROU_VERSION_BUGFIX 0
 
 #ifdef __cplusplus
