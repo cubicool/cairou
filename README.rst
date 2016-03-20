@@ -106,33 +106,71 @@ TODO
 .. _Clutter: https://blogs.gnome.org/clutter
 .. _Graphene: http://ebassi.github.io/graphene
 
-* Add support for the Clipper library, and break its functionality into
+* [ ] Add support for the Clipper library, and break its functionality into
   different (but similar) APIs based on the methods provided by both the Clipper
   object and the ClipperOffset object.
-* Optional `Harfbuzz`_ layout support.
-* Optional wrappers for simplifying `CairoGL/SDL2`_ usage, potentially along
+* [ ] Wrap as many features as possible using some manner of conditional
+  inclusion/evaluation, and improve the example CMake build system to
+  demonstrate this functionality. Most features (especially the JPEG, GIF,
+  Clipper, and Glyphicons components) should be optional. This may simply
+  require Cairou to adandon its "only a single header file" constraint, and move
+  the toggleable features into their own includes.
+* [ ] Optional `Harfbuzz`_ layout support.
+* [ ] Optional wrappers for simplifying `CairoGL/SDL2`_ usage, potentially along
   with `Glyphy`_.
-* Spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
+* [ ] Spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
   at all times.
 * Add a pixel-aligned drawing API.
 * Add cairou_object_path/cairou_show_object/cairo_object_apply.
-* Implement cairou_state_t structure + cairou_{save/restore} with a special
-  syntax for quick and easy structure create/allocation. Potentially:
+* Implement a cairou_state_t structure, as well as cairou_{save/restore}
+  functions that are capable of optionally pushing/popping these states.
+  Additionally, define a special syntax for quick and easy structure
+  creation/allocation. For example:
 
 .. code:: c
 
+   /* Allocate a new cairou_state_t object on the heap. */
    cairou_state_t* state = cairou_state_create(
        CAIROU_TRANSLATE, 1.0, 1.0,
        CAIROU_SCALE, 1.0, 0.0,
        CAIROU_LINE_WIDTH, 2.0
    );
 
-   cairou_save(state);
-
-   /* ...draw... */
-
-   cairou_restore();
    cairou_state_destroy(state);
+
+   /* Alternatively, manage your cairou_state_t object locally and simply
+   initialize it using the meta-syntax. */
+   cairou_state_t state;
+
+   cairou_state_init(&state,
+       CAIROU_TRANSLATE, 1.0, 1.0,
+       CAIROU_SCALE, 1.0, 0.0,
+       CAIROU_LINE_WIDTH, 2.0
+   );
+
+   /* METHOD 1: Push/pop the custom state using the most verbose method. */
+   cairo_save(); {
+       cairou_push_state(state);
+
+       /* ...draw... */
+
+       cairou_pop_state();
+   } cairo_restore();
+
+   /* METHOD 2: Pass an existing state object to save/restore. */
+   cairou_save(state); {
+       /* ...draw... */
+   } cairou_restore();
+
+   /* METHOD 3: Allow the save/restore functions to manage their state
+   themselves, without having to allocate memory on the heap. */
+   cairou_save(
+       CAIROU_ROTATE, M_PI,
+       CAIROU_FG_RGBA, 1.0f, 1.0f, 0.5f, 1.0f,
+       CAIROU_BG_RGB, 0.0f, 0.0f, 0.0f
+   ); {
+       /* ...draw... */
+   } cairou_restore();
 
 .. note::
 
@@ -220,3 +258,11 @@ TODO
   "weight", so that the old stroke becomes a new, complex fill.
 * Provide "faux 3D" transforms, possibly by using something like `Graphene`_ to
   convert Cairo matrices into 3D matrices, and back.
+* Create an optional *cairou.hpp* header file that implements C++11/14 API
+  extensions to the core C-based Cairou routines.
+
+[ ] Test foo!
+[ ] Test bar?
+
+* [ ] Test baz!?
+* [ ] Test qux...
