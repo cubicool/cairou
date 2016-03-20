@@ -121,12 +121,15 @@ TODO
 .. code:: c
 
    cairou_state_t* state = cairou_state_create(
-       CAIROU_TRANSLATE, 1.0, 1.0, 1.0,
+       CAIROU_TRANSLATE, 1.0, 1.0,
        CAIROU_SCALE, 1.0, 0.0,
        CAIROU_LINE_WIDTH, 2.0
    );
+
    cairou_save(state);
-   ...
+
+   /* ...draw... */
+
    cairou_restore();
    cairou_state_destroy(state);
 
@@ -150,16 +153,15 @@ TODO
    foo_t* foo = foo_create();
    bar_t* bar = bar_create();
    static baz_t baz;
-   ...
+
    cairou_user_data_create(KEY_FOO, foo, foo_destroy);
    cairou_user_data_create(KEY_BAR, bar, bar_destroy);
    cairou_user_data_create(KEY_BAZ, &baz);
-   ...
-   cairou_t* cr0 = cairou_create(surface, KEY_FOO);
-   cairou_t* cr1 = cairou_create(surface, KEY_FOO, KEY_BAR, KEY_BAZ);
-   ...
-   cairou_destroy(cr0);
-   cairou_destroy(cr1);
+
+   cairo_t* cr0 = cairou_create(surface, KEY_FOO);
+   cairo_t* cr1 = cairou_create(surface, KEY_FOO, KEY_BAR, KEY_BAZ);
+
+   /* ...draw... */
 
 * Introduce a system for creating an arbitrary number of "rendering objects" and
   having them called based on a timeout--and in some kind of dependent
@@ -168,6 +170,12 @@ TODO
 
 .. code:: c
 
+   cairo_bool_t do_draw0(cairo_t* cr, cairou_state_t* state);
+   cairo_bool_t do_draw1(cairo_t* cr, cairou_state_t* state);
+   cairo_bool_t do_draw2(cairo_t* cr, cairou_state_t* state);
+
+   typedef cairo_bool_t (*cairou_draw_cb_t)(cairo_t*, cairou_state_t*);
+
    typedef struct _cairou_draw_t {
        const char* name;
        cairou_draw_callback_t callback;
@@ -175,14 +183,18 @@ TODO
        const char* draw_before;
        const char* draw_after;
    } cairou_draw_t;
-   ...
-   cairou_draw_t* draw0 = cairou_draw_create(...);
-   cairou_draw_t* draw1 = cairou_draw_create(...);
-   cairou_draw_t* draw2 = cairou_draw_create(...);
-   ...
+
+   cairou_draw_t* draw0 = cairou_draw_create(do_draw0);
+   cairou_draw_t* draw1 = cairou_draw_create(do_draw1);
+   cairou_draw_t* draw2 = cairou_draw_create(do_draw2);
+
+   cairou_state_t* state = cairo_state_create(...);
+
    cairou_draw(NULL, draw0);
    cairou_draw(state, draw1, draw2);
-   ...
+
+   cairo_state_destroy(state);
+
    cairou_draw_destroy(draw0);
    cairou_draw_destroy(draw1);
    cairou_draw_destroy(draw2);
