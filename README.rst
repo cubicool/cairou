@@ -21,12 +21,13 @@ Overview
 .. _text: https://github.com/cubicool/cairou/blob/master/src/text.cpp
 
 Cairou (Cairo Utility) was born from a common codebase I continually ended up
-copying from project to project. Instead of trying to keep all these different
-versions in sync, I've decided to divorce it out into its own project and
-maintain it thusly. It is written using a mix of C90-compatible C and C++03,
-although it strictly maintains a C-linkable API for maximum accessibility. C++
-is usually only used (see `text`_ and `named-path`_) to take advantage of the
-STL.
+copying from project to project. Instead of trying to keep these different
+versions in sync, I've decided to divorce them out into their own project and
+maintain them thusly. Cairou is written using a mix of C90-compatible C and
+C++03, and strictly maintains a C-linkable external API for maximum
+accessibility. C++ is usually only used (see `text`_ and `named-path`_) to take
+advantage of the STL or interact with existing code that cannot be easily
+converted.
 
 While Cairou does include an example build system using CMake, you are welcome
 to include the source wholesale into your own projects. Additionally, I have
