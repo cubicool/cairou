@@ -106,19 +106,19 @@ TODO
 .. _Clutter: https://blogs.gnome.org/clutter
 .. _Graphene: http://ebassi.github.io/graphene
 
-* [ ] Add support for the Clipper library, and break its functionality into
+* Add support for the Clipper library, and break its functionality into
   different (but similar) APIs based on the methods provided by both the Clipper
   object and the ClipperOffset object.
-* [ ] Wrap as many features as possible using some manner of conditional
+* Wrap as many features as possible using some manner of conditional
   inclusion/evaluation, and improve the example CMake build system to
   demonstrate this functionality. Most features (especially the JPEG, GIF,
   Clipper, and Glyphicons components) should be optional. This may simply
   require Cairou to adandon its "only a single header file" constraint, and move
   the toggleable features into their own includes.
-* [ ] Optional `Harfbuzz`_ layout support.
-* [ ] Optional wrappers for simplifying `CairoGL/SDL2`_ usage, potentially along
+* Optional `Harfbuzz`_ layout support.
+* Optional wrappers for simplifying `CairoGL/SDL2`_ usage, potentially along
   with `Glyphy`_.
-* [ ] Spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
+* Spline constraints; i.e., point x0 must stay 5 units perpendicular to point x1
   at all times.
 * Add a pixel-aligned drawing API.
 * Add cairou_object_path/cairou_show_object/cairo_object_apply.
@@ -261,8 +261,14 @@ TODO
 * Create an optional *cairou.hpp* header file that implements C++11/14 API
   extensions to the core C-based Cairou routines.
 
+************************
+Github Markup Extensions
+************************
+
 [ ] Test foo!
 [ ] Test bar?
+[x] Test baz!?
 
-* [ ] Test baz!?
-* [ ] Test qux...
+- [ ] Test foo!
+- [ ] Test bar?
+- [x] Test baz!?
