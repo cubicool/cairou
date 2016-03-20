@@ -1,4 +1,6 @@
-src/python/cairockscffi/__pycache__
-src/python/cairockscffi/*.pyc
+src/python/cairoucffi/__pycache__
+src/python/cairoucffi/*.pyc
 tests/python/test_output
 tests/python/tests/__pycache__
+build
+.syntastic
