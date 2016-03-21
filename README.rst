@@ -260,15 +260,3 @@ TODO
   convert Cairo matrices into 3D matrices, and back.
 * Create an optional *cairou.hpp* header file that implements C++11/14 API
   extensions to the core C-based Cairou routines.
-
-************************
-Github Markup Extensions
-************************
-
-[ ] Test foo!
-[ ] Test bar?
-[x] Test baz!?
-
-- [ ] Test foo!
-- [ ] Test bar?
-- [x] Test baz!?
