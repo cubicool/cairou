@@ -21,15 +21,15 @@ DEFAULT_BUFFER = """\
 # This is a Python script to quickly test Cairo stuff!
 # You have access to the following variables:
 # cr = The Cairo drawing context.
-# w = The DrawingArea's allocated width.
-# h = The DrwaingArea's allocated height.
+# width = The DrawingArea's allocated width.
+# height = The DrwaingArea's allocated height.
 
 import math
 
 cr.set_source_rgba(0.1, 0.2, 0.3, 1.0)
 cr.paint()
 cr.set_line_width(10)
-cr.arc(w / 2.0, h / 2.0, h / 3.0, 0.0, 2.0 * math.pi)
+cr.arc(width / 2.0, height / 2.0, height / 3.0, 0.0, 2.0 * math.pi)
 cr.set_source_rgb(0.3, 0.3, 0.3)
 cr.fill_preserve()
 cr.set_source_rgb(0.1, 0.1, 0.1)
@@ -71,8 +71,8 @@ class CairoDrawingArea(Gtk.DrawingArea):
         eval(compile(buf, "<cairoscript>", "exec"), {
             "cairo": cairo,
             "cr": cr,
-            "w":  w,
-            "h":  h
+            "width":  w,
+            "height":  h
         })
 
     def _size(self, w, h):
@@ -84,6 +84,8 @@ class CairoDrawingArea(Gtk.DrawingArea):
 
         return int(w), int(h)
 
+    # TODO: Only set _buffer IF the source is valid; otherwise, set some kind
+    #       of indicator, but do NOT refresh the screen.
     def parse(self, buf):
         self._buffer = buf
 
@@ -145,7 +147,7 @@ class SourceView(GtkSource.View):
         self.get_buffer().set_text(text)
 
     def set_font_size(self, size):
-        font = Pango.FontDescription("Droid Sans Mono")
+        font = Pango.FontDescription("Sauce Code Powerline Regular")
 
         font.set_size(Pango.SCALE * size)
 
@@ -170,13 +172,13 @@ class CairoWindow(Gtk.Window):
         tool = Gtk.HBox()
         vbox = Gtk.VBox()
         scroll = Gtk.ScrolledWindow()
-        paned = Gtk.VPaned()
+        paned = Gtk.HPaned()
         frame = Gtk.Frame()
 
         scroll.add(self._text)
 
         frame.add(scroll)
-        frame.set_border_width(5)
+        frame.set_border_width(2)
 
         paned.pack1(self._draw, False, False)
         paned.pack2(frame, True, True)
@@ -338,6 +340,7 @@ if __name__ == "__main__":
     if not s:
         cw.connect("destroy", Gtk.main_quit)
         cw.show_all()
-        cw.set_size_request(-1, 550)
+        # cw.set_size_request(1000, 550)
+        cw.maximize()
 
         Gtk.main()
