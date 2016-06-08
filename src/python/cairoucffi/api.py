@@ -175,7 +175,7 @@ cairo_bool_t cairou_icon_extents(
 
 cairou_icon_t cairou_icon_from_string(const char* icon);
 
-cairo_bool_t cairou_rounded_rectangle(
+cairo_bool_t cairou_rectangle(
     cairo_t* cr,
     double x,
     double y,
@@ -184,37 +184,6 @@ cairo_bool_t cairou_rounded_rectangle(
     double radius,
     const cairo_bool_t* corners
 );
-
-cairo_bool_t cairou_rounded_rectangle_apply(
-    cairo_t* cr,
-    double x,
-    double y,
-    double width,
-    double height,
-    double radius,
-    const cairo_bool_t* corners
-);
-
-cairo_bool_t cairou_rounded_rectangle_center(
-    cairo_t* cr,
-    double x,
-    double y,
-    double width,
-    double height,
-    double radius,
-    const cairo_bool_t* corners
-);
-
-cairo_bool_t cairou_rounded_rectangle_center_apply(
-    cairo_t* cr,
-    double x,
-    double y,
-    double width,
-    double height,
-    double radius,
-    const cairo_bool_t* corners
-);
-
 """)
 
 _lib = cairocffi.ffi.dlopen("libcairou.so")
@@ -593,7 +562,7 @@ def icon_from_string(icon):
     return _lib.cairou_icon_from_string(icon.encode("ascii"))
 
 
-def _rounded_rectangle(
+def _rectangle(
     libfunction,
     cr,
     x,
@@ -619,7 +588,7 @@ def _rounded_rectangle(
     )
 
 
-def rounded_rectangle(
+def rectangle(
     cr,
     x,
     y,
@@ -628,71 +597,8 @@ def rounded_rectangle(
     radius,
     corners=(True, True, True, True)
 ):
-    return _rounded_rectangle(
-        _lib.cairou_rounded_rectangle,
-        cr,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners
-    )
-
-
-def rounded_rectangle_apply(
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    return _rounded_rectangle(
-        _lib.cairou_rounded_rectangle_apply,
-        cr,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners
-    )
-
-
-def rounded_rectangle_center(
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    return _rounded_rectangle(
-        _lib.cairou_rounded_rectangle_center,
-        cr,
-        x,
-        y,
-        width,
-        height,
-        radius,
-        corners
-    )
-
-
-def rounded_rectangle_center_apply(
-    cr,
-    x,
-    y,
-    width,
-    height,
-    radius,
-    corners=(True, True, True, True)
-):
-    return _rounded_rectangle(
-        _lib.cairou_rounded_rectangle_center_apply,
+    return _rectangle(
+        _lib.cairou_rectangle,
         cr,
         x,
         y,
@@ -766,10 +672,7 @@ def merge_with_cairocffi():
         icon_from_string,
         saved,
         named_path,
-        rounded_rectangle,
-        rounded_rectangle_apply,
-        rounded_rectangle_center,
-        rounded_rectangle_center_apply
+        rectangle
     ):
         mn = method.__name__
 

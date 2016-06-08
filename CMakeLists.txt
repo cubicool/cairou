@@ -1,6 +1,6 @@
 PROJECT(cairou)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
@@ -13,27 +13,30 @@ FIND_PACKAGE(GIF REQUIRED)
 
 SET(CAIROU_SRC_FILES
 	# Standard C files.
-	"src/distance-field.c"
-	"src/emboss.c"
-	"src/gaussian-blur.c"
-	"src/gif-surface.c"
-	"src/glyphicons.c"
-	"src/icon.c"
-	"src/invert.c"
-	"src/map-path-onto.c"
-	"src/rounded-rectangle.c"
-	"src/spline.c"
-	"src/surface-from-jpeg.c"
-	"src/surface-from-png.c"
+	"src/cairou-distance-field.c"
+	"src/cairou-emboss.c"
+	"src/cairou-gaussian-blur.c"
+	"src/cairou-gif-surface.c"
+	"src/cairou-glyphicons.c"
+	"src/cairou-grid.c"
+	"src/cairou-icon.c"
+	"src/cairou-invert.c"
+	"src/cairou-map-path-onto.c"
+	"src/cairou-rectangle.c"
+	"src/cairou-spline.c"
+	"src/cairou-status.c"
+	"src/cairou-surface-from-jpeg.c"
+	"src/cairou-surface-from-png.c"
 
 	# C++ files, use external C linkage.
-	"src/named-path.cpp"
-	"src/text.cpp"
+	# "src/cairou-named-path.cpp"
+	"src/cairou-text.cpp"
 )
 
 SET(CAIROU_HEADER_FILES
 	"src/cairou.h"
 	"src/cairou-glyphicons.h"
+	"src/cairou-private.h"
 )
 
 INCLUDE_DIRECTORIES(

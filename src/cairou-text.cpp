@@ -1,5 +1,6 @@
 #include "cairou.h"
-#include "utf8.h"
+#include "utf8/checked.h"
+#include "utf8/unchecked.h"
 
 #include <math.h>
 #include <cstring>

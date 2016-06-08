@@ -1,5 +1,5 @@
 #ifndef CAIROU_H
-#define CAIROU_H 1
+#define CAIROU_H
 
 #include "cairou-glyphicons.h"
 
@@ -32,81 +32,26 @@
 extern "C" {
 #endif
 
-/**
- * cairou_append_named_path:
- * @cr: a Cairo context
- * @named_path: a string representing the name (or key) for the path
- *
- * This function appends the current path (in its entirety) to the
- * specified named path. After calling this routine, the current path
- * on the context is cleared.
- *
- * Note that this funtion uses "append" in its name (as opposed to create),
- * due to the fact that you can append multiple Cairo paths to a single named
- * path object; the first append implicitly "creates" the named path.
- **/
-cairo_bool_t cairou_append_named_path(cairo_t* cr, const char* named_path);
+typedef enum _cairou_status_t {
+	CAIROU_STATUS_SUCCESS = 0,
+	CAIROU_STATUS_FOO
+} cairou_status_t;
 
-/**
- * cairou_append_named_path_preserve:
- * @cr: a Cairo context
- * @named_path: a string representing the name (or key) for the path
- *
- * This function appends the current path (in its entirety) to the
- * specified named path. Unlike @cairou_append_named_path, the path
- * is NOT cleared after a call to this function.
- **/
-cairo_bool_t cairou_append_named_path_preserve(cairo_t* cr, const char* named_path);
-
-/**
- * cairou_set_named_path:
- * @cr: a Cairo context
- * @named_path: a string representing the name (or key) for the path
- *
- * This function clears the current path and makes the named path
- * specified by @named_path the current path on the passed-in context.
- * The named path is not deleted, and can be reused until either the
- * context to which it is bound is destroyed or the user explicitly calls
- * @cairou_remove_named_path.
- *
- * If a blank string (or NULL) is used as @named_path, the most recently
- * appended-to named path object is used.
- **/
-cairo_bool_t cairou_set_named_path(cairo_t* cr, const char* named_path);
-
-/**
- * cairou_set_named_path_preserve:
- * @cr: a Cairo context
- * @named_path: a string representing the name (or key) for the path
- *
- * This function behaves exactly as cairou_set_named_path(), except
- * that the current path on @cr is NOT cleared.
- **/
-cairo_bool_t cairou_set_named_path_preserve(cairo_t* cr, const char* named_path);
-
-/**
- * cairou_remove_named_path:
- * @cr: a Cairo context
- * @named_path: a string representing the name (or key) for the path
- *
- * Deletes the named path bound the specified context.
- **/
-cairo_bool_t cairou_remove_named_path(cairo_t* cr, const char* named_path);
+cairo_public
+cairou_status_t cairou_status(cairo_t* cr);
 
 /**
  * cairou_map_path_onto:
  * @cr: a Cairo context
  * @path: a cairo path onto which the CURRENT cr path will be mapped
  *
- * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map
- * the current path on @cr to the path provided by @path. In the common case you can
- * create an arc or curve, quickly issue a copy_path/copy_path_flat, create a NEW path on @cr
- * and then pass the previously saved path into @path.
+ * This function (taken from Behdad Esfahbod's cairotwisted example) will attempt to map the current
+ * path on @cr to the path provided by @path. In the common case you can create an arc or curve,
+ * quickly issue a copy_path/copy_path_flat, create a NEW path on @cr and then pass the previously
+ * saved path into @path.
  **/
-cairo_bool_t cairou_map_path_onto(
-	cairo_t* cr,
-	cairo_path_t* path
-);
+cairo_public
+void cairou_map_path_onto(cairo_t* cr, cairo_path_t* path);
 
 /**
  * cairou_create_emboss_create:
@@ -117,12 +62,12 @@ cairo_bool_t cairou_map_path_onto(
  * @ambient: the ambient light component
  * @diffuse: the diffuse light componnet
  *
- * This function (taken mostly from "Graphics Gems IV") will return a newly-created
- * Cairo image surface created by applying the emboss algorightm on @surface. This
- * new surface can be used to create a new pattern, or used directly with set_source_surface.
- * This function was further adapted by Andrea Canciani to use a Sobel operator to perform
- * the matrix convolution.
+ * This function (taken mostly from "Graphics Gems IV") will return a newly-created Cairo image
+ * surface created by applying the emboss algorightm on @surface. This new surface can be used to
+ * create a new pattern, or used directly with set_source_surface.  This function was further
+ * adapted by Andrea Canciani to use a Sobel operator to perform the matrix convolution.
  **/
+cairo_public
 cairo_surface_t* cairou_emboss_create(
 	cairo_surface_t* surface,
 	double azimuth,
@@ -141,10 +86,10 @@ cairo_surface_t* cairou_emboss_create(
  * @ambient: the ambient light component
  * @diffuse: the diffuse light componnet
  *
- * This function is identical to the similarly named function @cairou_emboss_surface_create,
- * except that instead of returning a new surface it will do an IN-PLACE emboss of the passed
- * in @surface.
+ * This function is identical to the similarly named function @cairou_emboss_surface_create, except
+ * that instead of returning a new surface it will do an IN-PLACE emboss of the passed in @surface.
  **/
+cairo_public
 cairo_bool_t cairou_emboss(
 	cairo_surface_t* surface,
 	double azimuth,
@@ -160,9 +105,10 @@ cairo_bool_t cairou_emboss(
  * @radius: the blur radius
  * @deviation: the deviation value used when creating the blur kernel
  *
- * Returns a newly created Cairo image surface with the gaussian_blur algorigthm applied.
- * See the documentation for @cairou_gaussian_blur.
+ * Returns a newly created Cairo image surface with the gaussian_blur algorigthm applied.  See the
+ * documentation for @cairou_gaussian_blur.
  **/
+cairo_public
 cairo_surface_t* cairou_gaussian_blur_create(
 	cairo_surface_t* surface,
 	double radius,
@@ -175,10 +121,10 @@ cairo_surface_t* cairou_gaussian_blur_create(
  * @radius: the blur radius
  * @deviation: the deviation value used when creating the blur kernel
  *
- * Performs an IN-PLACE gaussian blur on @surface. This function was taken from an
- * example provided by MacSlow (Mirco Mueller), though the original unmodified code
- * has been lost in the ether.
+ * Performs an IN-PLACE gaussian blur on @surface. This function was taken from an example provided
+ * by MacSlow (Mirco Mueller), though the original unmodified code has been lost in the ether.
  **/
+cairo_public
 cairo_bool_t cairou_gaussian_blur(
 	cairo_surface_t* surface,
 	double radius,
@@ -189,10 +135,13 @@ cairo_bool_t cairou_gaussian_blur(
  * cairou_a8_invert:
  * @surface: a CAIRO_FORMAT_A8 surface to be inverted
  *
- * Performs an IN-PLACE invert on @surface. This function can be handy when you
- * need to invert an alpha mask that is easy to stroke in one way, but hard to
- * stroke another (for example, with font glyphs).
+ * Performs an IN-PLACE invert on @surface. This function can be handy when you need to invert an
+ * alpha mask that is easy to stroke in one way, but hard to stroke another (for example, with font
+ * glyphs).
+ *
+ * TODO: Why did I ever need this?
  **/
+cairo_public
 cairo_bool_t cairou_a8_invert(cairo_surface_t* surface);
 
 /**
@@ -201,13 +150,13 @@ cairo_bool_t cairou_a8_invert(cairo_surface_t* surface);
  * @scan_size: size of the "effect" region
  * @block_size: the surface divisor
  *
- * This routine will create an unsigned distance field surface in a CAIRO_FORMAT_A8
- * surface. These surfaces can be used in various calculations, particularly when
- * combined with an appropriate GLSL shader. For the best results, it is recommended that
- * you rasterize on a large surface type (like 4096x4096) and use a block_size large enough
- * to reduce it to something sensible like 128x128. The scan_size argument will determine
- * how much variation you have in your aliased edges.
+ * This routine will create an unsigned distance field surface in a CAIRO_FORMAT_A8 surface. These
+ * surfaces can be used in various calculations, particularly when combined with an appropriate GLSL
+ * shader. For the best results, it is recommended that you rasterize on a large surface type (like
+ * 4096x4096) and use a block_size large enough to reduce it to something sensible like 128x128. The
+ * scan_size argument will determine how much variation you have in your aliased edges.
  **/
+cairo_public
 cairo_surface_t* cairou_distance_field_create(
 	cairo_surface_t* surface,
 	int scan_size,
@@ -221,6 +170,7 @@ cairo_surface_t* cairou_distance_field_create(
  * This routine will return a new cairo_surface_t* initialized from a JPEG file on disk.
  * Current, the only supported Cairo format is RGB24.
  **/
+cairo_public
 cairo_surface_t* cairou_surface_from_jpeg(const char* file);
 
 /**
@@ -232,6 +182,7 @@ cairo_surface_t* cairou_surface_from_jpeg(const char* file);
  * loaded into memory. Only the RGB24 Cairo format is suported.
  * TODO: Why is the size needed?
  **/
+cairo_public
 cairo_surface_t* cairou_surface_from_jpeg_data(unsigned char* data, unsigned int size);
 
 /**
@@ -243,6 +194,7 @@ cairo_surface_t* cairou_surface_from_jpeg_data(unsigned char* data, unsigned int
  * loaded into memory. It is nothing more (or less) than a simple wrapper over the standard
  * cairo_image_surface_create_from_png_stream.
  **/
+cairo_public
 cairo_surface_t* cairou_surface_from_png_data(unsigned char* data);
 
 /**
@@ -253,6 +205,7 @@ cairo_surface_t* cairou_surface_from_png_data(unsigned char* data);
  * represents the internal state of the GIF library. Each new frame is loaded "on
  * demand" with @cairo_gif_surface_next.
  **/
+cairo_public
 cairo_surface_t* cairou_gif_surface_create(const char* file);
 
 /**
@@ -265,6 +218,7 @@ cairo_surface_t* cairou_gif_surface_create(const char* file);
  * A copy of the data is made and managed internally; the user may free their own buffer
  * after calling this function.
  **/
+cairo_public
 cairo_surface_t* cairou_gif_surface_create_for_data(unsigned char* data, unsigned int size);
 
 /**
@@ -276,6 +230,7 @@ cairo_surface_t* cairou_gif_surface_create_for_data(unsigned char* data, unsigne
  * this frame should be displayed in 1/100ths of a second, or 0 if unspecified. If a value
  * less than 0 is returned, some error occurred internally.
  **/
+cairo_public
 int cairou_gif_surface_next(cairo_surface_t* surface);
 
 /**
@@ -287,6 +242,7 @@ int cairou_gif_surface_next(cairo_surface_t* surface);
  * the image during initialization that doesn't actually load any data, but determines
  * how many frames (or records) are in the file.
  **/
+cairo_public
 unsigned int cairou_gif_surface_get_num_frames(cairo_surface_t* surface);
 
 /**
@@ -360,6 +316,7 @@ typedef enum _cairou_text_flags_t {
  * The bulk of the magic facilitated by this routine is described in the various
  * flags documentation.
  **/
+cairo_public
 cairo_bool_t cairou_show_text(
 	cairo_t* cr,
 	const char* utf8,
@@ -425,7 +382,7 @@ cairo_bool_t cairou_text_extents(
 /**
  * cairou_point_t:
  * This structure serves as the primitive unit for each point in a spline.
- */
+ **/
 typedef struct _cairou_point_t {
 	double x;
 	double y;
@@ -440,7 +397,7 @@ typedef struct _cairou_point_t {
  *
  * This routine appends an array of #cairou_point_t instances to the current path.
  * The points define a spline, which is optionally @closed or otherwise.
- */
+ **/
 cairo_bool_t cairou_append_spline(
 	cairo_t* cr,
 	cairou_point_t* points,
@@ -484,7 +441,7 @@ typedef enum _cairou_icon_flags_t {
  * It provides an easy way to dray a glyph in this font using an enumeration
  * corresponding to the particular desired icon. It returns FALSE if the
  * Glyphicons font is not found by Cairo, as this is NOT a totally free font.
- */
+ **/
 cairo_bool_t cairou_show_icon(
 	cairo_t* cr,
 	cairou_icon_t icon,
@@ -501,7 +458,7 @@ cairo_bool_t cairou_show_icon(
  *
  * This function behaves like cairou_show_icon(), except that the path is
  * not automatically filled.
- */
+ **/
 cairo_bool_t cairou_icon_path(
 	cairo_t* cr,
 	cairou_icon_t icon,
@@ -523,7 +480,7 @@ cairo_bool_t cairou_icon_path(
  *
  * This function returns the extents (similar to rect_extents in the text API)
  * of the rectangular region affected by this icon and the associated flags.
- */
+ **/
 cairo_bool_t cairou_icon_extents(
 	cairo_t* cr,
 	cairou_icon_t icon,
@@ -542,11 +499,11 @@ cairo_bool_t cairou_icon_extents(
  * heuristic used is trivially simple: all known enumerations are
  * converted to lowercase, and the first substring match that occurs
  * is used. On failure, CAIROU_ICON_ERROR is returned.
- */
+ **/
 cairou_icon_t cairou_icon_from_string(const char* icon);
 
 /**
- * cairou_rounded_rectangle:
+ * cairou_rectangle:
  * @cr: a Cairo context
  * @x: the x coordinate
  * @y: the y coordinate
@@ -560,7 +517,7 @@ cairou_icon_t cairou_icon_from_string(const char* icon);
  * These values correspond to: top-left, top-right, bottom-right, and bottom-left corners.
  * By default (when using NULL), all four corners are rounded.
  **/
-cairo_bool_t cairou_rounded_rectangle(
+cairo_bool_t cairou_rectangle(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -570,78 +527,244 @@ cairo_bool_t cairou_rounded_rectangle(
 	const cairo_bool_t* corners
 );
 
+#if 0
 /**
- * cairou_rounded_rectangle_apply:
- * @cr: a Cairo context
- * @x: the x coordinate
- * @y: the y coordinate
- * @width: the width value
- * @height: the height value
- * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL
+ * cairou_object_t:
+ * @CAIROU_OBJECT_TRIANGLE: draws a triangle, using a single size value for the radius. The object
+ * is drawn in the traditional "pointing up" position.
+ * @CAIROU_OBJECT_RECTANGLE: draws a rectangle using the specified width and height values.
+ * @CAIROU_OBJECT_ROUNDED_RECTANGLE: draws a rounded rectangle using the specified width, height and
+ * radius values. An optional array of 4 cairo_bool_t values can be specified indicating whether or
+ * not a corner should (or should not) be rounded, corresponding to: top-left, top-right,
+ * bottom-right, and bottom-left corners. By default all four corners are rounded.
+ * @CAIROU_OBJECT_SQUARE: draws a square, using a single size value for both width and height.
+ * @CAIROU_OBJECT_CIRCLE: draws a complete circular arc, using a single size value for the radius.
  *
- * This function, whose signature is identical to cairou_rounded_rectangle,
- * applies the resultant rounded rectangle and "punches out" the edges of the
- * context passed in as @cr. This can be thougt of as applying a "border" to an
- * existing context/surface, almost like a traditional picture.
+ * The #cairou_object_t enum is used to amalgamate a group of drawing options
+ * into a single operation. The functions that accept a #cairou_object_t also
+ * accept a va_list of variable arguments, the number and type of which will depend
+ * on the current object enumeration.
+ *
+ * All drawing operations occur using an origin of 0, 0; therefore, users must
+ * manually translate before drawing (and this is almost always what you want anyways).
  **/
-cairo_bool_t cairou_rounded_rectangle_apply(
-	cairo_t* cr,
-	double x,
-	double y,
-	double width,
-	double height,
-	double radius,
-	const cairo_bool_t* corners
+typedef enum _cairou_object_t {
+	CAIROU_OBJECT_TRIANGLE,
+	CAIROU_OBJECT_RECTANGLE,
+	CAIROU_OBJECT_ROUNDED_RECTANGLE,
+	CAIROU_OBJECT_SQUARE,
+	CAIROU_OBJECT_PENTAGON,
+	CAIROU_OBJECT_HEXAGON,
+	CAIROU_OBJECT_OCTOGON,
+	CAIROU_OBJECT_CIRCLE
+} cairou_object_t;
+
+cairo_bool_t cairou_show_object(cairou_object_t object, ...);
+cairo_bool_t cairou_object_path(cairou_object_t object, ...);
+
+/* cairo_bool_t cairou_object_extents(cairou_object_t object, double* extents, ...); */
+
+/* TODO: Capture all "gettable" Cairo values and store them in this structure.
+typedef struct _cairou_state_t {
+	cairo_matrix_t font_matrix;
+	cairo_font_options_t* font_options;
+	cairo_font_face_t* font_face;
+	cairo_scaled_font_t* scaled_font;
+	cairo_operator_t op;
+	cairo_pattern_t* source;
+	double tolerance;
+	cairo_antialias_t antialias;
+	cairo_fill_rule_t fill_fule;
+	double line_width;
+	cairo_line_cap_t line_cap;
+	cairo_line_join_t line_join;
+	double miter_limit;
+	int dash_count;
+	double* dashes;
+	double* offset;
+	cairo_matrix_t matrix;
+} cairou_state_t; */
+
+/* cairo_save();
+	cairo_translate();
+	cairo_stuff();
+cairo_restore();
+
+cairou_save(CAIROU_STATE_TRANSLATE, 0.0, 0.0, 0.0);
+cairou_restore();
+
+typedef enum _cairou_state_t {
+	CAIROU_STATE_TRANSLATE,
+	CAIROU_STATE_ROTATE,
+	CAIROU_STATE_SCALE,
+	CAIROU_STATE_
+} cairou_state_t; */
+
+/* cairo_bool_t cairou_save(...);
+ * cairo_tool_t cairou_restore(); */
+#endif
+
+/**
+ * cairou_grid_t:
+ * A #cairou_grid_t structure is an arrangement of squares (coordinates), each of uniform size, most
+ * commonly created to either fill or fit within an existing, rectangular region. They can be
+ * tightly packed (when padding is NOT requested) or sparse (when padding is requested), and can be
+ * dynamically reinitialized at any point without concern.
+ *
+ * Since #cairou_grid_t structures are dynamically allocated, a thorough API is provided for
+ * interacting with them for most of the common operations.
+ **/
+typedef struct _cairou_grid_t cairou_grid_t;
+
+#if 0
+ * Furthermore, the width and height values represet each dimension relative to the origin. Thus,
+ * using the previous example and cell size of 5.0 (with no padding), the width of the grid becomes
+ * 50.0 (10 cell_columns * 5.0 cell_size) and the height becomes 25.0 (5 cell_rows * 5.0 cell_size).
+ * The ACTUAL extens of the grid, however, are twice this when accounting for the central origin.
+#endif
+
+/**
+ * cairou_grid_option_t:
+ * @CAIROU_GRID_OPTION_PADDING: the amount of uniform padding to use between coordinate cells,
+ * defined as a single double. The default padding value is 0.
+ * @CAIROU_GRID_OPTION_ORIGIN: the X/Y grid cell coordinate to be used as the origin, defined as two
+ * integers. The default origin is (0, 0). The grid's cell coordinates are always referred to as
+ * relative to the origin. For example, if a #cairou_grid_t is created using 10 rows and 20 columns,
+ * the top-left coordinate becomes (-10, -5), the top-right (10, -5), etc.
+ * @CAIROU_GRID_OPTION_MATRIX: the matrix instance to use when drawing, defined as a pointer to an
+ * existing #cairou_matrix_t. The passed-in matrix data WILL be copied, making it safe to delete the
+ * original matrix if necessary.
+ *
+ * The #cairou_grid_option_t enumeration defines a number of sentinel flags that are used during
+ * #cairou_grid_t creation (implemented as the @options parameter of those functions). Each value
+ * expects 1 or more subsequent values to follow, and an @options list is always terminated with
+ * NULL.
+ *
+ * Note: while there are currently only a small number #cairou_grid_option_t enumerations, there
+ * will likely be more in the future; thus, leading to this more future-proof--but slightly
+ * wonky--API decision.
+ **/
+typedef enum _cairou_grid_option_t {
+	CAIROU_GRID_OPTION_PADDING = 1,
+	CAIROU_GRID_OPTION_ORIGIN,
+	CAIROU_GRID_OPTION_MATRIX
+} cairou_grid_option_t;
+
+/**
+ * cairou_grid_create:
+ * @rows: the number of horizontal (left-to-right) cells
+ * @cols: the number of vertical (top-to-bottom) cells
+ * @size: the uniform size of each grid cell
+ * @options: a variable, NULL-terminated list of #cairou_grid_option_t enums and their appropriate
+ * parameters; see the #cairou_grid_option_t documention for me help
+ *
+ * This is the basic #cairou_grid_t creation function. It requires the user to know both the
+ * dimensions and size of the coordinate cells beforehand.
+ **/
+cairou_grid_t* cairou_grid_create(
+	int rows,
+	int cols,
+	double size,
+	cairou_grid_option_t options,
+	...
 );
 
 /**
- * cairou_rounded_rectangle_center:
- * @cr: a Cairo context
- * @x: the center x coordinate
- * @y: the center y coordinate
- * @width: the width value, equal to the left and right of the @x position
- * @height: the height value, equal above and below the @y position
- * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL
- *
- * This function creates a common rounded-rectangle shape similar to the normal
- * @cairou_rounded_rectangle function above, except that the @x and @y coordinates
- * specify the center of the shape and the @width and @height represent the equidistant
- * lenghts from the center. The remaining parameters behave as in @cairo_rounded_rectangle.
+ * cairou_grid_create_for_rows_cols:
+ * @rows: the number of horizontal cells
+ * @cols: the number of vertical cells
+ * @width: the horizontal size constraint to be "filled" during creation
+ * @height: the vertical size constraint to be "filled" during creation
+ * @options: a variable, NULL-terminated list of #cairou_grid_option_t enums and their appropriate
+ * parameters; see the #cairou_grid_option_t documention for me help
  **/
-cairo_bool_t cairou_rounded_rectangle_center(
-	cairo_t* cr,
-	double x,
-	double y,
+cairou_grid_t* cairou_grid_create_for_rows_cols(
+	int rows,
+	int cols,
 	double width,
 	double height,
-	double radius,
-	const cairo_bool_t* corners
+	cairou_grid_option_t options,
+	...
 );
 
 /**
- * cairou_rounded_rectangle_center_apply:
- * @cr: a Cairo context
- * @x: the center x coordinate
- * @y: the center y coordinate
- * @width: the width value, equal to the left and right of the @x position
- * @height: the height value, equal above and below the @y position
- * @radius: the radius of each arc
- * @corners: a 4-value cairo_bool_t array, or NULL
- *
- * Behaves exactly as @cairou_rounded_rectangle_apply, with sizing and positioning
- * parameters behaving as they do in @cairou_rounded_rectangle_center.
+ * cairou_grid_create_for_size:
+ * @size: the uniform size of each grid cell
+ * @width: the horizontal size constraint to be "filled" during creation
+ * @height: the vertical size constraint to be "filled" during creation
+ * @options: a variable, NULL-terminated list of #cairou_grid_option_t enums and their appropriate
+ * parameters; see the #cairou_grid_option_t documention for me help
  **/
-cairo_bool_t cairou_rounded_rectangle_center_apply(
-	cairo_t* cr,
-	double x,
-	double y,
+cairou_grid_t* cairou_grid_create_for_size(
+	double size,
 	double width,
 	double height,
-	double radius,
-	const cairo_bool_t* corners
+	cairou_grid_option_t options,
+	...
 );
+
+/**
+ * cairou_grid_destroy:
+ * @grid: a valid #cairou_grid_t pointer
+ *
+ * Deletes the memory allocated for the passed-in #cairou_grid_t instance.
+ **/
+void cairou_grid_destroy(cairou_grid_t* grid);
+
+/**
+ * cairou_grid_get_rows:
+ * @grid: a valid #cairou_grid_t pointer
+ *
+ * Returns the number of vertical rows for the passed-in #cairou_grid_t instance.
+ **/
+int cairou_grid_get_rows(cairou_grid_t* grid);
+
+/**
+ * cairou_grid_get_cols:
+ * @grid: a valid #cairou_grid_t pointer
+ *
+ * Returns the number of horizontal columns for the passed-in #cairou_grid_t instance.
+ **/
+int cairou_grid_get_cols(cairou_grid_t* grid);
+
+/**
+ * cairou_grid_get_size:
+ * @grid: a valid #cairou_grid_t pointer
+ *
+ * Returns the uniform size of each cell for the passed-in #cairou_grid_t instance.
+ **/
+double cairou_grid_get_size(cairou_grid_t* grid);
+
+/**
+ * cairou_grid_get_options:
+ * @grid: a valid #cairou_grid_t pointer
+ * @options:
+ *
+ * Returns the number of rows for the passed-in #cairou_grid_t instance.
+ **/
+void cairou_grid_get_options(cairou_grid_t* grid, cairou_grid_option_t options, ...);
+
+/**
+ * cairou_grid_set_options:
+ * @grid: a valid #cairou_grid_t pointer
+ *
+ * Returns the number of rows for the passed-in #cairou_grid_t instance.
+ **/
+void cairou_grid_set_options(cairou_grid_t* grid, cairou_grid_option_t options, ...);
+
+/*
+ * cairou_grid_extents(cairou_grid_t* grid, double* extents);
+ * cairou_grid_cell_extents(cairou_grid_t* grid, int row, int col, double* extents);
+ * cairou_grid_intersect(cairou_grid_t* grid, double x, double y);
+ * cairou_show_grid
+ * cairou_grid_path
+ **/
+
+/* These math helper routines don't have the cairou_* prefix. */
+double slope(double x0, double y0, double x1, double y1);
+double y_intercept(double x0, double y0, double x1, double y1);
+double y_intercept_m(double x, double y, double m);
+double slope_intercept(double x, double y, double m, double b);
 
 #ifdef __cplusplus
 }

@@ -3,13 +3,13 @@
 #include <math.h>
 #include <stdlib.h>
 
-/* This code was written by the fantastic Behdad Esfahbod from the cairotwisted.c
- * file in Pango. Thanks Behdad! P. S. Don't send me any questions about this code,
- * as I only know how to USE it, and I have NO IDEA how it actually works. :) */
+/* This code was written by the fantastic Behdad Esfahbod from the cairotwisted.c file in Pango.
+ * Thanks Behdad! */
 
-/* Returns Euclidean distance between two points */
-static double two_points_distance(cairo_path_data_t* a, cairo_path_data_t* b) {
-	double dx, dy;
+/* Returns Euclidean distance between two points. */
+static double _distance(cairo_path_data_t* a, cairo_path_data_t* b) {
+	double dx;
+	double dy;
 
 	dx = b->point.x - a->point.x;
 	dy = b->point.y - a->point.y;
@@ -17,9 +17,9 @@ static double two_points_distance(cairo_path_data_t* a, cairo_path_data_t* b) {
 	return sqrt(dx * dx + dy * dy);
 }
 
-/* Returns length of a Bezier curve. Seems like computing that analytically is not easy. The
- * code just flattens the curve using cairo and adds the length of segments. */
-static double curve_length(
+/* Returns length of a Bezier curve. Seems like computing that analytically is not easy. The code
+ * just flattens the curve using cairo and adds the length of segments. */
+static double _curve_length(
 	double x0,
 	double y0,
 	double x1,
@@ -56,7 +56,7 @@ static double curve_length(
 			break;
 
 		case CAIRO_PATH_LINE_TO:
-			length += two_points_distance(&current_point, &data[1]);
+			length += _distance(&current_point, &data[1]);
 			current_point = data[1];
 
 			break;
@@ -72,12 +72,9 @@ static double curve_length(
 	return length;
 }
 
-typedef double parametrization_t;
-
-/* Compute parametrization info. That is, for each part of the cairo path, tags it with
- * its length. */
-static parametrization_t* parametrize_path(cairo_path_t* path) {
-	parametrization_t* parametrization = 0;
+/* Compute parametrization info; for each part of the cairo path, tags it with its length. */
+static double* _parametrize_path(cairo_path_t* path) {
+	double* parametrization = 0;
 	cairo_path_data_t* data = 0;
 	cairo_path_data_t last_move_to;
 	cairo_path_data_t current_point;
@@ -86,7 +83,7 @@ static parametrization_t* parametrize_path(cairo_path_t* path) {
 	current_point.point.x = 0.0;
 	current_point.point.y = 0.0;
 
-	parametrization = (parametrization_t*)malloc(path->num_data * sizeof(parametrization[0]));
+	parametrization = (double*)malloc(path->num_data * sizeof(parametrization[0]));
 
 	for(i = 0; i < path->num_data; i += path->data[i].header.length) {
 		data = &path->data[i];
@@ -104,13 +101,13 @@ static parametrization_t* parametrize_path(cairo_path_t* path) {
 			data = (&last_move_to) - 1;
 
 		case CAIRO_PATH_LINE_TO:
-			parametrization[i] = two_points_distance(&current_point, &data[1]);
+			parametrization[i] = _distance(&current_point, &data[1]);
 			current_point = data[1];
 
 			break;
 
 		case CAIRO_PATH_CURVE_TO:
-			parametrization[i] = curve_length(
+			parametrization[i] = _curve_length(
 				current_point.point.x, current_point.point.x,
 				data[1].point.x, data[1].point.y,
 				data[2].point.x, data[2].point.y,
@@ -126,11 +123,11 @@ static parametrization_t* parametrize_path(cairo_path_t* path) {
 	return parametrization;
 }
 
-typedef void (*transform_point_func_t) (void *closure, double *x, double *y);
+typedef void (*transform_point_func_t)(void* closure, double* x, double* y);
 
-/* Project a path using a function. Each point of the path (including  Bezier control
- * points) is passed to the function for transformation. */
-static void transform_path(cairo_path_t* path, transform_point_func_t f, void* closure) {
+/* Project a path using a function. Each point of the path (including Bezier control points) are
+ * passed to the function for transformation. */
+static void _transform_path(cairo_path_t* path, transform_point_func_t func, void* closure) {
 	cairo_path_data_t* data;
 	int i;
 
@@ -139,12 +136,12 @@ static void transform_path(cairo_path_t* path, transform_point_func_t f, void* c
 
 		switch(data->header.type) {
 		case CAIRO_PATH_CURVE_TO:
-			f(closure, &data[3].point.x, &data[3].point.y);
-			f(closure, &data[2].point.x, &data[2].point.y);
+			func(closure, &data[3].point.x, &data[3].point.y);
+			func(closure, &data[2].point.x, &data[2].point.y);
 
 		case CAIRO_PATH_MOVE_TO:
 		case CAIRO_PATH_LINE_TO:
-			f(closure, &data[1].point.x, &data[1].point.y);
+			func(closure, &data[1].point.x, &data[1].point.y);
 
 			break;
 
@@ -156,24 +153,23 @@ static void transform_path(cairo_path_t* path, transform_point_func_t f, void* c
 
 typedef struct {
 	cairo_path_t* path;
-	parametrization_t* parametrization;
+	double* parametrization;
 } parametrized_path_t;
 
-/* Project a point X,Y onto a parameterized path. The final point is
- * where you get if you walk on the path forward from the beginning for X
- * units, then stop there and walk another Y units perpendicular to the
- * path at that point. In more detail:
+/* Project a point X,Y onto a parametrized path. The final point is where you get if you walk on the
+ * path forward from the beginning for X units, then stop there and walk another Y units
+ * perpendicular to the path at that point. In more detail:
  *
- * There's three pieces of math involved:
+ * There are three pieces of math involved:
  *
  *   - The parametric form of the Line equation
- *     http: *en.wikipedia.org/wiki/Line
+ *     http://en.wikipedia.org/wiki/Line
  *
  *   - The parametric form of the Cubic Bézier curve equation
- *     http: *en.wikipedia.org/wiki/B%C3%A9zier_curve
+ *     http://en.wikipedia.org/wiki/B%C3%A9zier_curve
  *
  *   - The Gradient (aka multi-dimensional derivative) of the above
- *     http: *en.wikipedia.org/wiki/Gradient
+ *     http://en.wikipedia.org/wiki/Gradient
  *
  * The parametric forms are used to answer the question of "where will I be
  * if I walk a distance of X on this path". The Gradient is used to answer
@@ -181,14 +177,14 @@ typedef struct {
  * degrees and walk straight for a distance of Y". */
 static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	double ratio;
-	double the_y = *y;
-	double the_x = *x;
+	double yy = *y;
+	double xx = *x;
 	double dx;
 	double dy;
 	int i;
 
 	cairo_path_t* path = param->path;
-	parametrization_t* parametrization = param->parametrization;
+	double* parametrization = param->parametrization;
 	cairo_path_data_t* data;
 	cairo_path_data_t last_move_to;
 	cairo_path_data_t current_point;
@@ -199,10 +195,10 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	for(
 		i = 0;
 		i + path->data[i].header.length < path->num_data &&
-		(the_x > parametrization[i] || path->data[i].header.type == CAIRO_PATH_MOVE_TO);
+		(xx > parametrization[i] || path->data[i].header.type == CAIRO_PATH_MOVE_TO);
 		i += path->data[i].header.length
 	) {
-		the_x -= parametrization[i];
+		xx -= parametrization[i];
 		data = &path->data[i];
 
 		switch(data->header.type) {
@@ -238,7 +234,8 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		data = (&last_move_to) - 1;
 
 	case CAIRO_PATH_LINE_TO:
-		ratio = the_x / parametrization[i];
+		ratio = xx / parametrization[i];
+
 		/* Line polynomial */
 		*x = current_point.point.x * (1 - ratio) + data[1].point.x * ratio;
 		*y = current_point.point.y * (1 - ratio) + data[1].point.y * ratio;
@@ -247,19 +244,18 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		dx = -(current_point.point.x - data[1].point.x);
 		dy = -(current_point.point.y - data[1].point.y);
 
-		/* optimization for: ratio = the_y / sqrt (dx * dx + dy * dy); */
-		ratio = the_y / parametrization[i];
+		/* optimization for: ratio = yy / sqrt (dx * dx + dy * dy); */
+		ratio = yy / parametrization[i];
 		*x += -dy * ratio;
 		*y += dx * ratio;
 
 		break;
 
 	case CAIRO_PATH_CURVE_TO: {
-		/* FIXME the formulas here are not exactly what we want, because the
-		 * Bezier parametrization is not uniform. But I don't know how to do
-		 * better. The caller can do slightly better though, by flattening the
-		 * Bezier and avoiding this branch completely. That has its own cost
-		 * though, as large y values magnify the flattening error drastically. */
+		/* FIXME: The formulas here are not exactly what we want, because the Bezier parametrization
+		 * is not uniform. But I don't know how to do better. The caller can do slightly better
+		 * though, by flattening the Bezier and avoiding this branch completely. That has its own
+		 * cost though, as large y values magnify the flattening error drastically. */
 
 		double ratio_1_0;
 		double ratio_0_1;
@@ -272,7 +268,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 		double _1__4ratio_1_0_3ratio_2_0;
 		double _2ratio_1_0_3ratio_2_0;
 
-		ratio = the_x / parametrization[i];
+		ratio = xx / parametrization[i];
 		ratio_1_0 = ratio;
 		ratio_0_1 = 1 - ratio;
 		ratio_2_0 = ratio_1_0 * ratio_1_0;
@@ -311,7 +307,7 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 			+ 3 * data[3].point.y * ratio_2_0
 		;
 
-		ratio = the_y / sqrt(dx * dx + dy * dy);
+		ratio = yy / sqrt(dx * dx + dy * dy);
 		*x += -dy * ratio;
 		*y += dx * ratio;
 
@@ -320,21 +316,21 @@ static void point_on_path(parametrized_path_t* param, double* x, double* y) {
 	}
 }
 
-cairo_bool_t cairou_map_path_onto(cairo_t* cr, cairo_path_t* path) {
-	cairo_path_t* cur_path = 0;
+void cairou_map_path_onto(cairo_t* cr, cairo_path_t* path) {
+	cairo_path_t* cur_path = NULL;
 
 	parametrized_path_t param;
 
-	if(cairo_status(cr) || !path) return FALSE;
+	/* if(cairo_status(cr) || !path) return FALSE; */
 
 	cur_path = cairo_copy_path(cr);
 
 	param.path = path;
-	param.parametrization = parametrize_path(path);
+	param.parametrization = _parametrize_path(path);
 
 	cairo_new_path(cr);
 
-	transform_path(
+	_transform_path(
 		cur_path,
 		(transform_point_func_t)(point_on_path),
 		&param
@@ -345,7 +341,5 @@ cairo_bool_t cairou_map_path_onto(cairo_t* cr, cairo_path_t* path) {
 	free(param.parametrization);
 
 	cairo_path_destroy(cur_path);
-
-	return TRUE;
 }
 

@@ -4,7 +4,7 @@
 
 static const cairo_bool_t _cairou_default_corners[4] = { TRUE, TRUE, TRUE, TRUE };
 
-cairo_bool_t cairou_rounded_rectangle(
+cairo_bool_t cairou_rectangle(
 	cairo_t* cr,
 	double x,
 	double y,
@@ -13,7 +13,7 @@ cairo_bool_t cairou_rounded_rectangle(
 	double radius,
 	const cairo_bool_t* corners
 ) {
-	if(cairo_status(cr)) return FALSE;
+	/* if(cairo_status(cr)) return FALSE; */
 
 	if(!corners) corners = _cairou_default_corners;
 
@@ -87,6 +87,7 @@ cairo_bool_t cairou_rounded_rectangle(
 	return TRUE;
 }
 
+#if 0
 cairo_bool_t cairou_rounded_rectangle_apply(
 	cairo_t* cr,
 	double x,
@@ -160,4 +161,5 @@ cairo_bool_t cairou_rounded_rectangle_center_apply(
 
 	return TRUE;
 }
+#endif
 
