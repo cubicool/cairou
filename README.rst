@@ -172,11 +172,15 @@ TODO
 Future Enhancements
 *******************
 
+.. _smooth curves: https://pythoninformer.com/python-libraries/pycairo/bezier-curves/
 .. _Harfbuzz: http://www.harbuzz.org
 .. _CairoGL/SDL2: https://github.com/cubicool/cairo-gl-sdl2
 .. _Glyphy: https://www.glyphy.org
 .. _Clutter: https://blogs.gnome.org/clutter
 .. _Graphene: http://ebassi.github.io/graphene
+
+#. Implement a wrapper API for creating `smooth curves`_, as discussed at that
+   link (and enforcing the "matching coordinates" rule).
 
 #. **BETTER TEST COVERAGE!**
 
