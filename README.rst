@@ -17,8 +17,8 @@ libGLU was for traditional OpenGL.
 Overview
 ========
 
-.. _named-path: https://github.com/cubicool/cairou/blob/master/src/named-path.cpp
-.. _text: https://github.com/cubicool/cairou/blob/master/src/text.cpp
+.. _named-path: https://github.com/cubicool/cairou/blob/master/src/cairou-named-path.cpp
+.. _text: https://github.com/cubicool/cairou/blob/master/src/cairou-text.cpp
 
 Cairou (Cairo Utility) was born from a common codebase I continually ended up
 copying from project to project. Instead of trying to keep these different
